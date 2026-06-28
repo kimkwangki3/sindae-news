@@ -105,7 +105,7 @@ export default async function MePage() {
       {/* 바로가기 */}
       <section className="mt-6 overflow-hidden rounded-card border border-line bg-white">
         {writeAllowed && (
-          <MeLink href="/articles" label="기사 작성" icon="✍️" />
+          <MeLink href="/reporter" label="기자 공간" icon="✍️" />
         )}
         <MeLink href="/market" label="내 나눔글" icon="🤝" />
         <MeLink href="/board" label="내 게시글" icon="💬" />
