@@ -1,17 +1,24 @@
 "use server";
 
 import { createClient } from "./supabase/server";
+import { getCurrentUser } from "./auth";
 
 export interface AdRequestState {
   ok?: boolean;
   error?: string;
 }
 
-// 배너 광고 신청 — 관리자 확인·승인 후 게재. ad_requests insert(status=pending).
+// 배너 광고 신청 — 로그인 + 업체 등록 회원만. 관리자 확인·승인 후 게재.
 export async function submitAdRequest(
   _prev: AdRequestState,
   formData: FormData,
 ): Promise<AdRequestState> {
+  // 로그인 + 업체 등록 가드(UI와 이중)
+  const user = await getCurrentUser();
+  if (!user) return { error: "로그인이 필요합니다." };
+  if (!user.business)
+    return { error: "업체 등록을 한 회원만 광고를 신청할 수 있습니다." };
+
   const advertiser = String(formData.get("advertiser") ?? "").trim();
   const contact = String(formData.get("contact") ?? "").trim();
   const position = String(formData.get("position") ?? "").trim();
