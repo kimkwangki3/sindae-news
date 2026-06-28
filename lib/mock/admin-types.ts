@@ -109,3 +109,24 @@ export interface AdminTipRow {
   status: TipStatus;
   createdAt: string;
 }
+
+// --- 상권/업체 · 지역단체 (승인형) ---
+export type ApprovalKind = "business" | "org";
+export type ApprovalStatus = "pending" | "approved" | "rejected";
+
+export interface AdminEntityRow {
+  id: string;
+  name: string;
+  category: string;
+  status: ApprovalStatus;
+  sub: string; // 업체=대표·연락처 / 단체=대표·회원수
+  createdAt: string;
+}
+
+export interface AdminPromoRow {
+  id: string;
+  title: string;
+  business: string;
+  status: ApprovalStatus;
+  createdAt: string;
+}

@@ -39,6 +39,13 @@ const GROUPS: Group[] = [
     ],
   },
   {
+    title: "상권·단체",
+    items: [
+      { href: "/admin/business", label: "상권/업체", badge: "pendingBusiness" },
+      { href: "/admin/orgs", label: "지역단체", badge: "pendingOrg" },
+    ],
+  },
+  {
     title: "광고",
     items: [{ href: "/admin/ads", label: "광고 관리" }],
   },

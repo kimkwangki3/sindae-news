@@ -4,7 +4,13 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./auth";
 import { createServiceClient } from "./supabase/server";
 import { logAdmin } from "./audit";
-import type { PostKind, PostVisibility, TipStatus } from "./mock/admin-types";
+import type {
+  PostKind,
+  PostVisibility,
+  TipStatus,
+  ApprovalKind,
+  ApprovalStatus,
+} from "./mock/admin-types";
 
 async function assertAdmin() {
   const user = await getCurrentUser();
@@ -92,4 +98,62 @@ export async function setTipStatus(
     memo: status,
   });
   revalidatePath("/admin/tips");
+}
+
+// --- 상권/업체 · 지역단체 승인 ---
+const ENTITY_TABLE: Record<ApprovalKind, string> = {
+  business: "businesses",
+  org: "organizations",
+};
+const ENTITY_PATH: Record<ApprovalKind, string> = {
+  business: "/admin/business",
+  org: "/admin/orgs",
+};
+
+// 업체/단체 승인·반려
+export async function setEntityStatus(
+  kind: ApprovalKind,
+  id: string,
+  status: ApprovalStatus,
+): Promise<void> {
+  const admin = await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase
+    .from(ENTITY_TABLE[kind])
+    .update({ status, reviewed_by: admin.id })
+    .eq("id", id);
+  await logAdmin("set_entity_status", {
+    targetType: kind,
+    targetId: id,
+    memo: status,
+  });
+  revalidatePath(ENTITY_PATH[kind]);
+}
+
+// 업체/단체 삭제
+export async function deleteEntity(
+  kind: ApprovalKind,
+  id: string,
+): Promise<void> {
+  await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase.from(ENTITY_TABLE[kind]).delete().eq("id", id);
+  await logAdmin("delete_entity", { targetType: kind, targetId: id });
+  revalidatePath(ENTITY_PATH[kind]);
+}
+
+// 홍보글 승인·반려
+export async function setPromoStatus(
+  id: string,
+  status: ApprovalStatus,
+): Promise<void> {
+  await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase.from("promo_posts").update({ status }).eq("id", id);
+  await logAdmin("set_promo_status", {
+    targetType: "promo",
+    targetId: id,
+    memo: status,
+  });
+  revalidatePath("/admin/business");
 }

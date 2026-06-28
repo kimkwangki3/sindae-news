@@ -17,6 +17,10 @@ import type {
   AdminPostRow,
   TipStatus,
   AdminTipRow,
+  ApprovalKind,
+  ApprovalStatus,
+  AdminEntityRow,
+  AdminPromoRow,
 } from "@/lib/mock/admin-types";
 
 export type {
@@ -39,6 +43,10 @@ export type {
   AdminPostRow,
   TipStatus,
   AdminTipRow,
+  ApprovalKind,
+  ApprovalStatus,
+  AdminEntityRow,
+  AdminPromoRow,
 } from "@/lib/mock/admin-types";
 
 function embeddedCount(v: unknown): number {
@@ -62,20 +70,26 @@ export interface AdminQueueCounts {
   pendingArticles: number;
   pendingReports: number;
   newTips: number;
+  pendingBusiness: number;
+  pendingOrg: number;
 }
 
 export async function getAdminQueueCounts(): Promise<AdminQueueCounts> {
   const supabase = createServiceClient();
   const head = { count: "exact" as const, head: true };
-  const [a, r, t] = await Promise.all([
+  const [a, r, t, b, o] = await Promise.all([
     supabase.from("articles").select("*", head).eq("status", "pending"),
     supabase.from("reports").select("*", head).eq("status", "pending"),
     supabase.from("tips").select("*", head).eq("status", "pending"),
+    supabase.from("businesses").select("*", head).eq("status", "pending"),
+    supabase.from("organizations").select("*", head).eq("status", "pending"),
   ]);
   return {
     pendingArticles: a.count ?? 0,
     pendingReports: r.count ?? 0,
     newTips: t.count ?? 0,
+    pendingBusiness: b.count ?? 0,
+    pendingOrg: o.count ?? 0,
   };
 }
 
@@ -408,6 +422,71 @@ export async function getAdSlots(): Promise<AdSlotOption[]> {
   return (data ?? []).map((r) => {
     const row = r as { id: number; label: string };
     return { id: row.id, label: row.label };
+  });
+}
+
+// --- 상권/업체 · 지역단체 (승인형) -----------------------------------
+export async function getAdminEntities(
+  kind: ApprovalKind,
+  filter: "all" | ApprovalStatus = "all",
+): Promise<AdminEntityRow[]> {
+  const supabase = createServiceClient();
+  if (kind === "business") {
+    let q = supabase
+      .from("businesses")
+      .select("id, name, category, status, phone, created_at, owner:profiles(nickname)")
+      .order("created_at", { ascending: false });
+    if (filter !== "all") q = q.eq("status", filter);
+    const { data } = await q;
+    return (data ?? []).map((r) => {
+      const row = r as Record<string, unknown>;
+      return {
+        id: row.id as string,
+        name: row.name as string,
+        category: (row.category as string) ?? "",
+        status: row.status as ApprovalStatus,
+        sub: `${postAuthor(row.owner)} · ${(row.phone as string) ?? "-"}`,
+        createdAt: fmtDateTime(row.created_at as string),
+      };
+    });
+  }
+  let q = supabase
+    .from("organizations")
+    .select("id, name, category, status, created_at, owner:profiles(nickname), org_members(count)")
+    .order("created_at", { ascending: false });
+  if (filter !== "all") q = q.eq("status", filter);
+  const { data } = await q;
+  return (data ?? []).map((r) => {
+    const row = r as Record<string, unknown>;
+    return {
+      id: row.id as string,
+      name: row.name as string,
+      category: (row.category as string) ?? "",
+      status: row.status as ApprovalStatus,
+      sub: `${postAuthor(row.owner)} · 회원 ${embeddedCount(row.org_members)}`,
+      createdAt: fmtDateTime(row.created_at as string),
+    };
+  });
+}
+
+// 홍보글 승인 대기(업체 홍보글은 승인돼야 공개)
+export async function getPendingPromos(): Promise<AdminPromoRow[]> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("promo_posts")
+    .select("id, title, status, created_at, business:businesses(name)")
+    .eq("status", "pending")
+    .order("created_at", { ascending: false })
+    .limit(100);
+  return (data ?? []).map((r) => {
+    const row = r as Record<string, unknown>;
+    return {
+      id: row.id as string,
+      title: row.title as string,
+      business: (row.business as { name?: string } | null)?.name ?? "(업체)",
+      status: row.status as ApprovalStatus,
+      createdAt: fmtDateTime(row.created_at as string),
+    };
   });
 }
 
