@@ -68,7 +68,7 @@ create policy profile_update on profiles
 revoke select on profiles from anon, authenticated;
 grant select (
   id, nickname, nickname_set_at, neighborhood, avatar_url,
-  role, is_suspended, deleted_at, created_at
+  role, reporter_level, is_suspended, deleted_at, created_at
 ) on profiles to anon, authenticated;
 
 -- ---------------------------------------------------------------------
