@@ -22,6 +22,12 @@ export default function TopBar() {
         >
           ✍ 기자모집
         </Link>
+        <Link
+          href="/tips"
+          className="rounded-full border border-[#EAD2D8] bg-rose-soft px-2.5 py-1 text-[11px] font-bold text-rose-deep"
+        >
+          📣 기사제보
+        </Link>
       </div>
       <div className="flex items-center gap-3.5 text-lg">
         <button
