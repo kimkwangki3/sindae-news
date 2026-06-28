@@ -10,6 +10,7 @@ import type {
   TipStatus,
   ApprovalKind,
   ApprovalStatus,
+  ReporterLevel,
 } from "./mock/admin-types";
 
 async function assertAdmin() {
@@ -156,4 +157,61 @@ export async function setPromoStatus(
     memo: status,
   });
   revalidatePath("/admin/business");
+}
+
+// --- 기자 신청 승인/반려 ---
+// 승인: 신청 status=approved + (연결된 user_id가 있으면) 해당 회원을 reporter+등급 지정
+export async function approveReporterApp(
+  appId: string,
+  userId: string | null,
+  level: ReporterLevel,
+): Promise<void> {
+  const admin = await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase
+    .from("reporter_applications")
+    .update({ status: "approved", reviewed_by: admin.id })
+    .eq("id", appId);
+  if (userId) {
+    await supabase
+      .from("profiles")
+      .update({ role: "reporter", reporter_level: level })
+      .eq("id", userId);
+  }
+  await logAdmin("approve_reporter_app", {
+    targetType: "reporter_application",
+    targetId: appId,
+    memo: level,
+  });
+  revalidatePath("/admin/reporters");
+}
+
+export async function rejectReporterApp(appId: string): Promise<void> {
+  const admin = await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase
+    .from("reporter_applications")
+    .update({ status: "rejected", reviewed_by: admin.id })
+    .eq("id", appId);
+  await logAdmin("reject_reporter_app", {
+    targetType: "reporter_application",
+    targetId: appId,
+  });
+  revalidatePath("/admin/reporters");
+}
+
+// --- 정정보도 처리 ---
+export async function setCorrectionStatus(
+  id: string,
+  status: ApprovalStatus,
+): Promise<void> {
+  await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase.from("corrections").update({ status }).eq("id", id);
+  await logAdmin("set_correction_status", {
+    targetType: "correction",
+    targetId: id,
+    memo: status,
+  });
+  revalidatePath("/admin/corrections");
 }

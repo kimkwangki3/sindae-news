@@ -34,12 +34,18 @@ export default function ArticleManager({
 }) {
   const [rows, setRows] = useState(initial);
   const [filter, setFilter] = useState<Filter>("all");
+  const [query, setQuery] = useState("");
   const [, startTransition] = useTransition();
 
-  const shown = useMemo(
-    () => (filter === "all" ? rows : rows.filter((r) => r.status === filter)),
-    [rows, filter],
-  );
+  const shown = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return rows.filter((r) => {
+      if (filter !== "all" && r.status !== filter) return false;
+      if (q && !(`${r.title} ${r.author ?? ""}`.toLowerCase().includes(q)))
+        return false;
+      return true;
+    });
+  }, [rows, filter, query]);
 
   function toggleStatus(slug: string) {
     setRows((prev) =>
@@ -92,6 +98,14 @@ export default function ArticleManager({
             ＋ 새 기사
           </Link>
         }
+      />
+
+      {/* 검색 */}
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="제목·기자 검색"
+        className="mb-3 min-h-[44px] w-full rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose"
       />
 
       {/* 필터 칩 */}

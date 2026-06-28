@@ -25,7 +25,22 @@ const GROUPS: Group[] = [
   {
     title: "보도",
     items: [
-      { href: "/admin/articles", label: "기사 관리", badge: "pendingArticles" },
+      { href: "/admin/articles", label: "기사 관리" },
+      {
+        href: "/admin/articles/review",
+        label: "기사 승인 큐",
+        badge: "pendingArticles",
+      },
+      {
+        href: "/admin/reporters",
+        label: "기자 신청·관리",
+        badge: "pendingReporterApps",
+      },
+      {
+        href: "/admin/corrections",
+        label: "정정보도",
+        badge: "pendingCorrections",
+      },
     ],
   },
   {
@@ -67,10 +82,12 @@ export default function AdminNav({ counts }: { counts: AdminQueueCounts }) {
             {g.title}
           </p>
           {g.items.map((it) => {
+            // 정확 매칭(+편집기 등 하위경로는 부모를 활성표시).
             const active =
-              it.href === "/admin"
-                ? pathname === "/admin"
-                : pathname.startsWith(it.href);
+              pathname === it.href ||
+              (it.href !== "/admin" &&
+                it.href === "/admin/articles" &&
+                pathname.startsWith("/admin/articles/new"));
             const count = it.badge ? counts[it.badge] : 0;
             return (
               <Link

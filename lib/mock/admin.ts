@@ -21,6 +21,10 @@ import type {
   ApprovalStatus,
   AdminEntityRow,
   AdminPromoRow,
+  AdminReporterAppRow,
+  AdminReporterRow,
+  AdminCorrectionRow,
+  ReporterLevel,
 } from "@/lib/mock/admin-types";
 
 export type {
@@ -47,6 +51,9 @@ export type {
   ApprovalStatus,
   AdminEntityRow,
   AdminPromoRow,
+  AdminReporterAppRow,
+  AdminReporterRow,
+  AdminCorrectionRow,
 } from "@/lib/mock/admin-types";
 
 function embeddedCount(v: unknown): number {
@@ -72,17 +79,25 @@ export interface AdminQueueCounts {
   newTips: number;
   pendingBusiness: number;
   pendingOrg: number;
+  pendingReporterApps: number;
+  pendingCorrections: number;
 }
 
 export async function getAdminQueueCounts(): Promise<AdminQueueCounts> {
   const supabase = createServiceClient();
   const head = { count: "exact" as const, head: true };
-  const [a, r, t, b, o] = await Promise.all([
+  const [a, r, t, b, o, ra, c] = await Promise.all([
     supabase.from("articles").select("*", head).eq("status", "pending"),
     supabase.from("reports").select("*", head).eq("status", "pending"),
     supabase.from("tips").select("*", head).eq("status", "pending"),
     supabase.from("businesses").select("*", head).eq("status", "pending"),
     supabase.from("organizations").select("*", head).eq("status", "pending"),
+    supabase
+      .from("reporter_applications")
+      .select("*", head)
+      .eq("status", "pending"),
+    // corrections 테이블이 아직 없을 수 있어 best-effort
+    supabase.from("corrections").select("*", head).eq("status", "pending"),
   ]);
   return {
     pendingArticles: a.count ?? 0,
@@ -90,6 +105,8 @@ export async function getAdminQueueCounts(): Promise<AdminQueueCounts> {
     newTips: t.count ?? 0,
     pendingBusiness: b.count ?? 0,
     pendingOrg: o.count ?? 0,
+    pendingReporterApps: ra.count ?? 0,
+    pendingCorrections: c.count ?? 0,
   };
 }
 
@@ -484,6 +501,101 @@ export async function getPendingPromos(): Promise<AdminPromoRow[]> {
       id: row.id as string,
       title: row.title as string,
       business: (row.business as { name?: string } | null)?.name ?? "(업체)",
+      status: row.status as ApprovalStatus,
+      createdAt: fmtDateTime(row.created_at as string),
+    };
+  });
+}
+
+// --- 기자 신청·관리 --------------------------------------------------
+export async function getReporterApplications(
+  filter: "all" | ApprovalStatus = "all",
+): Promise<AdminReporterAppRow[]> {
+  const supabase = createServiceClient();
+  let q = supabase
+    .from("reporter_applications")
+    .select(
+      "id, user_id, name, phone, email, neighborhood, interests, motivation, pledge_agreed, status, created_at",
+    )
+    .order("created_at", { ascending: false });
+  if (filter !== "all") q = q.eq("status", filter);
+  const { data } = await q;
+  return (data ?? []).map((r) => {
+    const row = r as Record<string, unknown>;
+    return {
+      id: row.id as string,
+      userId: (row.user_id as string) ?? null,
+      name: row.name as string,
+      phone: (row.phone as string) ?? "-",
+      email: (row.email as string) ?? "-",
+      neighborhood: (row.neighborhood as string) ?? "-",
+      interests: Array.isArray(row.interests)
+        ? (row.interests as string[]).join(", ")
+        : "",
+      motivation: (row.motivation as string) ?? "",
+      pledged: Boolean(row.pledge_agreed),
+      status: row.status as ApprovalStatus,
+      createdAt: fmtDateTime(row.created_at as string),
+    };
+  });
+}
+
+// 활동 기자(role=reporter) + 작성 기사 수
+export async function getActiveReporters(): Promise<AdminReporterRow[]> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, nickname, reporter_level, created_at")
+    .eq("role", "reporter")
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false });
+
+  const rows = (data ?? []) as {
+    id: string;
+    nickname: string;
+    reporter_level: AdminReporterRow["level"];
+    created_at: string;
+  }[];
+
+  // 작성 기사 수(기자별 count)
+  return Promise.all(
+    rows.map(async (r) => {
+      const { count } = await supabase
+        .from("articles")
+        .select("*", { count: "exact", head: true })
+        .eq("author_id", r.id);
+      return {
+        id: r.id,
+        nickname: r.nickname,
+        level: r.reporter_level ?? null,
+        articles: count ?? 0,
+        joinedAt: r.created_at.slice(0, 10).replace(/-/g, "."),
+      };
+    }),
+  );
+}
+
+// --- 정정보도 --------------------------------------------------------
+export async function getCorrections(
+  filter: "all" | ApprovalStatus = "all",
+): Promise<AdminCorrectionRow[]> {
+  const supabase = createServiceClient();
+  let q = supabase
+    .from("corrections")
+    .select("id, reason, body, status, created_at, article:articles(title)")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (filter !== "all") q = q.eq("status", filter);
+  const { data, error } = await q;
+  if (error) return []; // 테이블 미생성 시 안전
+  return (data ?? []).map((r) => {
+    const row = r as Record<string, unknown>;
+    return {
+      id: row.id as string,
+      articleTitle:
+        (row.article as { title?: string } | null)?.title ?? "(연결 기사 없음)",
+      reason: (row.reason as string) ?? "",
+      body: (row.body as string) ?? "",
       status: row.status as ApprovalStatus,
       createdAt: fmtDateTime(row.created_at as string),
     };

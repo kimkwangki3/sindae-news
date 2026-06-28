@@ -130,3 +130,36 @@ export interface AdminPromoRow {
   status: ApprovalStatus;
   createdAt: string;
 }
+
+// --- 기자 신청·관리 ---
+export interface AdminReporterAppRow {
+  id: string;
+  userId: string | null;
+  name: string;
+  phone: string;
+  email: string;
+  neighborhood: string;
+  interests: string;
+  motivation: string;
+  pledged: boolean;
+  status: ApprovalStatus;
+  createdAt: string;
+}
+
+export interface AdminReporterRow {
+  id: string;
+  nickname: string;
+  level: ReporterLevel | null;
+  articles: number;
+  joinedAt: string;
+}
+
+// --- 정정보도 ---
+export interface AdminCorrectionRow {
+  id: string;
+  articleTitle: string;
+  reason: string;
+  body: string;
+  status: ApprovalStatus;
+  createdAt: string;
+}
