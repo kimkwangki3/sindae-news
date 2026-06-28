@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { createClient } from "./supabase/server";
 import { DEMO_COOKIE, getDemoUser } from "./mock/auth";
@@ -13,7 +14,8 @@ export function isDemoMode(): boolean {
 
 // 현재 로그인 사용자의 통합 신원(프로필 + 업체 + 단체 소속)을 서버에서 조회.
 // 비로그인이면 null. 권한 판정(can())에 그대로 넘긴다.
-export async function getCurrentUser(): Promise<CurrentUser | null> {
+// cache(): 한 요청 렌더 안에서 여러 번 호출돼도 실제 조회는 1회만(중복 인증/쿼리 방지).
+export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   // 셋업 전(.env 미설정): 데모 쿠키가 있으면 해당 페르소나로, 없으면 비로그인.
   if (isDemoMode()) {
     return getDemoUser(cookies().get(DEMO_COOKIE)?.value);
@@ -65,4 +67,4 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     business: business ?? null,
     orgs,
   };
-}
+});
