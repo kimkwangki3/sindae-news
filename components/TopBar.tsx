@@ -20,31 +20,22 @@ export default function TopBar() {
           href="/recruit"
           className="rounded-full border border-[#EAD2D8] bg-rose-soft px-2.5 py-1 text-[11px] font-bold text-rose-deep"
         >
-          ✍ 기자모집
+          기자모집
         </Link>
         <Link
           href="/tips"
           className="rounded-full border border-[#EAD2D8] bg-rose-soft px-2.5 py-1 text-[11px] font-bold text-rose-deep"
         >
-          📣 기사제보
+          기사제보
         </Link>
       </div>
-      <div className="flex items-center gap-3.5 text-lg">
-        <button
-          type="button"
-          aria-label="메뉴"
-          className="flex h-11 w-11 items-center justify-center"
-        >
-          ☰
-        </button>
-        <Link
-          href="/search"
-          aria-label="검색"
-          className="flex h-11 w-11 items-center justify-center"
-        >
-          🔍
-        </Link>
-      </div>
+      <Link
+        href="/search"
+        aria-label="검색"
+        className="flex h-11 w-11 items-center justify-center text-lg"
+      >
+        🔍
+      </Link>
     </header>
   );
 }
