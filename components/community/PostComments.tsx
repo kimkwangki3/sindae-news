@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import ReportSheet from "@/components/ReportSheet";
+import CommentItem from "@/components/CommentItem";
 import type { PostComment } from "@/lib/mock/community";
 import type { ReportTarget } from "@/lib/report";
 import {
   createMarketComment,
   createBoardComment,
+  editMarketComment,
+  deleteMarketComment,
+  editBoardComment,
+  deleteBoardComment,
 } from "@/lib/community-actions";
 
 // 나눔마켓·게시판 공용 댓글. 로그인 필수(작성), 낙관적 추가 + 서버 보정, 댓글별 신고(선택).
@@ -38,7 +43,7 @@ export default function PostComments({
     const tmpId = `tmp-${Date.now()}`;
     setComments((prev) => [
       ...prev,
-      { id: tmpId, author: "나", body: text, createdAt: "방금" },
+      { id: tmpId, author: "나", body: text, createdAt: "방금", mine: true },
     ]);
     setBody("");
 
@@ -48,7 +53,7 @@ export default function PostComments({
           ? await createMarketComment(postId, text)
           : await createBoardComment(postId, text);
       if (res.ok && res.comment) {
-        const saved = res.comment;
+        const saved = { ...res.comment, mine: true };
         setComments((prev) => prev.map((c) => (c.id === tmpId ? saved : c)));
       } else {
         setComments((prev) => prev.filter((c) => c.id !== tmpId));
@@ -56,6 +61,27 @@ export default function PostComments({
         setBody(text);
       }
     });
+  }
+
+  async function handleSave(id: string, text: string) {
+    const r =
+      postType === "market"
+        ? await editMarketComment(id, text)
+        : await editBoardComment(id, text);
+    if (r.ok)
+      setComments((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, body: text } : c)),
+      );
+    return r;
+  }
+
+  async function handleDelete(id: string) {
+    const r =
+      postType === "market"
+        ? await deleteMarketComment(id)
+        : await deleteBoardComment(id);
+    if (r.ok) setComments((prev) => prev.filter((c) => c.id !== id));
+    return r;
   }
 
   return (
@@ -66,24 +92,23 @@ export default function PostComments({
 
       <ul className="flex flex-col gap-4">
         {comments.map((c) => (
-          <li key={c.id} className="border-t border-line pt-4 first:border-t-0">
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] font-bold">{c.author}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] text-muted">{c.createdAt}</span>
-                {commentReportType && !c.id.startsWith("tmp-") && (
-                  <ReportSheet
-                    targetType={commentReportType}
-                    targetId={c.id}
-                    targetLabel={c.body.slice(0, 20)}
-                    triggerClassName="text-[11px] text-muted"
-                    triggerLabel="🚩"
-                  />
-                )}
-              </div>
-            </div>
-            <p className="mt-1.5 text-sm leading-relaxed">{c.body}</p>
-          </li>
+          <CommentItem
+            key={c.id}
+            comment={c}
+            onSave={handleSave}
+            onDelete={handleDelete}
+            reportNode={
+              commentReportType && !c.id.startsWith("tmp-") ? (
+                <ReportSheet
+                  targetType={commentReportType}
+                  targetId={c.id}
+                  targetLabel={c.body.slice(0, 20)}
+                  triggerClassName="text-[11px] text-muted"
+                  triggerLabel="🚩"
+                />
+              ) : undefined
+            }
+          />
         ))}
         {comments.length === 0 && (
           <li className="py-6 text-center text-sm text-muted">

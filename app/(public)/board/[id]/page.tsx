@@ -2,8 +2,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import ReportSheet from "@/components/ReportSheet";
 import PostComments from "@/components/community/PostComments";
+import PostOwnerControls from "@/components/community/PostOwnerControls";
 import BoardLike from "@/components/community/BoardLike";
 import { getCurrentUser } from "@/lib/auth";
+import { deleteBoardPost } from "@/lib/community-actions";
 import {
   getBoardPost,
   getBoardComments,
@@ -38,6 +40,12 @@ export default async function BoardDetailPage({
         <Link href="/board" className="text-sm text-muted">
           ‹ 자유게시판
         </Link>
+        {post.mine && (
+          <PostOwnerControls
+            editHref={`/board/write?id=${post.id}`}
+            deleteAction={deleteBoardPost.bind(null, post.id)}
+          />
+        )}
       </div>
 
       <span className="inline-block rounded-full bg-rose-soft px-2.5 py-1 text-[11px] font-bold text-rose">

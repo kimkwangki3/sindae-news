@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import type { MockComment } from "@/lib/mock/comments";
-import { createComment } from "@/app/(public)/articles/actions";
+import CommentItem from "@/components/CommentItem";
+import {
+  createComment,
+  editComment,
+  deleteComment,
+} from "@/app/(public)/articles/actions";
 
 // 댓글 — 로그인 필수(작성). comments insert(서버액션) + 낙관적 추가.
 export default function Comments({
@@ -29,14 +34,14 @@ export default function Comments({
     const tmpId = `tmp-${Date.now()}`;
     setComments((prev) => [
       ...prev,
-      { id: tmpId, author: "나", body: text, createdAt: "방금" },
+      { id: tmpId, author: "나", body: text, createdAt: "방금", mine: true },
     ]);
     setBody("");
 
     startTransition(async () => {
       const res = await createComment(slug, text);
       if (res.ok && res.comment) {
-        const saved = res.comment;
+        const saved = { ...res.comment, mine: true };
         setComments((prev) =>
           prev.map((c) => (c.id === tmpId ? saved : c)),
         );
@@ -49,6 +54,21 @@ export default function Comments({
     });
   }
 
+  async function handleSave(id: string, text: string) {
+    const r = await editComment(id, text);
+    if (r.ok)
+      setComments((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, body: r.body ?? text } : c)),
+      );
+    return { ok: r.ok, error: r.error };
+  }
+
+  async function handleDelete(id: string) {
+    const r = await deleteComment(id);
+    if (r.ok) setComments((prev) => prev.filter((c) => c.id !== id));
+    return { ok: r.ok, error: r.error };
+  }
+
   return (
     <section className="mt-8">
       <h3 className="mb-3 text-base text-rose-deep">
@@ -57,13 +77,12 @@ export default function Comments({
 
       <ul className="flex flex-col gap-4">
         {comments.map((c) => (
-          <li key={c.id} className="border-t border-line pt-4 first:border-t-0">
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] font-bold">{c.author}</span>
-              <span className="text-[11px] text-muted">{c.createdAt}</span>
-            </div>
-            <p className="mt-1.5 text-sm leading-relaxed">{c.body}</p>
-          </li>
+          <CommentItem
+            key={c.id}
+            comment={c}
+            onSave={handleSave}
+            onDelete={handleDelete}
+          />
         ))}
         {comments.length === 0 && (
           <li className="py-6 text-center text-sm text-muted">

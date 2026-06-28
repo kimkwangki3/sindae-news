@@ -3,7 +3,9 @@ import Link from "next/link";
 import Thumb from "@/components/Thumb";
 import ReportSheet from "@/components/ReportSheet";
 import PostComments from "@/components/community/PostComments";
+import PostOwnerControls from "@/components/community/PostOwnerControls";
 import { getCurrentUser } from "@/lib/auth";
+import { deleteMarketPost } from "@/lib/community-actions";
 import {
   getMarketPost,
   getMarketComments,
@@ -38,6 +40,12 @@ export default async function MarketDetailPage({
         <Link href="/market" className="text-sm text-muted">
           ‹ 나눔마켓
         </Link>
+        {post.mine && (
+          <PostOwnerControls
+            editHref={`/market/write?id=${post.id}`}
+            deleteAction={deleteMarketPost.bind(null, post.id)}
+          />
+        )}
       </div>
 
       <Thumb

@@ -62,6 +62,78 @@ export async function createBoardPost(formData: FormData): Promise<void> {
   redirect("/board");
 }
 
+// 나눔마켓 글 수정 — 본인만(RLS). id는 bind 주입.
+export async function updateMarketPost(
+  id: string,
+  formData: FormData,
+): Promise<void> {
+  const user = await requireMemberOrRedirect();
+  const title = String(formData.get("title") ?? "").trim();
+  if (title.length < 2) throw new Error("제목을 입력해 주세요.");
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("market_posts")
+    .update({
+      category: String(formData.get("category") ?? "share"),
+      title,
+      neighborhood: String(formData.get("neighborhood") ?? "").trim() || null,
+      body: String(formData.get("body") ?? "").trim() || null,
+    })
+    .eq("id", id)
+    .eq("author_id", user.id);
+  if (error) throw new Error("수정에 실패했습니다.");
+  revalidatePath(`/market/${id}`);
+  redirect(`/market/${id}`);
+}
+
+// 게시판 글 수정 — 본인만. id는 bind 주입.
+export async function updateBoardPost(
+  id: string,
+  formData: FormData,
+): Promise<void> {
+  const user = await requireMemberOrRedirect();
+  const title = String(formData.get("title") ?? "").trim();
+  if (title.length < 2) throw new Error("제목을 입력해 주세요.");
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("board_posts")
+    .update({
+      category: String(formData.get("category") ?? "daily"),
+      title,
+      body: String(formData.get("body") ?? "").trim() || null,
+    })
+    .eq("id", id)
+    .eq("author_id", user.id);
+  if (error) throw new Error("수정에 실패했습니다.");
+  revalidatePath(`/board/${id}`);
+  redirect(`/board/${id}`);
+}
+
+// 본인 글 삭제(소프트삭제: visibility=hidden) → 목록으로.
+export async function deleteMarketPost(id: string): Promise<void> {
+  const user = await requireMemberOrRedirect();
+  const supabase = createClient();
+  await supabase
+    .from("market_posts")
+    .update({ visibility: "hidden" })
+    .eq("id", id)
+    .eq("author_id", user.id);
+  revalidatePath("/market");
+  redirect("/market");
+}
+
+export async function deleteBoardPost(id: string): Promise<void> {
+  const user = await requireMemberOrRedirect();
+  const supabase = createClient();
+  await supabase
+    .from("board_posts")
+    .update({ visibility: "hidden" })
+    .eq("id", id)
+    .eq("author_id", user.id);
+  revalidatePath("/board");
+  redirect("/board");
+}
+
 export interface CommentResult {
   ok: boolean;
   comment?: PostComment;
@@ -113,6 +185,54 @@ export async function createBoardComment(
   body: string,
 ): Promise<CommentResult> {
   return createPostComment("board_comments", "/board", postId, body);
+}
+
+// 본인 댓글 수정 — RLS(author_id=auth.uid())로 본인만.
+async function editCommentIn(
+  table: "market_comments" | "board_comments",
+  id: string,
+  body: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const text = body.trim();
+  if (!text) return { ok: false, error: "내용을 입력해 주세요." };
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const supabase = createClient();
+  const { error } = await supabase
+    .from(table)
+    .update({ body: text })
+    .eq("id", id)
+    .eq("author_id", user.id);
+  return error ? { ok: false, error: "수정에 실패했습니다." } : { ok: true };
+}
+
+// 본인 댓글 삭제(소프트삭제: visibility=hidden).
+async function deleteCommentIn(
+  table: "market_comments" | "board_comments",
+  id: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const supabase = createClient();
+  const { error } = await supabase
+    .from(table)
+    .update({ visibility: "hidden" })
+    .eq("id", id)
+    .eq("author_id", user.id);
+  return error ? { ok: false, error: "삭제에 실패했습니다." } : { ok: true };
+}
+
+export async function editMarketComment(id: string, body: string) {
+  return editCommentIn("market_comments", id, body);
+}
+export async function deleteMarketComment(id: string) {
+  return deleteCommentIn("market_comments", id);
+}
+export async function editBoardComment(id: string, body: string) {
+  return editCommentIn("board_comments", id, body);
+}
+export async function deleteBoardComment(id: string) {
+  return deleteCommentIn("board_comments", id);
 }
 
 export interface LikeResult {

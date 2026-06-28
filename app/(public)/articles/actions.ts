@@ -67,6 +67,43 @@ export async function createComment(
   };
 }
 
+// 본인 댓글 수정 — RLS(author_id=auth.uid())로 본인만 가능.
+export async function editComment(
+  id: string,
+  body: string,
+): Promise<{ ok: boolean; body?: string; error?: string }> {
+  const text = body.trim();
+  if (!text) return { ok: false, error: "내용을 입력해 주세요." };
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("comments")
+    .update({ body: text })
+    .eq("id", id)
+    .eq("author_id", user.id);
+  if (error) return { ok: false, error: "수정에 실패했습니다." };
+  return { ok: true, body: text };
+}
+
+// 본인 댓글 삭제(소프트삭제: visibility=hidden) — 화면에서 사라짐, 관리자 복구 가능.
+export async function deleteComment(
+  id: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("comments")
+    .update({ visibility: "hidden" })
+    .eq("id", id)
+    .eq("author_id", user.id);
+  if (error) return { ok: false, error: "삭제에 실패했습니다." };
+  return { ok: true };
+}
+
 export interface ReactionResult {
   likeCount: number;
   dislikeCount: number;
