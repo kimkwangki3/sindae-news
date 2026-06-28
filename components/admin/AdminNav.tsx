@@ -71,6 +71,15 @@ const GROUPS: Group[] = [
     title: "사람",
     items: [{ href: "/admin/members", label: "회원 관리" }],
   },
+  {
+    title: "설정",
+    items: [
+      { href: "/admin/staff", label: "관리자·권한" },
+      { href: "/admin/settings", label: "카테고리·슬롯" },
+      { href: "/admin/legal", label: "법적 페이지" },
+      { href: "/admin/logs", label: "감사 로그" },
+    ],
+  },
 ];
 
 // 관리자 네비 — 모바일: 가로 스크롤, lg: 그룹 사이드바. 대기건수 배지.

@@ -181,3 +181,28 @@ export interface CategoryTotal {
   count: number;
   views: number;
 }
+
+// --- 설정 ---
+export interface AuditLogRow {
+  id: string;
+  actor: string;
+  action: string;
+  targetType: string;
+  targetId: string;
+  memo: string;
+  createdAt: string;
+}
+
+export interface SlotRow {
+  id: number;
+  key: string;
+  label: string;
+  isActive: boolean;
+}
+
+export interface LegalPageRow {
+  slug: string;
+  title: string;
+  body: string;
+  updatedAt: string;
+}

@@ -215,3 +215,39 @@ export async function setCorrectionStatus(
   });
   revalidatePath("/admin/corrections");
 }
+
+// --- 설정 ---
+// 광고 슬롯 활성/비활성
+export async function setSlotActive(
+  id: number,
+  active: boolean,
+): Promise<void> {
+  await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase.from("ad_slots").update({ is_active: active }).eq("id", id);
+  await logAdmin("set_slot_active", {
+    targetType: "ad_slot",
+    targetId: String(id),
+    memo: String(active),
+  });
+  revalidatePath("/admin/settings");
+}
+
+// 법적 페이지 본문 저장(upsert)
+export async function saveLegalPage(formData: FormData): Promise<void> {
+  await assertAdmin();
+  const slug = String(formData.get("slug") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const body = String(formData.get("body") ?? "");
+  if (!slug) throw new Error("slug 누락");
+  const supabase = createServiceClient();
+  await supabase
+    .from("legal_pages")
+    .upsert(
+      { slug, title, body, updated_at: new Date().toISOString() },
+      { onConflict: "slug" },
+    );
+  await logAdmin("save_legal_page", { targetType: "legal", targetId: slug });
+  revalidatePath("/admin/legal");
+  revalidatePath(`/legal/${slug}`);
+}

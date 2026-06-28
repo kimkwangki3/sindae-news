@@ -27,6 +27,9 @@ import type {
   ReporterLevel,
   ContentStatRow,
   CategoryTotal,
+  AuditLogRow,
+  SlotRow,
+  LegalPageRow,
 } from "@/lib/mock/admin-types";
 
 export type {
@@ -58,6 +61,9 @@ export type {
   AdminCorrectionRow,
   ContentStatRow,
   CategoryTotal,
+  AuditLogRow,
+  SlotRow,
+  LegalPageRow,
 } from "@/lib/mock/admin-types";
 
 function embeddedCount(v: unknown): number {
@@ -715,4 +721,80 @@ export async function getCategoryTotals(): Promise<CategoryTotal[]> {
     count: v.count,
     views: v.views,
   }));
+}
+
+// --- 설정: 감사로그 / 슬롯 / 관리자 / 법적페이지 ---------------------
+export async function getAuditLogs(limit = 200): Promise<AuditLogRow[]> {
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from("admin_audit_logs")
+    .select("id, action, target_type, target_id, memo, created_at, actor:profiles(nickname)")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) return [];
+  return (data ?? []).map((r) => {
+    const row = r as Record<string, unknown>;
+    return {
+      id: String(row.id),
+      actor: (row.actor as { nickname?: string } | null)?.nickname ?? "(시스템)",
+      action: (row.action as string) ?? "",
+      targetType: (row.target_type as string) ?? "",
+      targetId: (row.target_id as string) ?? "",
+      memo: (row.memo as string) ?? "",
+      createdAt: fmtDateTime(row.created_at as string),
+    };
+  });
+}
+
+export async function getSlots(): Promise<SlotRow[]> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("ad_slots")
+    .select("id, key, label, is_active")
+    .order("id", { ascending: true });
+  return (data ?? []).map((r) => {
+    const row = r as { id: number; key: string; label: string; is_active: boolean };
+    return { id: row.id, key: row.key, label: row.label, isActive: row.is_active };
+  });
+}
+
+// 관리자(운영진) 계정 — role=admin/superadmin
+export async function getStaffList(): Promise<AdminMemberRow[]> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, nickname, role, reporter_level, neighborhood, is_suspended, created_at")
+    .in("role", ["admin", "superadmin"])
+    .is("deleted_at", null)
+    .order("created_at", { ascending: true });
+  return (data ?? []).map((r) => {
+    const row = r as Record<string, unknown>;
+    return {
+      id: row.id as string,
+      nickname: row.nickname as string,
+      role: row.role as AdminMemberRow["role"],
+      reporterLevel: null,
+      neighborhood: (row.neighborhood as string) ?? null,
+      joinedAt: (row.created_at as string).slice(0, 10).replace(/-/g, "."),
+      isSuspended: Boolean(row.is_suspended),
+    };
+  });
+}
+
+export async function getLegalPages(): Promise<LegalPageRow[]> {
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from("legal_pages")
+    .select("slug, title, body, updated_at")
+    .order("slug", { ascending: true });
+  if (error) return [];
+  return (data ?? []).map((r) => {
+    const row = r as { slug: string; title: string; body: string | null; updated_at: string };
+    return {
+      slug: row.slug,
+      title: row.title,
+      body: row.body ?? "",
+      updatedAt: row.updated_at.slice(0, 10).replace(/-/g, "."),
+    };
+  });
 }
