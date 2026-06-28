@@ -1,4 +1,38 @@
-import type { CurrentUser } from "./types";
+import type { CurrentUser, ReporterLevel } from "./types";
+
+// 기자 등급 한글 라벨
+export const REPORTER_LEVEL_LABEL: Record<ReporterLevel, string> = {
+  applicant: "기자신청자",
+  junior: "준기자",
+  senior: "정기자",
+};
+
+function isAdmin(u: CurrentUser): boolean {
+  return u.role === "admin" || u.role === "superadmin";
+}
+
+// 기사 작성 가능? (정지/탈퇴 아님 + 관리자 또는 준/정기자). 기자신청자는 불가.
+export function canWriteArticle(user: CurrentUser | null): boolean {
+  if (!user || user.deleted_at || user.is_suspended) return false;
+  if (isAdmin(user)) return true;
+  return (
+    user.role === "reporter" &&
+    (user.reporter_level === "junior" || user.reporter_level === "senior")
+  );
+}
+
+// 제출 시 결정되는 상태: 관리자·정기자=즉시발행 / 준기자=승인대기
+export function articleStatusOnSubmit(
+  user: CurrentUser,
+): "published" | "pending" {
+  if (isAdmin(user) || user.reporter_level === "senior") return "published";
+  return "pending";
+}
+
+// 준기자 기사 승인은 관리자만
+export function canApproveArticle(user: CurrentUser | null): boolean {
+  return !!user && isAdmin(user);
+}
 
 // 회원등급_설계.md 의 3층 권한 모델 구현.
 // ① 계정 등급(role) ② 소속(업체/단체 멤버십) ③ 상태(정지/탈퇴)
@@ -63,6 +97,8 @@ export function can(
     case "write_article":
       return (
         user.role === "reporter" &&
+        (user.reporter_level === "junior" ||
+          user.reporter_level === "senior") &&
         (!target.authorId || target.authorId === user.id)
       );
     case "write_promo":

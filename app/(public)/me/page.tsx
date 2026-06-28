@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { logout } from "@/lib/auth-actions";
+import { canWriteArticle, REPORTER_LEVEL_LABEL } from "@/lib/permissions";
 import type { UserRole } from "@/lib/types";
 
 export const metadata = { title: "마이페이지 · 신대신문" };
@@ -19,7 +20,7 @@ export default async function MePage() {
   if (!user) redirect("/login");
 
   const approvedOrgs = user.orgs.filter((o) => o.status === "approved");
-  const canWriteArticle = user.role === "reporter" || user.role === "admin";
+  const writeAllowed = canWriteArticle(user);
   const isAdmin = user.role === "admin" || user.role === "superadmin";
 
   return (
@@ -43,6 +44,11 @@ export default async function MePage() {
             <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[11px] font-bold text-rose">
               {ROLE_LABEL[user.role]}
             </span>
+            {user.role === "reporter" && user.reporter_level && (
+              <span className="rounded-full bg-line px-2 py-0.5 text-[11px] font-bold text-muted">
+                {REPORTER_LEVEL_LABEL[user.reporter_level]}
+              </span>
+            )}
             {user.neighborhood && (
               <span className="text-[11px] text-muted">
                 📍 {user.neighborhood}
@@ -98,7 +104,7 @@ export default async function MePage() {
 
       {/* 바로가기 */}
       <section className="mt-6 overflow-hidden rounded-card border border-line bg-white">
-        {canWriteArticle && (
+        {writeAllowed && (
           <MeLink href="/articles" label="기사 작성" icon="✍️" />
         )}
         <MeLink href="/market" label="내 나눔글" icon="🤝" />

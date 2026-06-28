@@ -3,6 +3,8 @@
 export type UserRole = "user" | "reporter" | "admin" | "superadmin";
 export type OrgRole = "owner" | "staff" | "member";
 export type ReviewStatus = "pending" | "approved" | "rejected";
+// 기자 등급: 신청자(작성불가) / 준기자(승인후발행) / 정기자(즉시발행)
+export type ReporterLevel = "applicant" | "junior" | "senior";
 
 // 계정 등급(profiles.role) + 상태 + 소속(업체/단체 멤버십)
 export interface Profile {
@@ -11,6 +13,7 @@ export interface Profile {
   neighborhood: string | null;
   avatar_url: string | null;
   role: UserRole;
+  reporter_level?: ReporterLevel | null; // role='reporter'일 때만 의미
   is_suspended: boolean;
   deleted_at: string | null;
 }

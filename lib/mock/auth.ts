@@ -40,6 +40,7 @@ export const DEMO_PERSONAS: Record<DemoPersona, PersonaDef> = {
       neighborhood: "신대동",
       avatar_url: null,
       role: "reporter",
+      reporter_level: "senior",
       is_suspended: false,
       deleted_at: null,
       business: null,
