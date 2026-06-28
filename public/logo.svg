@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 88" role="img" aria-label="신대신문">
+  <!-- 말풍선형 신문 아이콘 -->
+  <g fill="none" stroke="#C77B8B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="10" y="10" width="66" height="58" rx="14"/>
+    <path d="M30 68 L30 80 L44 68" fill="#C77B8B" stroke="none"/>
+  </g>
+  <!-- 신문 내부: 사진 박스 + 기사 줄 -->
+  <rect x="22" y="24" width="18" height="14" rx="3" fill="#C77B8B"/>
+  <g stroke="#C77B8B" stroke-width="4.5" stroke-linecap="round">
+    <line x1="46" y1="26" x2="64" y2="26"/>
+    <line x1="46" y1="33" x2="64" y2="33"/>
+    <line x1="22" y1="46" x2="64" y2="46"/>
+    <line x1="22" y1="54" x2="64" y2="54"/>
+  </g>
+  <!-- 워드마크 -->
+  <text x="96" y="60" font-family="'Gowun Dodum','Noto Sans KR','Apple SD Gothic Neo',sans-serif"
+        font-size="52" font-weight="800" fill="#2B2426" letter-spacing="3">신대신문</text>
+</svg>

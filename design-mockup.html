@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>신대신문 — 디자인 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#FBF6F2;
+    --ivory-2:#F4EBE4;
+    --rose:#C77B8B;
+    --rose-deep:#7C3A4E;
+    --ink:#2B2426;
+    --muted:#8A7E80;
+    --line:#EADFD8;
+    --white:#FFFFFF;
+    --radius:18px;
+    --radius-sm:12px;
+    --shadow:0 8px 30px rgba(124,58,78,.08);
+    --serif:'Gowun Batang',serif;
+    --sans:'Gowun Dodum','Gowun Batang',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--ivory-2);font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased;padding:40px 16px 80px}
+  h1,h2,h3,.serif{font-family:var(--serif)}
+  .page-title{text-align:center;margin-bottom:8px}
+  .page-title h1{font-size:34px;font-weight:800;color:var(--rose-deep);letter-spacing:-1px}
+  .page-title p{color:var(--muted);font-size:14px;margin-top:6px}
+
+  /* style guide */
+  .guide{max-width:920px;margin:28px auto 50px;background:var(--white);border-radius:24px;padding:28px;box-shadow:var(--shadow)}
+  .guide h2{font-size:18px;color:var(--rose-deep);margin-bottom:18px}
+  .swatches{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:24px}
+  .sw{width:120px}
+  .sw .chip{height:64px;border-radius:14px;border:1px solid var(--line)}
+  .sw small{display:block;margin-top:8px;font-size:12px;color:var(--muted)}
+  .sw b{display:block;font-size:13px;margin-top:2px}
+  .type-row{padding:12px 0;border-top:1px solid var(--line)}
+  .type-row .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+  /* phones row */
+  .frames{display:flex;gap:28px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+  .device{width:390px;max-width:100%}
+  .device > .cap{text-align:center;font-size:13px;color:var(--rose-deep);font-weight:700;margin-bottom:10px}
+  .phone{background:var(--ivory);border-radius:30px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
+  .scr{height:760px;overflow-y:auto;scrollbar-width:thin}
+  .scr::-webkit-scrollbar{width:6px}
+  .scr::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+
+  /* app chrome */
+  .topbar{position:sticky;top:0;z-index:5;background:rgba(251,246,242,.92);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
+  .logo{font-family:var(--serif);font-weight:800;font-size:22px;color:var(--rose-deep)}
+  .logo span{color:var(--rose)}
+  .ic{width:22px;height:22px;color:var(--ink);opacity:.7}
+  .nav{display:flex;gap:16px;overflow-x:auto;padding:12px 18px;border-bottom:1px solid var(--line);font-size:14px}
+  .nav a{color:var(--muted);text-decoration:none;white-space:nowrap;padding-bottom:4px}
+  .nav a.on{color:var(--rose-deep);font-weight:700;border-bottom:2px solid var(--rose)}
+
+  .pad{padding:18px}
+  .kicker{display:inline-block;font-size:11px;font-weight:700;color:var(--rose);background:#F6E7EA;padding:4px 10px;border-radius:999px;letter-spacing:.5px}
+  .lead{margin-top:14px}
+  .lead .thumb{width:100%;height:200px;border-radius:var(--radius);background:linear-gradient(135deg,#E7Cdd4,#C77B8B);position:relative;overflow:hidden}
+  .lead .thumb::after{content:'사진';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;opacity:.55;font-size:13px}
+  .lead h2{font-size:23px;line-height:1.35;margin-top:14px;font-weight:800}
+  .lead .meta{color:var(--muted);font-size:12px;margin-top:8px}
+
+  .sec-title{display:flex;align-items:center;justify-content:space-between;margin:26px 0 12px}
+  .sec-title h3{font-size:17px;color:var(--rose-deep)}
+  .sec-title a{font-size:12px;color:var(--rose);text-decoration:none}
+
+  .item{display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+  .item .t{flex:1}
+  .item .t .k{font-size:11px;color:var(--rose);font-weight:700}
+  .item .t h4{font-family:var(--serif);font-size:16px;line-height:1.4;margin-top:4px;font-weight:700}
+  .item .t .meta{font-size:11px;color:var(--muted);margin-top:8px}
+  .item .img{width:84px;height:84px;border-radius:14px;background:linear-gradient(135deg,#EFD9DE,#D69AA8);flex-shrink:0}
+
+  .adbox{margin:22px 0;height:90px;border-radius:var(--radius);background:repeating-linear-gradient(45deg,#F4EBE4,#F4EBE4 12px,#EFE2DA 12px,#EFE2DA 24px);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;border:1px dashed var(--rose)}
+
+  /* article detail */
+  .art h1{font-size:26px;line-height:1.4;font-weight:800;margin-top:14px}
+  .art .byline{display:flex;align-items:center;gap:10px;margin:16px 0;padding-bottom:16px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+  .art .av{width:34px;height:34px;border-radius:50%;background:var(--rose)}
+  .art .hero{width:100%;height:210px;border-radius:var(--radius);background:linear-gradient(135deg,#E7CDD4,#7C3A4E);margin:6px 0 18px}
+  .art p{font-size:15px;line-height:1.85;color:#3a3133;margin-bottom:16px}
+  .art .pull{font-family:var(--serif);font-size:18px;color:var(--rose-deep);border-left:3px solid var(--rose);padding-left:16px;margin:22px 0;line-height:1.6}
+
+  /* market */
+  .chips{display:flex;gap:8px;padding:14px 18px 4px;flex-wrap:wrap}
+  .chip-f{font-size:13px;padding:7px 14px;border-radius:999px;background:var(--white);border:1px solid var(--line);color:var(--muted)}
+  .chip-f.on{background:var(--rose-deep);color:#fff;border-color:var(--rose-deep)}
+  .card{background:var(--white);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(124,58,78,.05);display:flex;gap:12px}
+  .card .ph{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,#EFD9DE,#D69AA8);flex-shrink:0}
+  .card .info{flex:1}
+  .card .tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px}
+  .tag.share{background:#E3F1E8;color:#3f8f5e}
+  .tag.req{background:#FBEAD2;color:#B5803A}
+  .tag.done{background:#ECE7E4;color:#8A7E80}
+  .tag.pin{background:#F6E7EA;color:var(--rose-deep)}
+  .card h4{font-size:15px;margin:8px 0 4px;font-weight:700}
+  .card .cmeta{font-size:11px;color:var(--muted);display:flex;gap:10px}
+  .write-btn{background:var(--rose-deep);color:#fff;border:none;padding:9px 16px;border-radius:999px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;box-shadow:0 4px 12px rgba(124,58,78,.25)}
+
+  .bottomnav{position:sticky;bottom:0;background:var(--white);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:10px 0 14px}
+  .bn{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--muted)}
+  .bn.on{color:var(--rose-deep);font-weight:700}
+  .bn .d{width:20px;height:20px;border-radius:6px;background:currentColor;opacity:.85}
+
+  /* reactions + share */
+  .react{display:flex;gap:10px;margin:24px 0 8px}
+  .react button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--white);font-family:var(--sans);font-size:14px;color:var(--ink);cursor:pointer}
+  .react button .n{color:var(--muted);font-size:13px}
+  .react button.like.on{background:#F6E7EA;border-color:var(--rose);color:var(--rose-deep);font-weight:700}
+  .react button.bad.on{background:#ECE7E4;border-color:#B9ABA4;color:#6f6361;font-weight:700}
+  .react .share{flex:0 0 auto;padding:12px 16px}
+  .ipnote{font-size:11px;color:var(--muted);text-align:center;margin-bottom:18px}
+
+  /* comments */
+  .cmts{border-top:1px solid var(--line);padding-top:20px;margin-top:8px}
+  .cmts h3{font-size:16px;color:var(--rose-deep);margin-bottom:14px}
+  .loginbox{background:var(--ivory-2);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;margin-bottom:18px}
+  .loginbox p{font-size:13px;color:var(--muted);margin-bottom:12px}
+  .kakao{display:inline-flex;align-items:center;gap:8px;background:#FEE500;color:#191600;border:none;padding:11px 20px;border-radius:12px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer}
+  .cmt{display:flex;gap:10px;padding:14px 0;border-top:1px solid var(--line)}
+  .cmt .av{width:32px;height:32px;border-radius:50%;background:var(--rose);flex-shrink:0}
+  .cmt .b{flex:1}
+  .cmt .b .nm{font-size:13px;font-weight:700}
+  .cmt .b .nm span{font-weight:400;color:var(--muted);font-size:11px;margin-left:8px}
+  .cmt .b .tx{font-size:14px;line-height:1.6;margin-top:5px;color:#3a3133}
+
+  /* report form */
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;color:var(--rose-deep);font-weight:700;margin-bottom:7px}
+  .field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:var(--white);border-radius:12px;padding:12px;font-family:var(--sans);font-size:14px;color:var(--ink)}
+  .field textarea{min-height:120px;resize:none}
+  .filebox{border:1px dashed var(--rose);border-radius:14px;padding:20px;text-align:center;color:var(--muted);font-size:13px;background:#FDF8F5}
+  .submit{width:100%;background:var(--rose-deep);color:#fff;border:none;padding:15px;border-radius:14px;font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer;margin-top:6px}
+
+  /* in-feed ad */
+  .infeed{display:flex;align-items:center;gap:12px;background:#FDF8F5;border:1px dashed var(--rose);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+  .infeed .badge{font-size:10px;font-weight:700;color:var(--rose-deep);background:#F6E7EA;padding:3px 8px;border-radius:999px;flex-shrink:0}
+  .infeed .ph{width:54px;height:54px;border-radius:10px;background:linear-gradient(135deg,#F4EBE4,#E0CFC6);flex-shrink:0}
+  .infeed .tx{flex:1;font-size:13px}
+  .infeed .tx b{color:var(--rose-deep)}
+  .infeed .tx small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+
+  /* store / district */
+  .store{background:var(--white);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(124,58,78,.05);display:flex;gap:12px}
+  .store .ph{width:78px;height:78px;border-radius:12px;background:linear-gradient(135deg,#F0DCD0,#D8A98F);flex-shrink:0}
+  .store .info{flex:1}
+  .store .cat{font-size:10px;font-weight:700;color:#B5803A;background:#FBEAD2;padding:3px 8px;border-radius:999px}
+  .store .promo{font-size:10px;font-weight:700;color:var(--rose-deep);background:#F6E7EA;padding:3px 8px;border-radius:999px;margin-left:4px}
+  .store h4{font-size:15px;margin:8px 0 4px;font-weight:700}
+  .store .meta{font-size:11px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
+  .star{color:#E0A43B;font-weight:700}
+  .pill.wait{background:#FBEAD2;color:#B5803A}
+
+  /* market detail */
+  .mhero{width:100%;height:230px;border-radius:var(--radius);background:linear-gradient(135deg,#EFD9DE,#C77B8B);margin-bottom:16px}
+  .mthumbs{display:flex;gap:8px;margin-bottom:16px}
+  .mthumbs div{width:54px;height:54px;border-radius:10px;background:linear-gradient(135deg,#EFD9DE,#D69AA8)}
+  .seller{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:16px}
+  .seller .av{width:38px;height:38px;border-radius:50%;background:var(--rose)}
+  .seller .nm{font-size:14px;font-weight:700}
+  .seller .nm span{display:block;font-size:11px;color:var(--muted);font-weight:400}
+  .barbtn{position:sticky;bottom:0;display:flex;gap:10px;padding:12px 16px;background:rgba(251,246,242,.95);border-top:1px solid var(--line)}
+  .barbtn button{flex:1;border:none;border-radius:14px;padding:14px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer}
+  .barbtn .chat{background:var(--rose-deep);color:#fff}
+  .barbtn .heart{flex:0 0 auto;background:var(--white);border:1px solid var(--line);color:var(--rose-deep);padding:14px 18px}
+
+  /* logged-in identity bar */
+  .idbar{display:flex;align-items:center;gap:10px;padding:10px 18px;background:#fff;border-bottom:1px solid var(--line)}
+  .idbar .av{width:32px;height:32px;border-radius:50%;background:var(--rose);flex-shrink:0}
+  .idbar .who{font-size:13px;font-weight:700;flex-shrink:0}
+  .idbar .tags{display:flex;gap:6px;overflow-x:auto}
+  .idbar .t{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .idbar .t.biz{background:#FBEAD2;color:#B5803A}
+  .idbar .t.org{background:#E3F1E8;color:#3f8f5e}
+
+  /* org badges */
+  .store .org{font-size:10px;font-weight:700;color:#3f8f5e;background:#E3F1E8;padding:3px 8px;border-radius:999px}
+  .tag.org{background:#E3F1E8;color:#3f8f5e}
+
+  /* analytics bars */
+  .bars{display:flex;align-items:flex-end;gap:8px;height:140px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .bars .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .bars .col .bar{width:100%;max-width:26px;background:linear-gradient(180deg,#C77B8B,#7C3A4E);border-radius:6px 6px 0 0}
+  .bars .col small{font-size:10px;color:var(--muted)}
+  .legend{font-size:11px;color:var(--muted);margin-top:8px}
+
+  /* nickname setup */
+  .nick-prev{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:6px}
+  .nick-prev .av{width:40px;height:40px;border-radius:50%;background:var(--rose)}
+
+  /* reporter recruit */
+  .recruit-ic{font-size:11px;font-weight:700;color:var(--rose-deep);background:#F6E7EA;border:1px solid #EAD2D8;padding:4px 9px;border-radius:999px;white-space:nowrap;cursor:pointer}
+  .pledge{background:#FFF6F8;border:1px solid var(--rose);border-radius:14px;padding:16px;margin-bottom:16px}
+  .pledge h4{font-size:13px;color:var(--rose-deep);margin-bottom:8px}
+  .pledge p{font-size:12.5px;line-height:1.7;color:#5a4d50;margin-bottom:8px}
+  .pledge .strong{font-weight:700;color:#c0504d}
+  .pledge label{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#3a3133;font-weight:700;margin-top:6px}
+  .pledge label input{width:auto;margin-top:3px}
+
+  /* hot ranking */
+  .rankitem{display:flex;gap:14px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
+  .rankitem .no{font-family:var(--serif);font-size:22px;font-weight:800;color:var(--rose);width:26px;text-align:center;flex-shrink:0}
+  .rankitem.top .no{color:var(--rose-deep)}
+  .rankitem .t{flex:1}
+  .rankitem .t .k{font-size:11px;color:var(--rose);font-weight:700}
+  .rankitem .t h4{font-family:var(--serif);font-size:15px;line-height:1.4;margin-top:4px;font-weight:700}
+  .rankitem .t .meta{font-size:11px;color:var(--muted);margin-top:6px}
+  .rankitem .img{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#EFD9DE,#D69AA8);flex-shrink:0}
+
+  /* report */
+  .reportlink{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);cursor:pointer;border:1px solid var(--line);padding:6px 12px;border-radius:999px;background:#fff}
+  .cmt .rep{font-size:11px;color:var(--muted);cursor:pointer;margin-left:8px;text-decoration:underline}
+  .pill.rep{background:#FBE3E0;color:#c0504d}
+
+  /* login */
+  .login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:40px 26px;text-align:center}
+  .login-wrap .logo-lg{font-family:var(--serif);font-size:34px;font-weight:800;color:var(--rose-deep)}
+  .login-wrap .tagline{color:var(--muted);font-size:14px;margin:10px 0 40px;line-height:1.6}
+  .login-wrap .kakao{width:100%;justify-content:center;padding:15px}
+  .login-wrap .guest{margin-top:14px;background:none;border:none;color:var(--muted);font-size:13px;text-decoration:underline;cursor:pointer}
+  .login-wrap .terms{font-size:11px;color:var(--muted);margin-top:34px;line-height:1.7}
+  .login-wrap .terms a{color:var(--rose)}
+
+  /* store detail */
+  .gallery{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px}
+  .gallery .g{width:130px;height:130px;border-radius:14px;background:linear-gradient(135deg,#F0DCD0,#D8A98F);flex-shrink:0}
+  .inforow{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line);font-size:14px}
+  .inforow .k{width:64px;color:var(--muted);flex-shrink:0;font-size:13px}
+  .inforow .v{flex:1;color:#3a3133}
+  .open-now{color:#3f8f5e;font-weight:700}
+  .menu-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+  .menu-item .nm{font-size:14px;font-weight:500}
+  .menu-item .nm small{display:block;color:var(--muted);font-size:11px;font-weight:400;margin-top:2px}
+  .menu-item .pr{font-size:14px;color:var(--rose-deep);font-weight:700}
+  .menu-item .mi{width:54px;height:54px;border-radius:10px;background:linear-gradient(135deg,#F0DCD0,#D8A98F);flex-shrink:0;margin-right:12px}
+  .promo-card{background:#FDF8F5;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+  .promo-card .pc-tag{font-size:10px;font-weight:700;color:var(--rose-deep);background:#F6E7EA;padding:3px 8px;border-radius:999px}
+  .promo-card h5{font-size:14px;margin:8px 0 4px;font-weight:700}
+  .promo-card p{font-size:13px;color:#3a3133;line-height:1.6}
+
+  /* mypage */
+  .profile{display:flex;align-items:center;gap:14px;padding:8px 0 20px}
+  .profile .av{width:56px;height:56px;border-radius:50%;background:var(--rose)}
+  .profile .nm{font-size:17px;font-weight:700}
+  .profile .nm small{display:block;color:var(--muted);font-size:12px;font-weight:400;margin-top:3px}
+  .mlist{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .mlist a{display:flex;justify-content:space-between;align-items:center;padding:15px 16px;border-top:1px solid var(--line);font-size:14px;color:var(--ink);text-decoration:none}
+  .mlist a:first-child{border-top:none}
+  .mlist a .badge{font-size:11px;color:#fff;background:var(--rose);border-radius:999px;padding:2px 8px}
+  .mlist a .arr{color:var(--muted)}
+
+  /* section divider */
+  .divider{max-width:1100px;margin:70px auto 30px;text-align:center;position:relative}
+  .divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--line)}
+  .divider span{position:relative;background:var(--ivory-2);padding:0 20px;font-family:var(--serif);font-size:18px;color:var(--rose-deep);font-weight:700}
+
+  /* admin desktop */
+  .admin{max-width:1100px;margin:0 auto 26px}
+  .admin .cap{font-size:13px;color:var(--rose-deep);font-weight:700;margin-bottom:10px}
+  .win{background:var(--white);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);display:flex;min-height:520px}
+  .side{width:200px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);padding:18px 0}
+  .side .brand{font-family:var(--serif);font-weight:800;font-size:18px;color:var(--rose-deep);padding:0 20px 16px;border-bottom:1px solid var(--line);margin-bottom:10px}
+  .side a{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:13.5px;color:var(--muted);text-decoration:none}
+  .side a.on{color:var(--rose-deep);font-weight:700;background:#F8EEF0;border-right:3px solid var(--rose)}
+  .side a .di{width:16px;height:16px;border-radius:5px;background:currentColor;opacity:.7}
+  .main{flex:1;padding:24px 28px;background:#FDFAF8;overflow:hidden}
+  .main h2{font-size:19px;color:var(--ink);margin-bottom:4px}
+  .main .sub{font-size:12.5px;color:var(--muted);margin-bottom:20px}
+  .stats{display:flex;gap:14px;margin-bottom:24px}
+  .stat{flex:1;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+  .stat .v{font-size:26px;font-weight:800;color:var(--rose-deep);font-family:var(--serif)}
+  .stat .l{font-size:12px;color:var(--muted);margin-top:4px}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;font-size:13px}
+  th{text-align:left;background:#F8EEF0;color:var(--rose-deep);font-weight:700;padding:11px 14px;font-size:12px}
+  td{padding:11px 14px;border-top:1px solid var(--line);color:#3a3133}
+  .pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px}
+  .pill.pub{background:#E3F1E8;color:#3f8f5e}
+  .pill.draft{background:#FBEAD2;color:#B5803A}
+  .pill.hide{background:#ECE7E4;color:#8A7E80}
+  .act{color:var(--rose);text-decoration:none;font-size:12px;margin-right:10px;cursor:pointer}
+  .act.del{color:#c0504d}
+  .ed-grid{display:grid;grid-template-columns:1fr 280px;gap:20px}
+  .ed-main .field input,.ed-main .field textarea,.ed-main .field select{width:100%}
+  .editor-body{min-height:240px}
+  .ed-side .box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  .ed-side .box h4{font-size:13px;color:var(--rose-deep);margin-bottom:12px}
+  .toolbar{display:flex;gap:4px;background:#F8EEF0;border:1px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;padding:7px 10px}
+  .toolbar span{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#fff;font-size:13px;color:var(--ink);cursor:pointer}
+  .editor-body{border-radius:0 0 10px 10px !important}
+  .adslot{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+  .adslot .prev{width:120px;height:60px;border-radius:8px;background:repeating-linear-gradient(45deg,#F4EBE4,#F4EBE4 8px,#EFE2DA 8px,#EFE2DA 16px);flex-shrink:0}
+  .adslot .info{flex:1;font-size:13px}
+  .adslot .info .l{font-weight:700;color:var(--rose-deep)}
+  .adslot .info .u{font-size:11px;color:var(--muted);margin-top:3px}
+  .mini-btn{background:var(--rose-deep);color:#fff;border:none;padding:8px 14px;border-radius:10px;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer}
+  .mini-btn.ghost{background:#fff;color:var(--rose-deep);border:1px solid var(--rose)}
+
+  .note{max-width:920px;margin:50px auto 0;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>신대신문 <span style="font-size:18px;color:#C77B8B">·</span> 디자인 시안</h1>
+  <p>신대지구(순천시) 인터넷 신문 · 모바일 우선 · 더스티 로즈 톤</p>
+</div>
+
+<!-- STYLE GUIDE -->
+<section class="guide">
+  <h2>로고</h2>
+  <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--line)">
+    <img src="assets/logo.svg" alt="신대신문" style="height:56px">
+    <div style="background:#2B2426;padding:14px 20px;border-radius:12px"><img src="assets/logo.svg" alt="신대신문" style="height:40px;filter:brightness(0) invert(1)"></div>
+  </div>
+  <h2>스타일 가이드</h2>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#FBF6F2"></div><small>배경</small><b>#FBF6F2</b></div>
+    <div class="sw"><div class="chip" style="background:#F4EBE4"></div><small>서브 배경</small><b>#F4EBE4</b></div>
+    <div class="sw"><div class="chip" style="background:#C77B8B"></div><small>포인트</small><b>#C77B8B</b></div>
+    <div class="sw"><div class="chip" style="background:#7C3A4E"></div><small>딥 포인트</small><b>#7C3A4E</b></div>
+    <div class="sw"><div class="chip" style="background:#2B2426"></div><small>본문 잉크</small><b>#2B2426</b></div>
+  </div>
+  <div class="type-row">
+    <div class="lbl">헤드라인 — 고운바탕 / Serif</div>
+    <div style="font-family:var(--serif);font-size:26px;font-weight:800;color:#7C3A4E;margin-top:6px">신대지구의 오늘을 전합니다</div>
+  </div>
+  <div class="type-row">
+    <div class="lbl">본문 — 고운돋움 / Sans</div>
+    <div style="font-size:15px;line-height:1.8;margin-top:6px;color:#3a3133">읽기 편한 산세리프 본문. 넉넉한 줄간격과 여백으로 모바일에서 부드럽게 읽히도록 설계합니다.</div>
+  </div>
+  <div class="type-row" style="display:flex;gap:12px;align-items:center">
+    <span class="kicker">지역소식</span>
+    <span style="font-size:12px;color:#8A7E80">둥근 모서리 18px · 부드러운 그림자 · 카테고리 칩</span>
+  </div>
+</section>
+
+<!-- PHONE FRAMES -->
+<div class="frames">
+
+  <!-- 1. HOME -->
+  <div class="device">
+    <div class="cap">① 홈</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:8px"><img src="assets/logo.svg" alt="신대신문" style="height:26px;display:block"><span class="recruit-ic">✍ 기자모집</span></div>
+        <div style="display:flex;gap:14px">☰ 🔍</div>
+      </div>
+      <div class="idbar" style="cursor:pointer">
+        <div class="av"></div>
+        <div class="who">김신대 님</div>
+        <div class="tags">
+          <span class="t biz">🏪 신대해장국</span>
+          <span class="t org">🏛 신대동 주민자치회</span>
+        </div>
+        <span style="margin-left:auto;color:var(--muted);font-size:12px;flex-shrink:0">내정보 ›</span>
+      </div>
+      <div class="nav">
+        <a class="on">홈</a><a>🔥핫소식</a><a>지역소식</a><a>행정</a><a>인물</a><a>생활</a><a>지역단체</a>
+      </div>
+      <div class="pad">
+        <span class="kicker">오늘의 헤드라인</span>
+        <div class="lead">
+          <div class="thumb"></div>
+          <h2>신대지구 주민자치회, 봄맞이 마을정원 가꾸기 나서</h2>
+          <div class="meta">지역소식 · 2026.06.26 · 편집부</div>
+        </div>
+
+        <div class="adbox">광고 배너 (홈 상단)</div>
+
+        <div class="sec-title"><h3>지역소식</h3><a>더보기 ›</a></div>
+        <div class="item"><div class="t"><div class="k">지역소식</div><h4>순천만 인근 도보길 정비 완료… 주말 나들이객 늘어</h4><div class="meta">2026.06.25</div></div><div class="img"></div></div>
+        <div class="item"><div class="t"><div class="k">행정</div><h4>시, 신대지구 청년 창업 지원금 2차 모집 공고</h4><div class="meta">2026.06.24</div></div><div class="img"></div></div>
+
+        <div class="sec-title"><h3>인물</h3><a>더보기 ›</a></div>
+        <div class="item"><div class="t"><div class="k">인물</div><h4>"30년 한 자리에서" 신대시장 떡집 사장님 이야기</h4><div class="meta">2026.06.23</div></div><div class="img"></div></div>
+      </div>
+      <div class="bottomnav">
+        <div class="bn on"><div class="d"></div>홈</div>
+        <div class="bn"><div class="d"></div>기사</div>
+        <div class="bn"><div class="d"></div>상권</div>
+        <div class="bn"><div class="d"></div>제보</div>
+        <div class="bn"><div class="d"></div>나눔마켓</div>
+        <div class="bn"><div class="d"></div>게시판</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 2. LIST -->
+  <div class="device">
+    <div class="cap">② 기사 목록</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><img src="assets/logo.svg" alt="신대신문" style="height:26px;display:block"><div style="display:flex;gap:14px">☰ 🔍</div></div>
+      <div class="nav"><a>홈</a><a>🔥핫소식</a><a class="on">지역소식</a><a>행정</a><a>인물</a><a>생활</a><a>지역단체</a></div>
+      <div class="pad">
+        <h3 style="font-size:20px;color:#7C3A4E;margin-bottom:4px">지역소식</h3>
+        <p style="font-size:13px;color:#8A7E80">신대지구의 생생한 동네 소식</p>
+        <div class="item"><div class="t"><div class="k">지역소식</div><h4>순천만 인근 도보길 정비 완료… 주말 나들이객 늘어</h4><div class="meta">2026.06.25 · 편집부</div></div><div class="img"></div></div>
+        <div class="item"><div class="t"><div class="k">지역소식</div><h4>신대중앙로 가로수 교체 사업 다음 달 착수</h4><div class="meta">2026.06.24 · 편집부</div></div><div class="img"></div></div>
+        <div class="item"><div class="t"><div class="k">지역소식</div><h4>주민센터 앞 작은 도서관, 리모델링 후 재개관</h4><div class="meta">2026.06.22 · 편집부</div></div><div class="img"></div></div>
+        <div class="item"><div class="t"><div class="k">지역소식</div><h4>여름 물놀이장 운영 안내… 7월 1일 개장</h4><div class="meta">2026.06.21 · 편집부</div></div><div class="img"></div></div>
+        <div class="item"><div class="t"><div class="k">지역소식</div><h4>마을버스 3번 노선 일부 조정… 배차 간격 단축</h4><div class="meta">2026.06.20 · 편집부</div></div><div class="img"></div></div>
+      </div>
+      <div class="bottomnav">
+        <div class="bn"><div class="d"></div>홈</div>
+        <div class="bn on"><div class="d"></div>기사</div>
+        <div class="bn"><div class="d"></div>상권</div>
+        <div class="bn"><div class="d"></div>제보</div>
+        <div class="bn"><div class="d"></div>나눔마켓</div>
+        <div class="bn"><div class="d"></div>게시판</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 3. DETAIL -->
+  <div class="device">
+    <div class="cap">③ 기사 상세</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><img src="assets/logo.svg" alt="신대신문" style="height:22px"><div style="display:flex;gap:14px">🔖 ⤴</div></div>
+      <div class="pad art">
+        <span class="kicker">지역소식</span>
+        <h1>신대지구 주민자치회, 봄맞이 마을정원 가꾸기 나서</h1>
+        <div class="byline"><div class="av"></div><div>편집부 기자<br><span>2026.06.26 09:30</span></div></div>
+        <div class="hero"></div>
+        <p>신대지구 주민자치회가 지난 주말 마을 곳곳에서 봄맞이 정원 가꾸기 행사를 열었다. 주민 70여 명이 참여해 화단을 정비하고 계절 꽃을 심었다.</p>
+        <div class="pull">"동네가 밝아지니 오가는 사람들 표정도 환해졌어요."</div>
+        <p>자치회 관계자는 "주민이 직접 가꾼 공간이라 애착이 다르다"며 "여름에는 물주기 당번을 정해 관리할 계획"이라고 밝혔다.</p>
+        <div class="adbox">광고 (기사 중간)</div>
+        <p>이번 행사는 시의 마을공동체 지원사업 일환으로 진행됐으며, 가을에는 국화 심기 행사도 예정돼 있다.</p>
+
+        <div class="react">
+          <button class="like on">👍 좋아요 <span class="n">42</span></button>
+          <button class="bad">👎 싫어요 <span class="n">3</span></button>
+          <button class="share">⤴ 퍼가기</button>
+        </div>
+        <div class="ipnote">좋아요·싫어요는 IP당 1회만 가능합니다</div>
+        <div style="text-align:center;margin-bottom:20px"><span class="reportlink">🚩 이 기사 신고하기</span></div>
+
+        <div class="cmts">
+          <h3>댓글 8</h3>
+          <div class="loginbox">
+            <p>댓글을 쓰려면 로그인이 필요해요</p>
+            <button class="kakao">💬 카카오로 로그인</button>
+          </div>
+          <div class="cmt"><div class="av"></div><div class="b"><div class="nm">김주민 <span>2시간 전</span> <span class="rep">🚩 신고</span></div><div class="tx">동네가 예뻐졌네요. 다음 행사도 참여하고 싶어요!</div></div></div>
+          <div class="cmt"><div class="av" style="background:#D69AA8"></div><div class="b"><div class="nm">이순천 <span>1시간 전</span> <span class="rep">🚩 신고</span></div><div class="tx">물주기 당번 신청은 어디서 하나요?</div></div></div>
+          <div class="cmt"><div class="av" style="background:#B58B96"></div><div class="b"><div class="nm">박덕암 <span>40분 전</span> <span class="rep">🚩 신고</span></div><div class="tx">수고 많으셨습니다 🌸</div></div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 4. MARKET -->
+  <div class="device">
+    <div class="cap">④ 나눔마켓</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div class="logo">나눔<span>마켓</span></div><div style="display:flex;gap:10px;align-items:center"><span>🔍</span><button class="write-btn">＋ 글쓰기</button></div></div>
+      <div class="chips">
+        <span class="chip-f on">전체</span><span class="chip-f">나눔</span><span class="chip-f">요청</span><span class="chip-f">완료</span>
+      </div>
+      <div class="pad" style="padding-top:12px">
+        <div class="card" style="border:1px solid #F0D9DE">
+          <div class="ph"></div>
+          <div class="info"><span class="tag pin">📌 상단고정</span> <span class="tag share">나눔</span><h4>아기 옷 (6~12개월) 무료로 드려요</h4><div class="cmeta"><span>신대동</span><span>💬 4</span><span>방금 전</span></div></div>
+        </div>
+        <div class="card">
+          <div class="ph"></div>
+          <div class="info"><span class="tag share">나눔</span><h4>책장 나눔합니다 (직접 가져가실 분)</h4><div class="cmeta"><span>중앙동</span><span>💬 2</span><span>1시간 전</span></div></div>
+        </div>
+        <div class="card">
+          <div class="ph"></div>
+          <div class="info"><span class="tag req">요청</span><h4>유아용 카시트 잠깐 빌릴 수 있을까요?</h4><div class="cmeta"><span>신대동</span><span>💬 6</span><span>3시간 전</span></div></div>
+        </div>
+        <div class="infeed">
+          <span class="badge">광고</span><div class="ph"></div>
+          <div class="tx"><b>신대상권 · 봄날카페</b> 신규 오픈 1+1 이벤트<small>스폰서</small></div>
+        </div>
+        <div class="card" style="opacity:.7">
+          <div class="ph"></div>
+          <div class="info"><span class="tag done">완료</span><h4>화분 나눔 — 마감되었습니다 🙏</h4><div class="cmeta"><span>덕암동</span><span>💬 9</span><span>어제</span></div></div>
+        </div>
+      </div>
+      <div class="bottomnav">
+        <div class="bn"><div class="d"></div>홈</div>
+        <div class="bn"><div class="d"></div>기사</div>
+        <div class="bn"><div class="d"></div>상권</div>
+        <div class="bn"><div class="d"></div>제보</div>
+        <div class="bn on"><div class="d"></div>나눔마켓</div>
+        <div class="bn"><div class="d"></div>게시판</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 5. REPORT -->
+  <div class="device">
+    <div class="cap">⑤ 제보하기</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div class="logo">제보<span>하기</span></div><div></div></div>
+      <div class="pad">
+        <p style="font-size:14px;line-height:1.7;color:#3a3133;margin-bottom:18px">신대지구의 소식·제보를 보내주세요.<br>확인 후 기사에 반영하거나 직접 연락드립니다.</p>
+        <div class="field"><label>제목</label><input placeholder="예) 우리 동네 이런 일이 있어요"></div>
+        <div class="field"><label>분류</label><select><option>지역소식</option><option>행정</option><option>인물</option><option>생활</option><option>기타</option></select></div>
+        <div class="field"><label>내용</label><textarea placeholder="언제·어디서·무슨 일인지 적어주세요"></textarea></div>
+        <div class="field"><label>사진 첨부 (선택)</label><div class="filebox">📷 사진을 첨부하려면 눌러주세요</div></div>
+        <div class="field"><label>연락처 (선택)</label><input placeholder="회신받을 휴대폰 또는 이메일"></div>
+        <button class="submit">제보 보내기</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 6. MARKET WRITE -->
+  <div class="device">
+    <div class="cap">⑥ 나눔마켓 글쓰기</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">글쓰기</div><div></div></div>
+      <div class="pad">
+        <div class="field"><label>분류</label>
+          <div class="chips" style="padding:0;gap:8px">
+            <span class="chip-f on">나눔</span><span class="chip-f">요청</span>
+          </div>
+        </div>
+        <div class="field"><label>제목</label><input placeholder="예) 아기 옷 나눔해요"></div>
+        <div class="field"><label>동네</label><select><option>신대동</option><option>중앙동</option><option>덕암동</option></select></div>
+        <div class="field"><label>내용</label><textarea placeholder="물품 상태, 거래 방법 등을 적어주세요"></textarea></div>
+        <div class="field"><label>사진 (최대 5장)</label><div class="filebox">📷 사진 추가</div></div>
+        <button class="submit">등록하기</button>
+        <p class="ipnote" style="margin-top:14px">글쓰기는 카카오 로그인 후 가능합니다</p>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 7. MARKET DETAIL -->
+  <div class="device">
+    <div class="cap">⑦ 나눔마켓 글 상세</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">나눔<span>마켓</span></div><div>⋯</div></div>
+      <div class="pad">
+        <div class="mhero"></div>
+        <div class="mthumbs"><div></div><div></div><div></div></div>
+        <div><span class="tag share">나눔</span> <span class="tag pin">📌 상단고정</span></div>
+        <h2 style="font-family:var(--serif);font-size:20px;margin:12px 0 8px;font-weight:700">아기 옷 (6~12개월) 무료로 드려요</h2>
+        <div class="seller">
+          <div class="av"></div>
+          <div class="nm">행복맘<span>신대동 · 방금 전</span></div>
+        </div>
+        <p style="font-size:15px;line-height:1.8;color:#3a3133">아이가 자라서 못 입는 옷들이에요. 상태 좋고 깨끗하게 세탁했습니다. 필요하신 분 댓글 주세요. 직접 가져가실 분 우선이에요 :)</p>
+
+        <div class="cmts" style="margin-top:24px">
+          <h3>댓글 4</h3>
+          <div class="cmt"><div class="av"></div><div class="b"><div class="nm">이웃맘 <span>10분 전</span> <span class="rep">🚩 신고</span></div><div class="tx">혹시 아직 있을까요? 받고 싶어요!</div></div></div>
+          <div class="cmt"><div class="av" style="background:#D69AA8"></div><div class="b"><div class="nm">행복맘 <span>5분 전</span> <span class="rep">🚩 신고</span></div><div class="tx">네 있어요~ 쪽지 드릴게요 😊</div></div></div>
+        </div>
+        <div style="text-align:center;margin:18px 0 0"><span class="reportlink">🚩 이 게시글 신고하기</span></div>
+      </div>
+      <div class="barbtn">
+        <button class="heart">🤍 12</button>
+        <button class="chat">💬 댓글 달기</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 8. DISTRICT (상권) -->
+  <div class="device">
+    <div class="cap">⑧ 신대상권</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div class="logo">신대<span>상권</span></div><div style="display:flex;gap:14px">🔍</div></div>
+      <div class="chips">
+        <span class="chip-f on">전체</span><span class="chip-f">맛집</span><span class="chip-f">카페</span><span class="chip-f">생활·편의</span><span class="chip-f">의료</span>
+      </div>
+      <div class="pad" style="padding-top:12px">
+        <div class="adbox" style="margin:0 0 16px">상권 상단 배너 광고</div>
+        <div class="store">
+          <div class="ph"></div>
+          <div class="info"><span class="cat">맛집</span><span class="promo">홍보</span><h4>신대해장국 — 24시 영업</h4><div class="meta"><span class="star">★ 4.8</span><span>신대동</span><span>리뷰 32</span></div></div>
+        </div>
+        <div class="store">
+          <div class="ph"></div>
+          <div class="info"><span class="cat">카페</span><span class="promo">홍보</span><h4>봄날카페 — 신규 오픈 1+1</h4><div class="meta"><span class="star">★ 4.9</span><span>중앙동</span><span>리뷰 11</span></div></div>
+        </div>
+        <div class="store">
+          <div class="ph"></div>
+          <div class="info"><span class="cat">맛집</span><h4>할매손칼국수</h4><div class="meta"><span class="star">★ 4.7</span><span>덕암동</span><span>리뷰 58</span></div></div>
+        </div>
+        <div class="store">
+          <div class="ph"></div>
+          <div class="info"><span class="cat">생활·편의</span><h4>신대세탁소</h4><div class="meta"><span class="star">★ 4.6</span><span>신대동</span><span>리뷰 9</span></div></div>
+        </div>
+      </div>
+      <div class="bottomnav">
+        <div class="bn"><div class="d"></div>홈</div>
+        <div class="bn"><div class="d"></div>기사</div>
+        <div class="bn on"><div class="d"></div>상권</div>
+        <div class="bn"><div class="d"></div>제보</div>
+        <div class="bn"><div class="d"></div>나눔마켓</div>
+        <div class="bn"><div class="d"></div>게시판</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 9. STORE PROMO WRITE -->
+  <div class="device">
+    <div class="cap">⑨ 상권 홍보 글쓰기</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">홍보 글쓰기</div><div></div></div>
+      <div class="pad">
+        <div class="loginbox" style="text-align:left">
+          <p style="margin:0;color:#B5803A">⚠ 홍보 글은 <b>등록된 업체</b>만 작성할 수 있으며, 게시 전 <b>관리자 승인</b>이 필요합니다.</p>
+        </div>
+        <div class="field"><label>업체 선택</label><select><option>신대해장국 (승인된 내 업체)</option></select></div>
+        <div class="field"><label>제목</label><input placeholder="예) 점심 특선 메뉴 출시"></div>
+        <div class="field"><label>분류</label>
+          <div class="chips" style="padding:0;gap:8px"><span class="chip-f on">이벤트</span><span class="chip-f">신메뉴</span><span class="chip-f">공지</span></div>
+        </div>
+        <div class="field"><label>내용</label><textarea placeholder="홍보 내용을 적어주세요"></textarea></div>
+        <div class="field"><label>사진 (최대 5장)</label><div class="filebox">📷 사진 추가</div></div>
+        <button class="submit">승인 요청</button>
+        <p class="ipnote" style="margin-top:12px">제출 시 '승인 대기' 상태가 되고, 승인되면 노출됩니다</p>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 10. BUSINESS REGISTER -->
+  <div class="device">
+    <div class="cap">⑩ 업체 등록</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">업체 등록</div><div></div></div>
+      <div class="pad">
+        <p style="font-size:14px;line-height:1.7;color:#3a3133;margin-bottom:16px">업체를 등록하고 승인받으면 상권 홍보 글을 올릴 수 있어요.</p>
+        <div class="field"><label>업체명</label><input placeholder="예) 신대해장국"></div>
+        <div class="field"><label>업종</label><select><option>맛집</option><option>카페</option><option>생활·편의</option><option>의료</option><option>기타</option></select></div>
+        <div class="field"><label>주소</label><input placeholder="순천시 신대지구 …"></div>
+        <div class="field"><label>전화번호</label><input placeholder="061-…"></div>
+        <div class="field"><label>사업자등록번호</label><input placeholder="확인용 (비공개)"></div>
+        <div class="field"><label>대표 이미지 / 로고</label><div class="filebox">📷 대표 이미지 1장</div></div>
+        <div class="field"><label>매장·메뉴 사진 (최대 10장)</label>
+          <div class="gallery">
+            <div class="g" style="display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;background:#E7D3C7">＋</div>
+            <div class="g"></div><div class="g"></div>
+          </div>
+          <p class="ipnote" style="text-align:left;margin:0">메뉴판·내부·음식 사진을 올리면 상세 화면에 갤러리로 노출됩니다</p>
+        </div>
+        <div class="field"><label>메뉴 (선택)</label>
+          <div style="display:flex;gap:8px;margin-bottom:6px"><input placeholder="메뉴명" style="flex:1"><input placeholder="가격" style="width:90px"></div>
+          <button class="mini-btn ghost" style="font-size:12px">＋ 메뉴 추가</button>
+        </div>
+        <div class="field"><label>운영시간</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="time" value="09:00" style="flex:1"><span style="color:var(--muted)">~</span><input type="time" value="21:00" style="flex:1">
+          </div>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;color:var(--muted);margin-top:8px;font-size:12px"><input type="checkbox" style="width:auto">24시간 영업 / 요일별로 다름</label>
+        </div>
+        <div class="field"><label>휴무일</label>
+          <div class="chips" style="padding:0;gap:6px">
+            <span class="chip-f">월</span><span class="chip-f">화</span><span class="chip-f">수</span><span class="chip-f">목</span><span class="chip-f">금</span><span class="chip-f">토</span><span class="chip-f on">일</span><span class="chip-f">연중무휴</span>
+          </div>
+          <input placeholder="기타 (예: 매월 2·4째 월요일, 명절)" style="margin-top:8px">
+        </div>
+        <div class="field"><label>업체 소개</label><textarea placeholder="간단한 소개"></textarea></div>
+        <button class="submit">등록 신청 (승인 대기)</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 11. AD APPLY -->
+  <div class="device">
+    <div class="cap">⑪ 배너 광고 신청</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">광고 신청</div><div></div></div>
+      <div class="pad">
+        <p style="font-size:14px;line-height:1.7;color:#3a3133;margin-bottom:16px">신대신문에 배너 광고를 신청하세요. 지역 주민에게 노출됩니다.</p>
+        <div class="field"><label>광고 위치</label><select>
+          <option>홈 상단 배너</option><option>홈 중간 배너</option><option>홈 하단 배너</option>
+          <option>기사 상단 배너</option><option>기사 중간 배너</option><option>기사 하단 배너</option>
+          <option>상권 상단 배너</option><option>나눔마켓 인피드</option><option>사이드 배너 (PC)</option>
+        </select></div>
+        <div class="field"><label>업체명 / 광고주</label><input placeholder="예) 봄날카페"></div>
+        <div class="field"><label>배너 이미지</label><div class="filebox">🖼 배너 이미지 업로드 (권장 1200×300)</div></div>
+        <div class="field"><label>연결 링크</label><input placeholder="https://"></div>
+        <div class="field"><label>희망 게재 기간</label>
+          <div class="chips" style="padding:0;gap:8px"><span class="chip-f on">1주</span><span class="chip-f">1개월</span><span class="chip-f">3개월</span></div>
+        </div>
+        <div class="field"><label>연락처</label><input placeholder="회신받을 연락처"></div>
+        <button class="submit">광고 신청하기</button>
+        <p class="ipnote" style="margin-top:12px">신청 후 관리자 확인·승인을 거쳐 게재됩니다</p>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 12. LOGIN -->
+  <div class="device">
+    <div class="cap">⑫ 로그인 / 회원가입</div>
+    <div class="phone"><div class="scr">
+      <div class="login-wrap">
+        <img src="assets/logo.svg" alt="신대신문" style="height:48px;margin:0 auto">
+        <div class="tagline">신대지구의 오늘을 전합니다<br>로그인하고 댓글·나눔·상권을 이용하세요</div>
+        <button class="kakao">💬 카카오로 3초 만에 시작하기</button>
+        <button class="guest">로그인 없이 둘러보기</button>
+        <div class="terms">
+          가입 시 <a>이용약관</a> 및 <a>개인정보처리방침</a>에<br>동의하는 것으로 간주됩니다.
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 24. NICKNAME SETUP -->
+  <div class="device">
+    <div class="cap">㉔ 닉네임 설정 (가입 직후)</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div class="logo" style="font-size:18px">프로필 설정</div><div></div></div>
+      <div class="pad">
+        <span class="kicker">환영합니다 🎉</span>
+        <h2 style="font-family:var(--serif);font-size:21px;margin:12px 0 8px;font-weight:700">사용하실 닉네임을 정해주세요</h2>
+        <p style="font-size:13px;color:#8A7E80;margin-bottom:18px">댓글·나눔·상권에서 이 이름으로 표시됩니다. 언제든 변경할 수 있어요.</p>
+
+        <div class="nick-prev"><div class="av"></div><div><b>신대지킴이</b><div style="font-size:11px;color:#8A7E80">미리보기</div></div></div>
+
+        <div class="field"><label>닉네임 (2~12자)</label>
+          <div style="display:flex;gap:8px"><input value="신대지킴이" style="flex:1"><button class="mini-btn ghost" style="white-space:nowrap">중복확인</button></div>
+          <p class="ipnote" style="text-align:left;color:#3f8f5e;margin:6px 0 0">✓ 사용 가능한 닉네임입니다</p>
+        </div>
+        <div class="field"><label>거주 동네 (선택)</label><select><option>신대동</option><option>중앙동</option><option>덕암동</option><option>선택 안 함</option></select></div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:18px"><input type="checkbox" checked style="width:auto">서비스 이용약관 및 개인정보처리방침에 동의</label>
+        <button class="submit">시작하기</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 13. STORE DETAIL -->
+  <div class="device">
+    <div class="cap">⑬ 가게 상세 (메뉴·영업시간)</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">신대<span>상권</span></div><div>⤴</div></div>
+      <div class="pad">
+        <div class="gallery"><div class="g"></div><div class="g"></div><div class="g"></div></div>
+        <div><span class="store" style="display:inline;padding:0;box-shadow:none;background:none"><span class="cat">맛집</span> <span class="promo">홍보 등록업체</span></span></div>
+        <h2 style="font-family:var(--serif);font-size:22px;margin:12px 0 6px;font-weight:700">신대해장국</h2>
+        <div class="meta" style="font-size:13px;color:var(--muted)"><span class="star">★ 4.8</span> · 리뷰 32 · 신대동</div>
+
+        <div style="margin-top:16px">
+          <div class="inforow"><div class="k">영업시간</div><div class="v"><span class="open-now">영업 중</span> · 24시간 영업</div></div>
+          <div class="inforow"><div class="k">휴무일</div><div class="v">연중무휴</div></div>
+          <div class="inforow"><div class="k">전화</div><div class="v">061-123-4567</div></div>
+          <div class="inforow"><div class="k">주소</div><div class="v">순천시 신대지구 신대로 12 · <span style="color:var(--rose)">지도</span></div></div>
+        </div>
+
+        <div class="sec-title" style="margin-top:22px"><h3>메뉴</h3></div>
+        <div class="menu-item"><div style="display:flex;align-items:center"><div class="mi"></div><div class="nm">한우해장국<small>가장 인기</small></div></div><div class="pr">9,000원</div></div>
+        <div class="menu-item"><div style="display:flex;align-items:center"><div class="mi"></div><div class="nm">선지해장국</div></div><div class="pr">8,000원</div></div>
+        <div class="menu-item"><div style="display:flex;align-items:center"><div class="mi"></div><div class="nm">수육 (소)</div></div><div class="pr">18,000원</div></div>
+
+        <div class="sec-title" style="margin-top:22px"><h3>홍보 소식</h3></div>
+        <div class="promo-card"><span class="pc-tag">신메뉴</span><h5>점심 특선 출시</h5><p>11~14시 한정, 해장국+공기밥+음료 7,500원!</p></div>
+
+        <div class="cmts" style="margin-top:20px">
+          <h3>리뷰 32</h3>
+          <div class="cmt"><div class="av"></div><div class="b"><div class="nm">단골손님 <span>★★★★★</span> <span class="rep">🚩 신고</span></div><div class="tx">속풀이엔 여기가 최고예요.</div></div></div>
+        </div>
+        <div style="text-align:center;margin:18px 0"><span class="reportlink">🚩 이 업체 신고하기</span></div>
+      </div>
+      <div class="barbtn">
+        <button class="heart">🤍 찜</button>
+        <button class="chat">📞 전화하기</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 15. ORG LIST -->
+  <div class="device">
+    <div class="cap">⑮ 지역단체</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div class="logo">지역<span>단체</span></div><div style="display:flex;gap:14px">🔍</div></div>
+      <div class="chips">
+        <span class="chip-f on">전체</span><span class="chip-f">주민자치</span><span class="chip-f">봉사</span><span class="chip-f">동호회</span><span class="chip-f">종교·문화</span>
+      </div>
+      <div class="pad" style="padding-top:12px">
+        <p style="font-size:13px;color:#8A7E80;margin-bottom:12px">우리 동네 단체를 만나고 함께해요</p>
+        <div class="store">
+          <div class="ph"></div>
+          <div class="info"><span class="org">주민자치</span><h4>신대동 주민자치회</h4><div class="meta"><span>회원 84명</span><span>신대동</span></div></div>
+        </div>
+        <div class="store">
+          <div class="ph"></div>
+          <div class="info"><span class="org">봉사</span><h4>해피나눔 봉사단</h4><div class="meta"><span>회원 52명</span><span>중앙동</span></div></div>
+        </div>
+        <div class="store">
+          <div class="ph"></div>
+          <div class="info"><span class="org">동호회</span><h4>신대 둘레길 걷기 모임</h4><div class="meta"><span>회원 37명</span><span>덕암동</span></div></div>
+        </div>
+        <div class="store">
+          <div class="ph"></div>
+          <div class="info"><span class="org">종교·문화</span><h4>신대 합창단</h4><div class="meta"><span>회원 28명</span><span>신대동</span></div></div>
+        </div>
+      </div>
+      <div class="bottomnav">
+        <div class="bn"><div class="d"></div>홈</div>
+        <div class="bn"><div class="d"></div>기사</div>
+        <div class="bn on"><div class="d"></div>상권</div>
+        <div class="bn"><div class="d"></div>제보</div>
+        <div class="bn"><div class="d"></div>나눔마켓</div>
+        <div class="bn"><div class="d"></div>게시판</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 16. ORG DETAIL -->
+  <div class="device">
+    <div class="cap">⑯ 지역단체 소개</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">지역<span>단체</span></div><div>⤴</div></div>
+      <div class="pad">
+        <div class="mhero" style="background:linear-gradient(135deg,#CFE7D7,#7FB894)"></div>
+        <div><span class="tag org">주민자치</span></div>
+        <h2 style="font-family:var(--serif);font-size:22px;margin:12px 0 6px;font-weight:700">신대동 주민자치회</h2>
+        <div class="meta" style="font-size:13px;color:var(--muted)">회원 84명 · 신대동 · 2019년~</div>
+
+        <div style="margin-top:16px">
+          <div class="inforow"><div class="k">활동지역</div><div class="v">순천시 신대지구 일대</div></div>
+          <div class="inforow"><div class="k">대표</div><div class="v">홍길동 회장</div></div>
+          <div class="inforow"><div class="k">문의</div><div class="v">061-000-0000 · 카카오채널</div></div>
+        </div>
+
+        <div class="sec-title" style="margin-top:22px"><h3>단체 소개</h3></div>
+        <p style="font-size:15px;line-height:1.8;color:#3a3133">신대동 주민들의 더 나은 생활을 위해 마을 환경 개선, 봄·가을 정원 가꾸기, 이웃 돌봄 활동을 펼치고 있습니다. 누구나 함께할 수 있어요.</p>
+
+        <div class="sec-title" style="margin-top:22px"><h3>단체 소식</h3><a>더보기 ›</a></div>
+        <div class="promo-card"><span class="pc-tag" style="color:#3f8f5e;background:#E3F1E8">모집</span><h5>봄맞이 정원 가꾸기 자원봉사 모집</h5><p>이번 주말 함께하실 분을 찾습니다. 댓글로 신청해주세요!</p></div>
+        <div class="promo-card"><span class="pc-tag" style="color:#3f8f5e;background:#E3F1E8">공지</span><h5>6월 정기 회의 안내</h5><p>6월 30일 저녁 7시, 주민센터 2층.</p></div>
+        <div style="text-align:center;margin:18px 0"><span class="reportlink">🚩 이 단체 신고하기</span></div>
+      </div>
+      <div class="barbtn">
+        <button class="heart">🤍 관심</button>
+        <button class="chat" style="background:#FEE500;color:#191600">💬 카톡 문의</button>
+        <button class="chat">✋ 가입 신청</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 17. ORG POST WRITE -->
+  <div class="device">
+    <div class="cap">⑰ 단체 소식 글쓰기</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">단체 소식</div><div></div></div>
+      <div class="pad">
+        <div class="loginbox" style="text-align:left;background:#EAF4EE;border-color:#CFE7D7">
+          <p style="margin:0;color:#3f8f5e">ℹ 단체 소식은 <b>등록·승인된 단체</b>의 운영진만 작성할 수 있습니다.</p>
+        </div>
+        <div class="field"><label>단체 선택</label><select><option>신대동 주민자치회 (내 단체)</option></select></div>
+        <div class="field"><label>제목</label><input placeholder="예) 봄맞이 봉사 모집"></div>
+        <div class="field"><label>분류</label>
+          <div class="chips" style="padding:0;gap:8px"><span class="chip-f on">모집</span><span class="chip-f">공지</span><span class="chip-f">활동후기</span></div>
+        </div>
+        <div class="field"><label>내용</label><textarea placeholder="단체 소식을 적어주세요"></textarea></div>
+        <div class="field"><label>사진 (최대 5장)</label><div class="filebox">📷 사진 추가</div></div>
+        <button class="submit">게시하기</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 18. ORG REGISTER -->
+  <div class="device">
+    <div class="cap">⑱ 지역단체 등록</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">단체 등록</div><div></div></div>
+      <div class="pad">
+        <p style="font-size:14px;line-height:1.7;color:#3a3133;margin-bottom:16px">우리 단체를 등록하고 승인받으면 소개 페이지와 소식 글을 운영할 수 있어요.</p>
+        <div class="field"><label>단체명</label><input placeholder="예) 신대동 주민자치회"></div>
+        <div class="field"><label>분류</label><select><option>주민자치</option><option>봉사</option><option>동호회</option><option>종교·문화</option><option>기타</option></select></div>
+        <div class="field"><label>대표자 / 직책</label><input placeholder="예) 홍길동 회장"></div>
+        <div class="field"><label>활동지역</label><input placeholder="예) 순천시 신대지구"></div>
+        <div class="field"><label>문의 연락처</label><input placeholder="전화번호"></div>
+        <div class="field"><label>카카오톡 채널 (1:1 문의용)</label><input placeholder="http://pf.kakao.com/_xxxxx"><p class="ipnote" style="text-align:left;margin:6px 0 0">채널을 연결하면 '카톡 문의' 버튼으로 1:1 채팅이 열립니다</p></div>
+        <div class="field"><label>가입 신청 받기</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;color:var(--muted);font-size:13px"><input type="checkbox" checked style="width:auto">홈페이지에서 회원 가입 신청을 받습니다</label>
+        </div>
+        <div class="field"><label>대표 이미지 / 로고</label><div class="filebox">📷 대표 이미지 1장</div></div>
+        <div class="field"><label>활동 사진 (최대 10장)</label>
+          <div class="gallery"><div class="g" style="display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;background:#9FC7AC">＋</div><div class="g"></div></div>
+        </div>
+        <div class="field"><label>단체 소개</label><textarea placeholder="단체 활동·목적 소개"></textarea></div>
+        <button class="submit">등록 신청 (승인 대기)</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 19. ORG JOIN FORM -->
+  <div class="device">
+    <div class="cap">⑲ 지역단체 가입 신청</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">가입 신청</div><div></div></div>
+      <div class="pad">
+        <div class="loginbox" style="text-align:left;background:#EAF4EE;border-color:#CFE7D7">
+          <p style="margin:0;color:#3f8f5e"><b>신대동 주민자치회</b> 가입을 신청합니다.<br>단체 운영진 승인 후 회원이 됩니다.</p>
+        </div>
+        <div class="field"><label>이름</label><input placeholder="실명"></div>
+        <div class="field"><label>연락처</label><input placeholder="휴대폰 번호"></div>
+        <div class="field"><label>거주 동네</label><select><option>신대동</option><option>중앙동</option><option>덕암동</option><option>기타</option></select></div>
+        <div class="field"><label>가입 동기 (선택)</label><textarea placeholder="간단히 적어주세요"></textarea></div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:16px"><input type="checkbox" style="width:auto">개인정보를 단체 운영진에게 제공하는 데 동의합니다</label>
+        <button class="submit">가입 신청하기</button>
+        <p class="ipnote" style="margin-top:12px">신청 후 '승인 대기' 상태가 되며, 결과는 알림으로 안내됩니다</p>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 20. ORG MEMBER MANAGE (운영진) -->
+  <div class="device">
+    <div class="cap">⑳ 단체 가입 신청 관리 (운영진)</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">가입 관리</div><div></div></div>
+      <div class="pad">
+        <div class="field"><label>단체 선택</label><select><option>신대동 주민자치회 (운영진)</option></select></div>
+        <div class="chips" style="padding:0 0 8px"><span class="chip-f on">신청 3</span><span class="chip-f">회원 84</span></div>
+
+        <div style="font-size:12px;font-weight:700;color:#3f8f5e;margin:8px 0">가입 신청 대기</div>
+        <div class="card" style="display:block">
+          <div style="display:flex;align-items:center;gap:10px"><div class="ph" style="width:40px;height:40px;border-radius:50%"></div><div class="info"><h4 style="margin:0">이웃님 · 신대동</h4><div class="cmeta">동기: 마을 활동에 참여하고 싶어요</div></div></div>
+          <div style="display:flex;gap:8px;margin-top:12px"><button class="mini-btn" style="flex:1">승인</button><button class="mini-btn ghost" style="flex:1">거절</button></div>
+        </div>
+        <div class="card" style="display:block">
+          <div style="display:flex;align-items:center;gap:10px"><div class="ph" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#EFD9DE,#D69AA8)"></div><div class="info"><h4 style="margin:0">박주민 · 중앙동</h4><div class="cmeta">동기: 봉사활동 함께하고 싶습니다</div></div></div>
+          <div style="display:flex;gap:8px;margin-top:12px"><button class="mini-btn" style="flex:1">승인</button><button class="mini-btn ghost" style="flex:1">거절</button></div>
+        </div>
+
+        <div style="font-size:12px;font-weight:700;color:var(--muted);margin:18px 0 8px">현재 회원</div>
+        <div class="cmt" style="border:none"><div class="av"></div><div class="b"><div class="nm">홍길동 <span>회장 · 운영진</span></div></div></div>
+        <div class="cmt"><div class="av" style="background:#D69AA8"></div><div class="b"><div class="nm">김신대 <span>회원</span></div></div><a class="act del" style="align-self:center">내보내기</a></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 21. REPORT SHEET -->
+  <div class="device">
+    <div class="cap">㉑ 신고하기 (공통)</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">✕</div><div class="logo" style="font-size:18px">신고하기</div><div></div></div>
+      <div class="pad">
+        <p style="font-size:14px;color:#3a3133;margin-bottom:6px">신고 대상: <b>댓글 · "광고성 댓글…"</b></p>
+        <p class="ipnote" style="text-align:left;margin-bottom:18px">기사·댓글·업체·지역단체·나눔마켓 글 모두 같은 방식으로 신고합니다</p>
+        <div class="field"><label>신고 사유</label>
+          <div class="mlist">
+            <a>욕설 · 비방 · 혐오 <span class="arr">○</span></a>
+            <a>허위사실 · 가짜뉴스 <span class="arr">○</span></a>
+            <a>광고 · 스팸 · 도배 <span class="arr">●</span></a>
+            <a>음란 · 부적절한 내용 <span class="arr">○</span></a>
+            <a>개인정보 노출 <span class="arr">○</span></a>
+            <a>저작권 침해 <span class="arr">○</span></a>
+            <a>기타 <span class="arr">○</span></a>
+          </div>
+        </div>
+        <div class="field"><label>상세 내용 (선택)</label><textarea placeholder="신고 사유를 자세히 적어주세요"></textarea></div>
+        <button class="submit" style="background:#c0504d">신고 접수</button>
+        <p class="ipnote" style="margin-top:12px">허위·반복 신고 시 이용이 제한될 수 있습니다</p>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 22. HOT -->
+  <div class="device">
+    <div class="cap">㉒ 핫소식 (베스트)</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div class="logo">🔥 핫<span>소식</span></div><div>🔍</div></div>
+      <div class="chips"><span class="chip-f on">일간</span><span class="chip-f">주간</span><span class="chip-f">월간</span></div>
+      <div class="pad" style="padding-top:12px">
+        <p style="font-size:12px;color:#8A7E80;margin-bottom:6px">오늘 가장 많이 본 기사 · 06.26 기준</p>
+        <div class="rankitem top"><div class="no">1</div><div class="t"><div class="k">행정</div><h4>청년 창업 지원금 2차 모집 공고</h4><div class="meta">👁 2,310 · 💬 18</div></div><div class="img"></div></div>
+        <div class="rankitem top"><div class="no">2</div><div class="t"><div class="k">인물</div><h4>"30년 한 자리에서" 떡집 사장님 이야기</h4><div class="meta">👁 1,558 · 💬 24</div></div><div class="img"></div></div>
+        <div class="rankitem top"><div class="no">3</div><div class="t"><div class="k">지역소식</div><h4>주민자치회, 봄맞이 마을정원 가꾸기</h4><div class="meta">👁 1,204 · 💬 8</div></div><div class="img"></div></div>
+        <div class="rankitem"><div class="no">4</div><div class="t"><div class="k">지역소식</div><h4>순천만 인근 도보길 정비 완료</h4><div class="meta">👁 876 · 💬 5</div></div><div class="img"></div></div>
+        <div class="rankitem"><div class="no">5</div><div class="t"><div class="k">생활</div><h4>여름 물놀이장 7월 1일 개장</h4><div class="meta">👁 742 · 💬 11</div></div><div class="img"></div></div>
+        <div class="rankitem"><div class="no">6</div><div class="t"><div class="k">행정</div><h4>마을버스 3번 노선 일부 조정</h4><div class="meta">👁 690 · 💬 3</div></div><div class="img"></div></div>
+        <div class="rankitem"><div class="no">7</div><div class="t"><div class="k">지역소식</div><h4>작은 도서관 리모델링 후 재개관</h4><div class="meta">👁 654 · 💬 7</div></div><div class="img"></div></div>
+      </div>
+      <div class="bottomnav">
+        <div class="bn on"><div class="d"></div>홈</div>
+        <div class="bn"><div class="d"></div>기사</div>
+        <div class="bn"><div class="d"></div>상권</div>
+        <div class="bn"><div class="d"></div>제보</div>
+        <div class="bn"><div class="d"></div>나눔마켓</div>
+        <div class="bn"><div class="d"></div>게시판</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 23. REPORTER RECRUIT -->
+  <div class="device">
+    <div class="cap">㉓ 기자 모집 / 신청</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">기자 모집</div><div></div></div>
+      <div class="pad">
+        <span class="kicker">함께할 시민기자를 찾습니다</span>
+        <h2 style="font-family:var(--serif);font-size:21px;margin:12px 0 8px;font-weight:700">신대지구 소식, 직접 전해보세요</h2>
+        <p style="font-size:14px;line-height:1.8;color:#3a3133;margin-bottom:18px">우리 동네 이야기를 취재하고 기사로 쓰는 시민기자를 모집합니다. 승인 후 기사 작성 권한이 부여됩니다.</p>
+
+        <div class="field"><label>이름</label><input placeholder="실명"></div>
+        <div class="field"><label>연락처</label><input placeholder="휴대폰 번호"></div>
+        <div class="field"><label>이메일</label><input placeholder="email@"></div>
+        <div class="field"><label>거주 동네</label><select><option>신대동</option><option>중앙동</option><option>덕암동</option><option>기타</option></select></div>
+        <div class="field"><label>관심 분야</label>
+          <div class="chips" style="padding:0;gap:8px"><span class="chip-f on">지역소식</span><span class="chip-f">행정</span><span class="chip-f">인물</span><span class="chip-f">생활</span></div>
+        </div>
+        <div class="field"><label>지원 동기 / 활동 경험</label><textarea placeholder="간단히 적어주세요"></textarea></div>
+
+        <div class="pledge">
+          <h4>⚖ 기자 책임 서약 (필수)</h4>
+          <p>본인은 작성·게재하는 모든 기사에 대해 <span class="strong">법적·윤리적 책임이 작성 기자 본인에게 있음</span>을 인지합니다.</p>
+          <p>명예훼손, 허위사실 유포, 저작권 침해, 개인정보 침해 등으로 발생하는 <span class="strong">민·형사상 모든 책임은 작성 기자가 부담</span>하며, 신대신문(운영사 DSBH)은 이에 대한 책임을 지지 않습니다.</p>
+          <p>취재·보도 시 언론윤리강령과 관련 법령을 준수할 것을 서약합니다.</p>
+          <label><input type="checkbox">위 내용을 모두 읽고 동의하며 서약합니다</label>
+        </div>
+        <div class="field"><label>서명 (성명 입력)</label><input placeholder="서약자 성명"></div>
+
+        <button class="submit">기자 신청 (승인 대기)</button>
+        <p class="ipnote" style="margin-top:12px">관리자 승인 후 기사 작성 권한이 부여됩니다</p>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 25. BOARD LIST -->
+  <div class="device">
+    <div class="cap">㉕ 자유게시판</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div class="logo">자유<span>게시판</span></div><div style="display:flex;gap:10px;align-items:center"><span>🔍</span><button class="write-btn">＋ 글쓰기</button></div></div>
+      <div class="chips"><span class="chip-f on">전체</span><span class="chip-f">🔥인기</span><span class="chip-f">질문</span><span class="chip-f">일상</span><span class="chip-f">동네소식</span></div>
+      <div class="pad" style="padding-top:12px">
+        <div class="card" style="display:block">
+          <div style="display:flex;gap:12px"><div class="ph"></div><div class="info"><span class="tag pin">📌 공지</span><h4>게시판 이용 규칙 안내</h4><div class="cmeta"><span>운영자</span><span>👁 1,204</span><span>💬 3</span></div></div></div>
+        </div>
+        <div class="card" style="display:block">
+          <div style="display:flex;gap:12px"><div class="ph"></div><div class="info"><span class="tag req">질문</span><h4>신대동 근처 괜찮은 소아과 있을까요?</h4><div class="cmeta"><span>행복맘</span><span>👍 12</span><span>💬 8</span><span>10분 전</span></div></div></div>
+        </div>
+        <div class="card" style="display:block">
+          <div style="display:flex;gap:12px"><div class="ph"></div><div class="info"><span class="tag share">일상</span><h4>오늘 순천만 노을 미쳤어요 📷</h4><div class="cmeta"><span>산책러</span><span>👍 34</span><span>💬 11</span><span>1시간 전</span></div></div></div>
+        </div>
+        <div class="card" style="display:block">
+          <div style="display:flex;gap:12px"><div class="ph" style="background:none"></div><div class="info"><span class="tag org">동네소식</span><h4>중앙시장 주차장 공사 시작했네요</h4><div class="cmeta"><span>토박이</span><span>👍 6</span><span>💬 2</span><span>3시간 전</span></div></div></div>
+        </div>
+      </div>
+      <div class="bottomnav">
+        <div class="bn"><div class="d"></div>홈</div>
+        <div class="bn"><div class="d"></div>기사</div>
+        <div class="bn"><div class="d"></div>상권</div>
+        <div class="bn"><div class="d"></div>제보</div>
+        <div class="bn"><div class="d"></div>나눔마켓</div>
+        <div class="bn on"><div class="d"></div>게시판</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 26. BOARD WRITE -->
+  <div class="device">
+    <div class="cap">㉖ 게시판 글쓰기</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">글쓰기</div><div></div></div>
+      <div class="pad">
+        <div class="field"><label>분류</label>
+          <div class="chips" style="padding:0;gap:8px"><span class="chip-f on">일상</span><span class="chip-f">질문</span><span class="chip-f">동네소식</span></div>
+        </div>
+        <div class="field"><label>제목</label><input placeholder="제목을 입력하세요"></div>
+        <div class="field"><label>내용</label><textarea placeholder="자유롭게 이야기해보세요"></textarea></div>
+        <div class="field"><label>사진 첨부 (최대 10장)</label>
+          <div class="gallery"><div class="g" style="display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;background:#E7D3C7">＋</div><div class="g"></div></div>
+        </div>
+        <button class="submit">등록하기</button>
+        <p class="ipnote" style="margin-top:12px">글쓰기는 카카오 로그인 후 가능합니다 · 욕설·광고는 제재될 수 있어요</p>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 27. BOARD DETAIL -->
+  <div class="device">
+    <div class="cap">㉗ 게시판 글 상세</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div style="font-size:20px">‹</div><div class="logo" style="font-size:18px">자유<span>게시판</span></div><div>⋯</div></div>
+      <div class="pad">
+        <span class="tag share">일상</span>
+        <h2 style="font-family:var(--serif);font-size:20px;margin:12px 0 8px;font-weight:700">오늘 순천만 노을 미쳤어요 📷</h2>
+        <div class="seller">
+          <div class="av"></div>
+          <div class="nm">산책러<span>신대동 · 1시간 전 · 👁 312</span></div>
+        </div>
+        <p style="font-size:15px;line-height:1.8;color:#3a3133">퇴근길에 잠깐 들렀는데 하늘이 너무 예뻤어요. 다들 한 번씩 가보세요!</p>
+        <div class="mhero" style="margin:14px 0"></div>
+
+        <div class="react">
+          <button class="like on">👍 좋아요 <span class="n">34</span></button>
+          <button class="share">⤴ 퍼가기</button>
+        </div>
+        <div style="text-align:center;margin-bottom:18px"><span class="reportlink">🚩 이 글 신고하기</span></div>
+
+        <div class="cmts">
+          <h3>댓글 11</h3>
+          <div class="cmt"><div class="av"></div><div class="b"><div class="nm">이웃 <span>40분 전</span> <span class="rep">🚩 신고</span></div><div class="tx">와 진짜 예쁘네요 👍</div></div></div>
+          <div class="cmt"><div class="av" style="background:#D69AA8"></div><div class="b"><div class="nm">토박이 <span>20분 전</span> <span class="rep">🚩 신고</span></div><div class="tx">저도 어제 봤어요 ㅎㅎ</div></div></div>
+        </div>
+      </div>
+      <div class="barbtn">
+        <button class="heart">👍 34</button>
+        <button class="chat">💬 댓글 달기</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 14. MYPAGE -->
+  <div class="device">
+    <div class="cap">⑭ 내정보 (마이페이지)</div>
+    <div class="phone"><div class="scr">
+      <div class="topbar"><div class="logo" style="font-size:18px">내정보</div><div>⚙</div></div>
+      <div class="pad">
+        <div class="profile">
+          <div class="av"></div>
+          <div class="nm">김신대 님<small>카카오 로그인 · 신대동</small></div>
+        </div>
+        <div class="idbar" style="border:1px solid var(--line);border-radius:14px;margin-bottom:16px">
+          <div class="tags">
+            <span class="t biz">🏪 신대해장국</span>
+            <span class="t org">🏛 신대동 주민자치회</span>
+          </div>
+        </div>
+        <div class="mlist">
+          <a>내가 쓴 게시글 <span class="arr">›</span></a>
+          <a>내가 쓴 댓글 <span class="arr">›</span></a>
+          <a>찜한 가게·나눔 <span class="arr">›</span></a>
+          <a>내 나눔마켓 글 <span class="arr">›</span></a>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:var(--rose-deep);margin:18px 0 8px">업체</div>
+        <div class="mlist">
+          <a>내 업체 관리 <span><span class="badge">승인됨</span> ›</span></a>
+          <a>상권 홍보 글쓰기 <span class="arr">›</span></a>
+          <a>업체 등록 신청 <span class="arr">›</span></a>
+          <a>광고 신청 <span class="arr">›</span></a>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#3f8f5e;margin:18px 0 8px">지역단체</div>
+        <div class="mlist">
+          <a>내 단체 관리 <span><span class="badge" style="background:#3f8f5e">운영진</span> ›</span></a>
+          <a>가입 신청 관리 <span><span class="badge" style="background:#3f8f5e">신청 3</span> ›</span></a>
+          <a>단체 소식 글쓰기 <span class="arr">›</span></a>
+          <a>가입한 단체 <span class="arr">›</span></a>
+          <a>지역단체 등록 신청 <span class="arr">›</span></a>
+        </div>
+        <div class="mlist" style="margin-top:14px">
+          <a>닉네임·프로필 수정 <span class="arr">›</span></a>
+          <a>✍ 기자 신청하기 <span class="arr">›</span></a>
+          <a>제보하기 <span class="arr">›</span></a>
+          <a>공지·이용약관 <span class="arr">›</span></a>
+          <a>알림 설정 <span class="arr">›</span></a>
+          <a style="color:var(--muted)">로그아웃 <span class="arr">›</span></a>
+        </div>
+      </div>
+      <div class="bottomnav">
+        <div class="bn"><div class="d"></div>홈</div>
+        <div class="bn"><div class="d"></div>기사</div>
+        <div class="bn"><div class="d"></div>상권</div>
+        <div class="bn"><div class="d"></div>제보</div>
+        <div class="bn"><div class="d"></div>나눔마켓</div>
+        <div class="bn"><div class="d"></div>게시판</div>
+      </div>
+    </div></div>
+  </div>
+
+</div>
+
+<div class="divider"><span>관리자 페이지 (PC)</span></div>
+
+<!-- ADMIN: DASHBOARD -->
+<div class="admin">
+  <div class="cap">A. 대시보드</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a class="on"><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>기자 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a><span class="di"></span>신고 관리</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>대시보드</h2>
+      <div class="sub">2026년 6월 26일 · 한눈에 보는 현황</div>
+      <div class="stats">
+        <div class="stat"><div class="v">128</div><div class="l">발행 기사</div></div>
+        <div class="stat"><div class="v">6</div><div class="l">임시저장</div></div>
+        <div class="stat"><div class="v">5</div><div class="l">대기 댓글</div></div>
+        <div class="stat"><div class="v">3</div><div class="l">신규 제보</div></div>
+      </div>
+      <h2 style="font-size:15px">최근 기사</h2>
+      <div class="sub">최근 발행/수정한 글</div>
+      <table>
+        <tr><th>제목</th><th>카테고리</th><th>상태</th><th>날짜</th><th></th></tr>
+        <tr><td>마을정원 가꾸기 나서</td><td>지역소식</td><td><span class="pill pub">발행</span></td><td>06.26</td><td><a class="act">수정</a></td></tr>
+        <tr><td>청년 창업 지원금 2차 모집</td><td>행정</td><td><span class="pill pub">발행</span></td><td>06.24</td><td><a class="act">수정</a></td></tr>
+        <tr><td>여름 물놀이장 운영 안내(초안)</td><td>생활</td><td><span class="pill draft">임시</span></td><td>06.23</td><td><a class="act">수정</a></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: ARTICLES -->
+<div class="admin">
+  <div class="cap">B. 기사 관리</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a class="on"><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a><span class="di"></span>신고 관리</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div><h2 style="margin:0">기사 관리</h2><div class="sub" style="margin:2px 0 0">총 134건</div></div>
+        <button class="mini-btn">＋ 새 기사 작성</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <span class="chip-f on" style="font-size:12px">전체</span><span class="chip-f" style="font-size:12px">발행</span><span class="chip-f" style="font-size:12px">임시저장</span>
+        <input style="margin-left:auto;width:200px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px" placeholder="🔍 제목 검색">
+      </div>
+      <table>
+        <tr><th>제목</th><th>카테고리</th><th>상태</th><th>조회</th><th>발행일</th><th>관리</th></tr>
+        <tr><td>마을정원 가꾸기 나서</td><td>지역소식</td><td><span class="pill pub">발행</span></td><td>1,204</td><td>06.26</td><td><a class="act">수정</a><a class="act del">삭제</a></td></tr>
+        <tr><td>도보길 정비 완료</td><td>지역소식</td><td><span class="pill pub">발행</span></td><td>876</td><td>06.25</td><td><a class="act">수정</a><a class="act del">삭제</a></td></tr>
+        <tr><td>청년 창업 지원금 2차</td><td>행정</td><td><span class="pill pub">발행</span></td><td>2,310</td><td>06.24</td><td><a class="act">수정</a><a class="act del">삭제</a></td></tr>
+        <tr><td>물놀이장 운영 안내</td><td>생활</td><td><span class="pill draft">임시</span></td><td>—</td><td>—</td><td><a class="act">수정</a><a class="act del">삭제</a></td></tr>
+        <tr><td>떡집 사장님 이야기</td><td>인물</td><td><span class="pill pub">발행</span></td><td>1,558</td><td>06.23</td><td><a class="act">수정</a><a class="act del">삭제</a></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: ARTICLE EDITOR -->
+<div class="admin">
+  <div class="cap">C. 기사 작성 / 편집</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a class="on"><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a><span class="di"></span>신고 관리</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>기사 작성</h2>
+      <div class="sub">제목·본문을 작성하고 발행 또는 임시저장하세요</div>
+      <div class="ed-grid">
+        <div class="ed-main">
+          <div class="field"><label>제목</label><input placeholder="기사 제목을 입력하세요"></div>
+          <div class="field"><label>본문</label>
+            <div class="toolbar"><span>B</span><span><i>i</i></span><span>H</span><span>🔗</span><span>🖼</span><span>“”</span></div>
+            <textarea class="editor-body" placeholder="본문을 작성하세요 (마크다운/리치텍스트)"></textarea>
+          </div>
+        </div>
+        <div class="ed-side">
+          <div class="box"><h4>발행 설정</h4>
+            <div class="field"><label>상태</label><select><option>발행</option><option>임시저장</option></select></div>
+            <div style="display:flex;gap:8px;margin-top:6px"><button class="mini-btn" style="flex:1">발행</button><button class="mini-btn ghost" style="flex:1">임시저장</button></div>
+          </div>
+          <div class="box"><h4>분류</h4>
+            <div class="field" style="margin:0"><select><option>지역소식</option><option>행정</option><option>인물</option><option>생활</option></select></div>
+          </div>
+          <div class="box"><h4>슬러그 (URL)</h4>
+            <div class="field" style="margin:0"><input value="village-garden-2026" style="font-size:12px"></div>
+          </div>
+          <div class="box"><h4>대표 이미지</h4>
+            <div class="filebox" style="padding:24px">📷 썸네일 업로드</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: COMMENTS -->
+<div class="admin">
+  <div class="cap">D. 댓글 관리</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a class="on"><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a><span class="di"></span>신고 관리</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>댓글 관리</h2>
+      <div class="sub">신고·부적절 댓글을 숨기거나 삭제할 수 있습니다</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <span class="chip-f on" style="font-size:12px">전체</span><span class="chip-f" style="font-size:12px">신고됨 2</span><span class="chip-f" style="font-size:12px">숨김</span>
+      </div>
+      <table>
+        <tr><th>작성자</th><th>내용</th><th>기사</th><th>상태</th><th>관리</th></tr>
+        <tr><td>김주민</td><td>동네가 예뻐졌네요!</td><td>마을정원…</td><td><span class="pill pub">노출</span></td><td><a class="act">숨김</a><a class="act del">삭제</a></td></tr>
+        <tr><td>익명</td><td style="color:#c0504d">(신고 3회) 광고성 댓글…</td><td>도보길 정비</td><td><span class="pill draft">신고</span></td><td><a class="act">숨김</a><a class="act del">삭제</a></td></tr>
+        <tr><td>이순천</td><td>물주기 당번 신청은?</td><td>마을정원…</td><td><span class="pill pub">노출</span></td><td><a class="act">숨김</a><a class="act del">삭제</a></td></tr>
+        <tr><td>박덕암</td><td>(숨김 처리됨)</td><td>떡집 사장님</td><td><span class="pill hide">숨김</span></td><td><a class="act">복구</a><a class="act del">삭제</a></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: MARKET -->
+<div class="admin">
+  <div class="cap">E. 나눔마켓 관리</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>기자 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a class="on"><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a><span class="di"></span>신고 관리</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>나눔마켓 관리</h2>
+      <div class="sub">게시글 상단고정·삭제, 부적절 글 관리</div>
+      <table>
+        <tr><th>제목</th><th>분류</th><th>작성자</th><th>상태</th><th>관리</th></tr>
+        <tr><td>아기 옷 무료로 드려요</td><td><span class="tag share">나눔</span></td><td>행복맘</td><td><span class="pill pub">📌 고정</span></td><td><a class="act">고정해제</a><a class="act del">삭제</a></td></tr>
+        <tr><td>책장 나눔합니다</td><td><span class="tag share">나눔</span></td><td>중앙동주민</td><td><span class="pill pub">노출</span></td><td><a class="act">상단고정</a><a class="act del">삭제</a></td></tr>
+        <tr><td>유아용 카시트 빌릴까요?</td><td><span class="tag req">요청</span></td><td>신대맘</td><td><span class="pill pub">노출</span></td><td><a class="act">상단고정</a><a class="act del">삭제</a></td></tr>
+        <tr><td>화분 나눔 (마감)</td><td><span class="tag done">완료</span></td><td>덕암주민</td><td><span class="pill hide">완료</span></td><td><a class="act del">삭제</a></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: REPORTS -->
+<div class="admin">
+  <div class="cap">F. 제보함</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>기자 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a class="on"><span class="di"></span>제보함</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>제보함</h2>
+      <div class="sub">주민 제보 접수 내역 · 기사화 여부 관리</div>
+      <table>
+        <tr><th>제목</th><th>분류</th><th>연락처</th><th>상태</th><th>관리</th></tr>
+        <tr><td>우리 동네 가로등 고장났어요</td><td>생활</td><td>010-****-1234</td><td><span class="pill draft">신규</span></td><td><a class="act">기사화</a><a class="act">확인</a></td></tr>
+        <tr><td>주말 플리마켓 열려요</td><td>지역소식</td><td>email@…</td><td><span class="pill pub">확인</span></td><td><a class="act">기사화</a></td></tr>
+        <tr><td>봉사활동 미담 제보</td><td>인물</td><td>비공개</td><td><span class="pill hide">처리완료</span></td><td><a class="act">보기</a></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: ADS -->
+<div class="admin">
+  <div class="cap">G. 광고 배너 관리</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>기자 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a class="on"><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div><h2 style="margin:0">광고 배너 관리</h2><div class="sub" style="margin:2px 0 0">슬롯별 이미지·링크 교체 (지역 광고주 직접 배너)</div></div>
+        <button class="mini-btn">＋ 슬롯 추가</button>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--rose-deep);margin:4px 0 8px">홈</div>
+      <div class="adslot"><div class="prev"></div><div class="info"><div class="l">홈 상단 배너</div><div class="u">→ https://example-shop.kr · 게재중</div></div><button class="mini-btn ghost">교체</button></div>
+      <div class="adslot"><div class="prev"></div><div class="info"><div class="l">홈 중간 배너 (헤드라인 아래)</div><div class="u">→ https://local-cafe.kr · 게재중</div></div><button class="mini-btn ghost">교체</button></div>
+      <div class="adslot"><div class="prev"></div><div class="info"><div class="l">홈 하단 배너</div><div class="u">(비어있음)</div></div><button class="mini-btn">등록</button></div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--rose-deep);margin:18px 0 8px">기사</div>
+      <div class="adslot"><div class="prev"></div><div class="info"><div class="l">기사 상단 배너 (제목 위)</div><div class="u">(비어있음)</div></div><button class="mini-btn">등록</button></div>
+      <div class="adslot"><div class="prev"></div><div class="info"><div class="l">기사 중간 배너 (본문 중간)</div><div class="u">→ https://sc-home.kr · 게재중</div></div><button class="mini-btn ghost">교체</button></div>
+      <div class="adslot"><div class="prev"></div><div class="info"><div class="l">기사 하단 배너 (댓글 위)</div><div class="u">(비어있음)</div></div><button class="mini-btn">등록</button></div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--rose-deep);margin:18px 0 8px">상권 · 나눔마켓 · 사이드</div>
+      <div class="adslot"><div class="prev"></div><div class="info"><div class="l">상권 상단 배너</div><div class="u">→ https://bomnal.kr · 게재중</div></div><button class="mini-btn ghost">교체</button></div>
+      <div class="adslot"><div class="prev"></div><div class="info"><div class="l">나눔마켓 인피드 (3번째마다)</div><div class="u">→ https://bomnal.kr · 게재중</div></div><button class="mini-btn ghost">교체</button></div>
+      <div class="adslot"><div class="prev"></div><div class="info"><div class="l">사이드 배너 (PC 전용)</div><div class="u">(비어있음)</div></div><button class="mini-btn">등록</button></div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--rose-deep);margin:18px 0 8px">자동 광고</div>
+      <div class="adslot"><div class="prev"></div><div class="info"><div class="l">애드핏 / 애드센스</div><div class="u">슬롯 ID: DAN-xxxxxx · 활성</div></div><button class="mini-btn ghost">설정</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: BOARD -->
+<div class="admin">
+  <div class="cap">P. 게시판 관리</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>기자 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a class="on"><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a><span class="di"></span>신고 관리</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>게시판 관리 (자유게시판)</h2>
+      <div class="sub">공지 고정 · 숨김/삭제 · 신고글 처리 · 분류 관리</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <span class="chip-f on" style="font-size:12px">전체</span><span class="chip-f" style="font-size:12px">신고 1</span><span class="chip-f" style="font-size:12px">숨김</span>
+        <input style="margin-left:auto;width:200px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px" placeholder="🔍 제목·작성자 검색">
+      </div>
+      <table>
+        <tr><th>제목</th><th>분류</th><th>작성자</th><th>👍/💬</th><th>상태</th><th>관리</th></tr>
+        <tr><td>게시판 이용 규칙 안내</td><td>공지</td><td>운영자</td><td>—/3</td><td><span class="pill pub">📌 고정</span></td><td><a class="act">고정해제</a><a class="act del">삭제</a></td></tr>
+        <tr><td>오늘 순천만 노을 미쳤어요</td><td>일상</td><td>산책러</td><td>34/11</td><td><span class="pill pub">노출</span></td><td><a class="act">고정</a><a class="act">숨김</a><a class="act del">삭제</a></td></tr>
+        <tr><td>신대동 소아과 추천</td><td>질문</td><td>행복맘</td><td>12/8</td><td><span class="pill pub">노출</span></td><td><a class="act">숨김</a><a class="act del">삭제</a></td></tr>
+        <tr><td>(신고) 광고성 도배글…</td><td>일상</td><td>익명</td><td>0/0</td><td><span class="pill rep">신고 3</span></td><td><a class="act">숨김</a><a class="act del">삭제</a><a class="act">차단</a></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: MEMBERS -->
+<div class="admin">
+  <div class="cap">M. 회원 관리 (닉네임)</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>기자 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a><span class="di"></span>신고 관리</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a class="on"><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>회원 관리</h2>
+      <div class="sub">닉네임 관리 · 등급 · 제재</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <span class="chip-f on" style="font-size:12px">전체 1,284</span><span class="chip-f" style="font-size:12px">기자</span><span class="chip-f" style="font-size:12px">업체</span><span class="chip-f" style="font-size:12px">단체</span><span class="chip-f" style="font-size:12px">제재</span>
+        <input style="margin-left:auto;width:200px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px" placeholder="🔍 닉네임·연락처 검색">
+      </div>
+      <table>
+        <tr><th>닉네임</th><th>가입(카카오)</th><th>동네</th><th>등급</th><th>활동</th><th>관리</th></tr>
+        <tr><td>신대지킴이</td><td>2026.05.02</td><td>신대동</td><td><span class="pill pub">일반</span></td><td>댓글 24</td><td><a class="act">닉네임 변경</a><a class="act del">정지</a></td></tr>
+        <tr><td>행복맘</td><td>2026.04.18</td><td>신대동</td><td><span class="pill draft">업체</span></td><td>홍보 6</td><td><a class="act">닉네임 변경</a><a class="act del">정지</a></td></tr>
+        <tr><td>박편집</td><td>2026.01.10</td><td>중앙동</td><td><span class="pill rep">기자</span></td><td>기사 42</td><td><a class="act">닉네임 변경</a><a class="act del">정지</a></td></tr>
+        <tr><td>욕설러123</td><td>2026.06.20</td><td>—</td><td><span class="pill hide">정지</span></td><td>신고 5</td><td><a class="act">해제</a><a class="act del">탈퇴</a></td></tr>
+      </table>
+      <p class="ipnote" style="text-align:left;margin-top:14px">닉네임은 중복 불가 · 부적절 닉네임은 강제 변경 가능 · 변경 이력 보관</p>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: ANALYTICS -->
+<div class="admin">
+  <div class="cap">N. 통계·분석 (접속 + 기사별 읽음)</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>기자 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a><span class="di"></span>신고 관리</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a class="on"><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>통계 · 분석</h2>
+      <div class="sub">사이트 접속 현황 · 기사별 읽힘 데이터</div>
+
+      <div class="stats">
+        <div class="stat"><div class="v">3,421</div><div class="l">오늘 방문자</div></div>
+        <div class="stat"><div class="v">8,902</div><div class="l">오늘 페이지뷰</div></div>
+        <div class="stat"><div class="v">1,284</div><div class="l">누적 회원</div></div>
+        <div class="stat"><div class="v">2:14</div><div class="l">평균 체류시간</div></div>
+      </div>
+
+      <h2 style="font-size:14px">최근 7일 방문자</h2>
+      <div class="bars">
+        <div class="col"><div class="bar" style="height:48%"></div><small>월</small></div>
+        <div class="col"><div class="bar" style="height:62%"></div><small>화</small></div>
+        <div class="col"><div class="bar" style="height:55%"></div><small>수</small></div>
+        <div class="col"><div class="bar" style="height:78%"></div><small>목</small></div>
+        <div class="col"><div class="bar" style="height:70%"></div><small>금</small></div>
+        <div class="col"><div class="bar" style="height:92%"></div><small>토</small></div>
+        <div class="col"><div class="bar" style="height:85%"></div><small>일</small></div>
+      </div>
+      <div class="legend">유입: 카카오톡 41% · 검색 33% · 직접 18% · 기타 8%</div>
+
+      <h2 style="font-size:14px;margin-top:24px">기사별 읽음 통계</h2>
+      <table>
+        <tr><th>기사</th><th>조회수</th><th>순방문(IP)</th><th>평균 읽음률</th><th>평균 체류</th><th>댓글</th></tr>
+        <tr><td>청년 창업 지원금 2차 모집</td><td>2,310</td><td>1,905</td><td><span class="pill pub">86%</span></td><td>2:48</td><td>18</td></tr>
+        <tr><td>떡집 사장님 이야기</td><td>1,558</td><td>1,402</td><td><span class="pill pub">92%</span></td><td>3:10</td><td>24</td></tr>
+        <tr><td>마을정원 가꾸기</td><td>1,204</td><td>1,088</td><td><span class="pill draft">64%</span></td><td>1:32</td><td>8</td></tr>
+        <tr><td>도보길 정비 완료</td><td>876</td><td>790</td><td><span class="pill draft">58%</span></td><td>1:10</td><td>5</td></tr>
+      </table>
+      <p class="ipnote" style="text-align:left;margin-top:14px">읽음률=스크롤 도달 비율 · 본문 끝까지 읽은 비율로 기사 몰입도 파악 · 기간/카테고리별 필터 제공</p>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: REPORTER RECRUIT -->
+<div class="admin">
+  <div class="cap">L. 기자 신청 관리</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a class="on"><span class="di"></span>기자 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a><span class="di"></span>신고 관리</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>기자 신청 관리</h2>
+      <div class="sub">시민기자 신청 승인 · 책임 서약 확인 · 기사 작성 권한 부여</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <span class="chip-f on" style="font-size:12px">승인 대기 2</span><span class="chip-f" style="font-size:12px">활동 기자</span><span class="chip-f" style="font-size:12px">권한 정지</span>
+      </div>
+      <h2 style="font-size:14px">신청 대기</h2>
+      <table style="margin-bottom:22px">
+        <tr><th>이름</th><th>분야</th><th>연락처</th><th>서약</th><th>상태</th><th>관리</th></tr>
+        <tr><td>김기자</td><td>지역소식</td><td>010-****-1234</td><td><span class="pill pub">서약 완료</span></td><td><span class="pill wait">대기</span></td><td><a class="act">신청서 보기</a><a class="act">승인</a><a class="act del">반려</a></td></tr>
+        <tr><td>이시민</td><td>인물</td><td>email@…</td><td><span class="pill pub">서약 완료</span></td><td><span class="pill wait">대기</span></td><td><a class="act">신청서 보기</a><a class="act">승인</a><a class="act del">반려</a></td></tr>
+      </table>
+      <h2 style="font-size:14px">활동 기자</h2>
+      <table>
+        <tr><th>이름</th><th>분야</th><th>작성 기사</th><th>상태</th><th>관리</th></tr>
+        <tr><td>박편집</td><td>행정</td><td>42</td><td><span class="pill pub">활동중</span></td><td><a class="act">기사보기</a><a class="act del">권한정지</a></td></tr>
+        <tr><td>최취재</td><td>생활</td><td>17</td><td><span class="pill pub">활동중</span></td><td><a class="act">기사보기</a><a class="act del">권한정지</a></td></tr>
+      </table>
+      <p class="ipnote" style="text-align:left;margin-top:14px">서약서 원본(동의 일시·서명·IP)은 별도 보관되어 분쟁 시 책임 소재 증빙으로 사용됩니다</p>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: REPORTS(신고) -->
+<div class="admin">
+  <div class="cap">K. 신고 관리 (신고함)</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>기자 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a class="on"><span class="di"></span>신고 관리</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>신고 관리</h2>
+      <div class="sub">기사·댓글·업체·단체·나눔마켓 신고를 한곳에서 처리</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <span class="chip-f on" style="font-size:12px">미처리 5</span><span class="chip-f" style="font-size:12px">기사</span><span class="chip-f" style="font-size:12px">댓글</span><span class="chip-f" style="font-size:12px">업체</span><span class="chip-f" style="font-size:12px">단체</span><span class="chip-f" style="font-size:12px">나눔마켓</span>
+      </div>
+      <table>
+        <tr><th>유형</th><th>대상</th><th>사유</th><th>신고수</th><th>상태</th><th>처리</th></tr>
+        <tr><td>댓글</td><td>"광고성 댓글…"</td><td>광고·스팸</td><td><span class="pill rep">3</span></td><td><span class="pill draft">미처리</span></td><td><a class="act">숨김</a><a class="act del">삭제</a><a class="act">무시</a></td></tr>
+        <tr><td>기사</td><td>도보길 정비 완료</td><td>허위사실</td><td><span class="pill rep">1</span></td><td><span class="pill draft">미처리</span></td><td><a class="act">기사확인</a><a class="act">무시</a></td></tr>
+        <tr><td>업체</td><td>봄날카페</td><td>허위 광고</td><td><span class="pill rep">2</span></td><td><span class="pill draft">미처리</span></td><td><a class="act">경고</a><a class="act del">노출중단</a></td></tr>
+        <tr><td>나눔마켓</td><td>화분 나눔 글</td><td>판매·상업</td><td><span class="pill rep">1</span></td><td><span class="pill draft">미처리</span></td><td><a class="act">숨김</a><a class="act del">삭제</a></td></tr>
+        <tr><td>단체</td><td>신대 합창단</td><td>부적절 내용</td><td><span class="pill rep">1</span></td><td><span class="pill hide">처리완료</span></td><td><a class="act">기록</a></td></tr>
+      </table>
+      <p class="ipnote" style="text-align:left;margin-top:14px">동일 대상 신고 누적 시 자동으로 상단 정렬됩니다 · 신고자/시간 로그 보관</p>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: DISTRICT/BUSINESS -->
+<div class="admin">
+  <div class="cap">H. 상권·업체 관리 (승인)</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>기자 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a class="on"><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>상권·업체 관리</h2>
+      <div class="sub">업체 등록 승인 · 홍보 글 게시 승인</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <span class="chip-f on" style="font-size:12px">업체 승인 대기 2</span><span class="chip-f" style="font-size:12px">등록 업체</span><span class="chip-f" style="font-size:12px">홍보글 승인 3</span>
+      </div>
+      <h2 style="font-size:14px">업체 등록 신청</h2>
+      <table style="margin-bottom:22px">
+        <tr><th>업체명</th><th>업종</th><th>대표</th><th>상태</th><th>관리</th></tr>
+        <tr><td>봄날카페</td><td>카페</td><td>김봄</td><td><span class="pill wait">승인 대기</span></td><td><a class="act">승인</a><a class="act del">반려</a></td></tr>
+        <tr><td>신대정육점</td><td>생활·편의</td><td>이정</td><td><span class="pill wait">승인 대기</span></td><td><a class="act">승인</a><a class="act del">반려</a></td></tr>
+        <tr><td>신대해장국</td><td>맛집</td><td>박국</td><td><span class="pill pub">승인됨</span></td><td><a class="act">권한관리</a></td></tr>
+      </table>
+      <h2 style="font-size:14px">홍보 글 승인 대기</h2>
+      <table>
+        <tr><th>제목</th><th>업체</th><th>분류</th><th>상태</th><th>관리</th></tr>
+        <tr><td>점심 특선 출시</td><td>신대해장국</td><td>신메뉴</td><td><span class="pill wait">대기</span></td><td><a class="act">게시 승인</a><a class="act del">반려</a></td></tr>
+        <tr><td>오픈 1+1 이벤트</td><td>봄날카페</td><td>이벤트</td><td><span class="pill wait">대기</span></td><td><a class="act">게시 승인</a><a class="act del">반려</a></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: ORGANIZATIONS -->
+<div class="admin">
+  <div class="cap">J. 지역단체 관리 (승인)</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>기자 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a><span class="di"></span>신고 관리</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a class="on"><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>지역단체 관리</h2>
+      <div class="sub">단체 등록 승인 · 운영진 권한 · 소식 글 관리</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <span class="chip-f on" style="font-size:12px">승인 대기 2</span><span class="chip-f" style="font-size:12px">등록 단체</span><span class="chip-f" style="font-size:12px">소식글</span>
+      </div>
+      <h2 style="font-size:14px">단체 등록 신청</h2>
+      <table style="margin-bottom:22px">
+        <tr><th>단체명</th><th>분류</th><th>대표</th><th>상태</th><th>관리</th></tr>
+        <tr><td>신대 둘레길 걷기 모임</td><td>동호회</td><td>김둘레</td><td><span class="pill wait">승인 대기</span></td><td><a class="act">승인</a><a class="act del">반려</a></td></tr>
+        <tr><td>신대 합창단</td><td>종교·문화</td><td>이합창</td><td><span class="pill wait">승인 대기</span></td><td><a class="act">승인</a><a class="act del">반려</a></td></tr>
+        <tr><td>신대동 주민자치회</td><td>주민자치</td><td>홍길동</td><td><span class="pill pub">승인됨</span></td><td><a class="act">운영진 관리</a></td></tr>
+        <tr><td>해피나눔 봉사단</td><td>봉사</td><td>박나눔</td><td><span class="pill pub">승인됨</span></td><td><a class="act">운영진 관리</a></td></tr>
+      </table>
+      <h2 style="font-size:14px">최근 단체 소식</h2>
+      <table>
+        <tr><th>제목</th><th>단체</th><th>분류</th><th>상태</th><th>관리</th></tr>
+        <tr><td>봄맞이 정원 가꾸기 봉사 모집</td><td>주민자치회</td><td>모집</td><td><span class="pill pub">노출</span></td><td><a class="act">숨김</a><a class="act del">삭제</a></td></tr>
+        <tr><td>6월 정기 회의 안내</td><td>주민자치회</td><td>공지</td><td><span class="pill pub">노출</span></td><td><a class="act">숨김</a><a class="act del">삭제</a></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: AD APPLICATIONS -->
+<div class="admin">
+  <div class="cap">I. 광고 신청 관리</div>
+  <div class="win">
+    <div class="side">
+      <div class="brand">신대신문 <span style="font-size:11px;color:#8A7E80">관리자</span></div>
+      <a><span class="di"></span>대시보드</a>
+      <a><span class="di"></span>기사 관리</a>
+      <a><span class="di"></span>기자 관리</a>
+      <a><span class="di"></span>댓글 관리</a>
+      <a><span class="di"></span>나눔마켓 관리</a>
+      <a><span class="di"></span>게시판 관리</a>
+      <a><span class="di"></span>제보함</a>
+      <a><span class="di"></span>신고 관리</a>
+      <a><span class="di"></span>상권·업체</a>
+      <a><span class="di"></span>지역단체</a>
+      <a><span class="di"></span>광고 배너</a>
+      <a class="on"><span class="di"></span>광고 신청</a>
+      <a><span class="di"></span>회원 관리</a>
+      <a><span class="di"></span>통계·분석</a>
+      <a><span class="di"></span>법적 페이지</a>
+    </div>
+    <div class="main">
+      <h2>광고 신청 관리</h2>
+      <div class="sub">접수된 배너 광고 신청 · 승인 시 해당 슬롯에 게재</div>
+      <table>
+        <tr><th>광고주</th><th>위치</th><th>기간</th><th>연결 링크</th><th>상태</th><th>관리</th></tr>
+        <tr><td>봄날카페</td><td>나눔마켓 인피드</td><td>1개월</td><td>bomnal.kr</td><td><span class="pill wait">대기</span></td><td><a class="act">승인·게재</a><a class="act del">반려</a></td></tr>
+        <tr><td>신대해장국</td><td>홈 상단</td><td>1주</td><td>—</td><td><span class="pill wait">대기</span></td><td><a class="act">승인·게재</a><a class="act del">반려</a></td></tr>
+        <tr><td>순천부동산</td><td>기사 중간</td><td>3개월</td><td>sc-home.kr</td><td><span class="pill pub">게재중</span></td><td><a class="act">중단</a></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  이 파일은 디자인 확정용 정적 시안입니다 (서버 없이 브라우저에서 바로 열림).<br>
+  색·폰트·레이아웃을 확정하면 같은 토큰으로 Next.js 본 개발에 그대로 옮깁니다.
+</div>
+
+<div class="note" style="margin-top:24px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 26px">
+  <b style="color:#7C3A4E;font-family:var(--serif);font-size:15px">📱 앱(App) 제작 방향</b><br><br>
+  위 모바일 시안은 그대로 앱 화면이 됩니다. 권장 방식 2단계:<br>
+  ① <b>PWA</b> — Next.js 사이트를 '홈 화면에 추가'로 설치, 푸시 알림 가능. 가장 빠르고 비용 없음.<br>
+  ② <b>네이티브 앱(스토어 등록용)</b> — 같은 웹을 <b>Capacitor</b>로 감싸 iOS/Android 앱으로 빌드 → 앱스토어·플레이스토어 출시. 카메라·푸시 등 네이티브 기능 연동.<br><br>
+  <span style="color:#8A7E80">즉, 웹 한 번 잘 만들면 앱까지 재사용됩니다. 앱 전용으로 스플래시·앱 아이콘·온보딩·푸시 동의 화면만 추가하면 돼요.</span>
+</div>
+
+</body>
+</html>
