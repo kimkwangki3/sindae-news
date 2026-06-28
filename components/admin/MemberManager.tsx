@@ -40,7 +40,17 @@ export default function MemberManager({
   initial: AdminMemberRow[];
 }) {
   const [rows, setRows] = useState(initial);
+  const [query, setQuery] = useState("");
   const [, startTransition] = useTransition();
+
+  const q = query.trim().toLowerCase();
+  const shownRows = q
+    ? rows.filter(
+        (m) =>
+          m.nickname.toLowerCase().includes(q) ||
+          (m.neighborhood ?? "").toLowerCase().includes(q),
+      )
+    : rows;
 
   function changeRole(id: string, role: AdminRole) {
     setRows((prev) => prev.map((m) => (m.id === id ? { ...m, role } : m)));
@@ -65,8 +75,15 @@ export default function MemberManager({
     <div className="px-[18px] py-5">
       <PageHead title="회원 관리" sub={`총 ${rows.length}명`} />
 
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="닉네임·동네 검색"
+        className="mb-3 min-h-[44px] w-full rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose"
+      />
+
       <ul className="flex flex-col gap-2.5">
-        {rows.map((m) => {
+        {shownRows.map((m) => {
           const isSuper = m.role === "superadmin";
           return (
             <li
