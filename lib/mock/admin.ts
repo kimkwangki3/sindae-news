@@ -19,6 +19,7 @@ export type {
   CommentStatus,
   ReportStatus,
   AdminRole,
+  ReporterLevel,
   AdminStat,
   AdminArticleRow,
   AdminCommentRow,
@@ -73,19 +74,23 @@ export async function getAdminArticles(
   const supabase = createServiceClient();
   let q = supabase
     .from("articles")
-    .select("slug, title, category_id, status, view_count, published_at, created_at")
-    .in("status", ["published", "draft"])
+    .select(
+      "slug, title, category_id, status, view_count, published_at, created_at, pledge_ack, author:profiles(nickname, reporter_level)",
+    )
+    .in("status", ["published", "draft", "pending"])
     .order("created_at", { ascending: false });
   if (status !== "all") q = q.eq("status", status);
   const { data } = await q;
   return (data ?? []).map((r) => {
-    const row = r as {
+    const row = r as unknown as {
       slug: string;
       title: string;
       category_id: number | null;
       status: ArticleStatus;
       view_count: number | null;
       published_at: string | null;
+      pledge_ack: boolean | null;
+      author?: { nickname?: string; reporter_level?: AdminMemberRow["reporterLevel"] } | null;
     };
     return {
       slug: row.slug,
@@ -94,6 +99,9 @@ export async function getAdminArticles(
       status: row.status,
       views: row.status === "published" ? row.view_count ?? 0 : null,
       date: fmtDate(row.published_at),
+      author: row.author?.nickname ?? "편집부",
+      reporterLevel: row.author?.reporter_level ?? null,
+      pledged: !!row.pledge_ack,
     };
   });
 }
@@ -278,7 +286,9 @@ export async function getAdminMembers(): Promise<AdminMemberRow[]> {
   const supabase = createServiceClient();
   const { data } = await supabase
     .from("profiles")
-    .select("id, nickname, role, neighborhood, is_suspended, created_at")
+    .select(
+      "id, nickname, role, reporter_level, neighborhood, is_suspended, created_at",
+    )
     .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(200);
@@ -288,6 +298,7 @@ export async function getAdminMembers(): Promise<AdminMemberRow[]> {
       id: string;
       nickname: string;
       role: AdminMemberRow["role"];
+      reporter_level: AdminMemberRow["reporterLevel"];
       neighborhood: string | null;
       is_suspended: boolean;
       created_at: string;
@@ -296,6 +307,7 @@ export async function getAdminMembers(): Promise<AdminMemberRow[]> {
       id: row.id,
       nickname: row.nickname,
       role: row.role,
+      reporterLevel: row.reporter_level ?? null,
       neighborhood: row.neighborhood,
       joinedAt: row.created_at.slice(0, 10).replace(/-/g, "."),
       isSuspended: row.is_suspended,

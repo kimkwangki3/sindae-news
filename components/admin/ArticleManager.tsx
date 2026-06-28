@@ -3,16 +3,28 @@
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { PageHead, Pill } from "@/components/admin/ui";
-import { setArticleStatus, deleteArticle } from "@/lib/admin-actions";
+import {
+  setArticleStatus,
+  deleteArticle,
+  approveArticle,
+  rejectArticle,
+} from "@/lib/admin-actions";
 import type { AdminArticleRow, ArticleStatus } from "@/lib/mock/admin-types";
 
 type Filter = "all" | ArticleStatus;
 
 const FILTERS: { key: Filter; label: string }[] = [
   { key: "all", label: "전체" },
+  { key: "pending", label: "승인대기" },
   { key: "published", label: "발행" },
   { key: "draft", label: "임시저장" },
 ];
+
+const LEVEL_LABEL: Record<string, string> = {
+  applicant: "기자신청자",
+  junior: "준기자",
+  senior: "정기자",
+};
 
 // 기사 관리 — 발행/임시 토글·삭제를 낙관적으로 처리(서버액션 fire-and-forget).
 export default function ArticleManager({
@@ -49,11 +61,29 @@ export default function ArticleManager({
     startTransition(() => deleteArticle(slug));
   }
 
+  function approve(slug: string) {
+    setRows((prev) =>
+      prev.map((r) => (r.slug === slug ? { ...r, status: "published" } : r)),
+    );
+    startTransition(() => approveArticle(slug));
+  }
+
+  function reject(slug: string) {
+    if (!confirm("이 기사를 반려할까요? 작성자의 임시저장으로 되돌아갑니다."))
+      return;
+    setRows((prev) =>
+      prev.map((r) => (r.slug === slug ? { ...r, status: "draft" } : r)),
+    );
+    startTransition(() => rejectArticle(slug));
+  }
+
+  const pendingCount = rows.filter((r) => r.status === "pending").length;
+
   return (
     <div className="px-[18px] py-5">
       <PageHead
         title="기사 관리"
-        sub={`총 ${rows.length}건`}
+        sub={`총 ${rows.length}건${pendingCount ? ` · 승인대기 ${pendingCount}` : ""}`}
         action={
           <Link
             href="/admin/articles/new"
@@ -95,27 +125,57 @@ export default function ArticleManager({
                 {a.category} · {a.date ?? "임시저장"}
                 {a.views !== null && ` · 조회 ${a.views.toLocaleString()}`}
               </p>
+              {a.status === "pending" && (
+                <p className="mt-0.5 text-[11px] text-muted">
+                  기자 {a.author}
+                  {a.reporterLevel && ` (${LEVEL_LABEL[a.reporterLevel]})`} ·{" "}
+                  {a.pledged ? "✅ 서약" : "⚠️ 서약없음"}
+                </p>
+              )}
             </div>
             {a.status === "published" ? (
               <Pill tone="ok">발행</Pill>
+            ) : a.status === "pending" ? (
+              <Pill tone="warn">승인대기</Pill>
             ) : (
-              <Pill tone="warn">임시</Pill>
+              <Pill tone="muted">임시</Pill>
             )}
             <div className="flex flex-shrink-0 items-center gap-1">
-              <button
-                type="button"
-                onClick={() => toggleStatus(a.slug)}
-                className="min-h-[44px] px-2 text-xs font-bold text-rose-deep"
-              >
-                {a.status === "published" ? "임시전환" : "발행"}
-              </button>
-              <button
-                type="button"
-                onClick={() => remove(a.slug)}
-                className="min-h-[44px] px-2 text-xs font-bold text-rose"
-              >
-                삭제
-              </button>
+              {a.status === "pending" ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => approve(a.slug)}
+                    className="min-h-[44px] px-2 text-xs font-bold text-rose-deep"
+                  >
+                    게시승인
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => reject(a.slug)}
+                    className="min-h-[44px] px-2 text-xs font-bold text-muted"
+                  >
+                    반려
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => toggleStatus(a.slug)}
+                    className="min-h-[44px] px-2 text-xs font-bold text-rose-deep"
+                  >
+                    {a.status === "published" ? "임시전환" : "발행"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => remove(a.slug)}
+                    className="min-h-[44px] px-2 text-xs font-bold text-rose"
+                  >
+                    삭제
+                  </button>
+                </>
+              )}
             </div>
           </li>
         ))}

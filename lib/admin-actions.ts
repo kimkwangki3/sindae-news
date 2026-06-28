@@ -9,6 +9,7 @@ import type {
   ArticleStatus,
   CommentStatus,
   AdminRole,
+  ReporterLevel,
 } from "./mock/admin-types";
 
 // 관리자 권한 가드 — 모든 액션 진입점에서 재확인(UI 가드와 이중).
@@ -69,6 +70,48 @@ export async function saveArticle(formData: FormData): Promise<void> {
   if (error) throw new Error("저장에 실패했습니다.");
   revalidatePath("/admin/articles");
   redirect("/admin/articles");
+}
+
+// 준기자 pending 기사 게시 승인 — published + 검수 기록.
+export async function approveArticle(slug: string): Promise<void> {
+  const admin = await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase
+    .from("articles")
+    .update({
+      status: "published",
+      published_at: new Date().toISOString(),
+      reviewed_by: admin.id,
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq("slug", slug);
+  revalidatePath("/admin/articles");
+}
+
+// 반려 — 임시저장으로 되돌림(기자가 수정 후 재제출). 검수 기록.
+export async function rejectArticle(slug: string): Promise<void> {
+  const admin = await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase
+    .from("articles")
+    .update({
+      status: "draft",
+      reviewed_by: admin.id,
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq("slug", slug);
+  revalidatePath("/admin/articles");
+}
+
+// 기자 등급 지정/변경(기자신청자/준기자/정기자)
+export async function setReporterLevel(
+  id: string,
+  level: ReporterLevel,
+): Promise<void> {
+  await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase.from("profiles").update({ reporter_level: level }).eq("id", id);
+  revalidatePath("/admin/members");
 }
 
 export async function setCommentStatus(

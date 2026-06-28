@@ -1,8 +1,9 @@
 // 관리자 화면 공용 타입(서버/클라이언트). 서버 전용 import 금지.
-export type ArticleStatus = "published" | "draft";
+export type ArticleStatus = "published" | "draft" | "pending";
 export type CommentStatus = "visible" | "reported" | "hidden";
 export type ReportStatus = "pending" | "resolved";
 export type AdminRole = "user" | "reporter" | "admin" | "superadmin";
+export type ReporterLevel = "applicant" | "junior" | "senior";
 
 export interface AdminStat {
   key: string;
@@ -17,6 +18,9 @@ export interface AdminArticleRow {
   status: ArticleStatus;
   views: number | null; // 임시저장은 null
   date: string | null; // 발행일, 임시저장은 null
+  author?: string; // 작성 기자
+  reporterLevel?: ReporterLevel | null; // 작성자 기자 등급(승인 큐 표시용)
+  pledged?: boolean; // 책임 서약 동의 여부
 }
 
 export interface AdminCommentRow {
@@ -43,6 +47,7 @@ export interface AdminMemberRow {
   id: string;
   nickname: string;
   role: AdminRole;
+  reporterLevel: ReporterLevel | null;
   neighborhood: string | null;
   joinedAt: string;
   isSuspended: boolean;

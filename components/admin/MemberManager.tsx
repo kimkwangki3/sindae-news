@@ -2,14 +2,28 @@
 
 import { useState, useTransition } from "react";
 import { PageHead, Pill } from "@/components/admin/ui";
-import { setMemberRole, setMemberSuspended } from "@/lib/admin-actions";
-import type { AdminMemberRow, AdminRole } from "@/lib/mock/admin-types";
+import {
+  setMemberRole,
+  setMemberSuspended,
+  setReporterLevel,
+} from "@/lib/admin-actions";
+import type {
+  AdminMemberRow,
+  AdminRole,
+  ReporterLevel,
+} from "@/lib/mock/admin-types";
 
 // 등급 변경 가능한 후보(최고관리자는 변경 대상에서 제외).
 const ROLE_OPTIONS: { value: AdminRole; label: string }[] = [
   { value: "user", label: "일반회원" },
   { value: "reporter", label: "시민기자" },
   { value: "admin", label: "관리자" },
+];
+
+const LEVEL_OPTIONS: { value: ReporterLevel; label: string }[] = [
+  { value: "applicant", label: "기자신청자" },
+  { value: "junior", label: "준기자" },
+  { value: "senior", label: "정기자" },
 ];
 
 const ROLE_LABEL: Record<AdminRole, string> = {
@@ -31,6 +45,13 @@ export default function MemberManager({
   function changeRole(id: string, role: AdminRole) {
     setRows((prev) => prev.map((m) => (m.id === id ? { ...m, role } : m)));
     startTransition(() => setMemberRole(id, role));
+  }
+
+  function changeLevel(id: string, level: ReporterLevel) {
+    setRows((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, reporterLevel: level } : m)),
+    );
+    startTransition(() => setReporterLevel(id, level));
   }
 
   function toggleSuspend(id: string, next: boolean) {
@@ -108,6 +129,29 @@ export default function MemberManager({
                   {m.isSuspended ? "정지해제" : "정지"}
                 </button>
               </div>
+
+              {/* 시민기자일 때만 등급 지정(기자신청자/준기자/정기자) */}
+              {m.role === "reporter" && (
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-[11px] font-bold text-muted">
+                    기자 등급
+                  </span>
+                  <select
+                    aria-label="기자 등급"
+                    value={m.reporterLevel ?? "applicant"}
+                    onChange={(e) =>
+                      changeLevel(m.id, e.target.value as ReporterLevel)
+                    }
+                    className="min-h-[40px] flex-1 rounded-element border border-line bg-white px-3 text-sm outline-none focus:border-rose"
+                  >
+                    {LEVEL_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </li>
           );
         })}
