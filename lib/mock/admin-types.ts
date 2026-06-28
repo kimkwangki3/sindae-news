@@ -80,3 +80,32 @@ export interface AdSlotOption {
   id: number;
   label: string;
 }
+
+// --- 커뮤니티 백오피스(게시판·나눔마켓 공용 + 제보) ---
+export type PostKind = "board" | "market";
+export type PostVisibility = "visible" | "hidden";
+
+export interface AdminPostRow {
+  id: string;
+  title: string;
+  author: string;
+  category: string;
+  visibility: PostVisibility;
+  pinned: boolean;
+  comments: number;
+  extra: string; // 게시판=👍조회 / 나눔=동네·분류
+  createdAt: string;
+}
+
+export type TipStatus = "pending" | "approved" | "rejected";
+
+export interface AdminTipRow {
+  id: string;
+  title: string;
+  body: string;
+  category: string;
+  contact: string;
+  reporter: string;
+  status: TipStatus;
+  createdAt: string;
+}

@@ -12,6 +12,11 @@ import type {
   AdRequestRow,
   AdRow,
   AdSlotOption,
+  PostKind,
+  PostVisibility,
+  AdminPostRow,
+  TipStatus,
+  AdminTipRow,
 } from "@/lib/mock/admin-types";
 
 export type {
@@ -29,7 +34,18 @@ export type {
   AdRequestRow,
   AdRow,
   AdSlotOption,
+  PostKind,
+  PostVisibility,
+  AdminPostRow,
+  TipStatus,
+  AdminTipRow,
 } from "@/lib/mock/admin-types";
+
+function embeddedCount(v: unknown): number {
+  if (Array.isArray(v) && v.length > 0)
+    return Number((v[0] as { count?: number }).count ?? 0);
+  return 0;
+}
 
 function fmtDate(ts: string | null): string | null {
   return ts ? ts.slice(5, 10).replace("-", ".") : null;
@@ -45,19 +61,114 @@ function catName(id: number | null): string {
 export interface AdminQueueCounts {
   pendingArticles: number;
   pendingReports: number;
+  newTips: number;
 }
 
 export async function getAdminQueueCounts(): Promise<AdminQueueCounts> {
   const supabase = createServiceClient();
   const head = { count: "exact" as const, head: true };
-  const [a, r] = await Promise.all([
+  const [a, r, t] = await Promise.all([
     supabase.from("articles").select("*", head).eq("status", "pending"),
     supabase.from("reports").select("*", head).eq("status", "pending"),
+    supabase.from("tips").select("*", head).eq("status", "pending"),
   ]);
   return {
     pendingArticles: a.count ?? 0,
     pendingReports: r.count ?? 0,
+    newTips: t.count ?? 0,
   };
+}
+
+// --- 커뮤니티 백오피스: 게시판/나눔마켓 글 + 제보 ---
+function postAuthor(v: unknown): string {
+  return (v as { nickname?: string } | null)?.nickname ?? "익명";
+}
+
+// 게시판/나눔마켓 공용 글 목록(관리자: 숨김글 포함)
+export async function getAdminPosts(
+  kind: PostKind,
+  filter: "all" | "hidden" | "pinned" = "all",
+): Promise<AdminPostRow[]> {
+  const supabase = createServiceClient();
+  if (kind === "board") {
+    let q = supabase
+      .from("board_posts")
+      .select(
+        "id, title, category, visibility, is_pinned, like_count, view_count, created_at, author:profiles(nickname), board_comments(count)",
+      )
+      .order("is_pinned", { ascending: false })
+      .order("created_at", { ascending: false });
+    if (filter === "hidden") q = q.eq("visibility", "hidden");
+    if (filter === "pinned") q = q.eq("is_pinned", true);
+    const { data } = await q;
+    return (data ?? []).map((r) => {
+      const row = r as Record<string, unknown>;
+      return {
+        id: row.id as string,
+        title: row.title as string,
+        author: postAuthor(row.author),
+        category: (row.category as string) ?? "",
+        visibility: row.visibility as PostVisibility,
+        pinned: Boolean(row.is_pinned),
+        comments: embeddedCount(row.board_comments),
+        extra: `👍${Number(row.like_count ?? 0)} 👁${Number(row.view_count ?? 0)}`,
+        createdAt: fmtDateTime(row.created_at as string),
+      };
+    });
+  }
+  // market
+  let q = supabase
+    .from("market_posts")
+    .select(
+      "id, title, category, neighborhood, visibility, is_pinned, created_at, author:profiles(nickname), market_comments(count)",
+    )
+    .order("is_pinned", { ascending: false })
+    .order("created_at", { ascending: false });
+  if (filter === "hidden") q = q.eq("visibility", "hidden");
+  if (filter === "pinned") q = q.eq("is_pinned", true);
+  const { data } = await q;
+  return (data ?? []).map((r) => {
+    const row = r as Record<string, unknown>;
+    return {
+      id: row.id as string,
+      title: row.title as string,
+      author: postAuthor(row.author),
+      category: (row.category as string) ?? "",
+      visibility: row.visibility as PostVisibility,
+      pinned: Boolean(row.is_pinned),
+      comments: embeddedCount(row.market_comments),
+      extra: `${(row.neighborhood as string) ?? "-"} · ${row.category}`,
+      createdAt: fmtDateTime(row.created_at as string),
+    };
+  });
+}
+
+export async function getAdminTips(
+  filter: "all" | TipStatus = "all",
+): Promise<AdminTipRow[]> {
+  const supabase = createServiceClient();
+  let q = supabase
+    .from("tips")
+    .select(
+      "id, title, body, category, contact, status, created_at, reporter:profiles(nickname)",
+    )
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (filter !== "all") q = q.eq("status", filter);
+  const { data } = await q;
+  return (data ?? []).map((r) => {
+    const row = r as Record<string, unknown>;
+    return {
+      id: row.id as string,
+      title: row.title as string,
+      body: (row.body as string) ?? "",
+      category: (row.category as string) ?? "",
+      contact: (row.contact as string) ?? "-",
+      reporter: postAuthor(row.reporter),
+      status: row.status as TipStatus,
+      createdAt: fmtDateTime(row.created_at as string),
+    };
+  });
 }
 
 // --- 대시보드 통계 ----------------------------------------------------

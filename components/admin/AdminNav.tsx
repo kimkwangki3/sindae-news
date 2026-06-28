@@ -32,6 +32,9 @@ const GROUPS: Group[] = [
     title: "커뮤니티",
     items: [
       { href: "/admin/comments", label: "댓글 관리" },
+      { href: "/admin/board", label: "자유게시판" },
+      { href: "/admin/market", label: "나눔마켓" },
+      { href: "/admin/tips", label: "제보함", badge: "newTips" },
       { href: "/admin/reports", label: "신고 관리", badge: "pendingReports" },
     ],
   },

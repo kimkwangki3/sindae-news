@@ -5,16 +5,29 @@ import { PageHead, Pill } from "@/components/admin/ui";
 import { resolveReport } from "@/lib/admin-actions";
 import type { AdminReportRow } from "@/lib/mock/admin-types";
 
-// 신고 관리 — 통합 신고 목록. 처리완료로 전환(낙관적).
+// 신고 관리 — 통합 신고 목록. 유형/미처리 필터 + 처리완료(낙관적).
 export default function ReportManager({
   initial,
 }: {
   initial: AdminReportRow[];
 }) {
   const [rows, setRows] = useState(initial);
+  const [filter, setFilter] = useState<string>("all");
   const [, startTransition] = useTransition();
 
   const pending = rows.filter((r) => r.status === "pending").length;
+  const types = Array.from(new Set(rows.map((r) => r.targetType)));
+  const chips = ["all", "pending", ...types];
+  const chipLabel = (c: string) =>
+    c === "all" ? "전체" : c === "pending" ? "미처리" : c;
+
+  const shown = rows.filter((r) =>
+    filter === "all"
+      ? true
+      : filter === "pending"
+        ? r.status === "pending"
+        : r.targetType === filter,
+  );
 
   function resolve(id: string) {
     setRows((prev) =>
@@ -27,8 +40,25 @@ export default function ReportManager({
     <div className="px-[18px] py-5">
       <PageHead title="신고 관리" sub={`미처리 ${pending}건`} />
 
+      <div className="no-scrollbar mb-3 flex gap-2 overflow-x-auto">
+        {chips.map((c) => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => setFilter(c)}
+            className={`min-h-[34px] whitespace-nowrap rounded-full border px-3 text-sm ${
+              filter === c
+                ? "border-rose bg-rose text-white"
+                : "border-line bg-white text-muted"
+            }`}
+          >
+            {chipLabel(c)}
+          </button>
+        ))}
+      </div>
+
       <ul className="flex flex-col gap-2.5">
-        {rows.map((r) => (
+        {shown.map((r) => (
           <li
             key={r.id}
             className="rounded-card border border-line bg-white p-4"

@@ -8,7 +8,14 @@ export const metadata = { title: "기사 작성 · 관리자" };
 const CATEGORIES = Object.entries(CATEGORY_NAME) as [CategorySlug, string][];
 
 // 기사 작성/편집. 제목·본문 + 분류·슬러그·상태. 발행/임시저장 버튼이 status를 실어 보낸다.
-export default function NewArticlePage() {
+// ?title=&body= 로 들어오면 프리필(제보 → 기사화 연동).
+export default function NewArticlePage({
+  searchParams,
+}: {
+  searchParams: { title?: string; body?: string };
+}) {
+  const preTitle = searchParams.title ?? "";
+  const preBody = searchParams.body ?? "";
   return (
     <div className="px-[18px] py-5">
       <PageHead
@@ -30,6 +37,7 @@ export default function NewArticlePage() {
             id="title"
             name="title"
             required
+            defaultValue={preTitle}
             placeholder="기사 제목을 입력하세요"
             className="min-h-[48px] rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose"
           />
@@ -73,6 +81,7 @@ export default function NewArticlePage() {
             id="body"
             name="body"
             rows={12}
+            defaultValue={preBody}
             placeholder="본문을 작성하세요"
             className="resize-y rounded-element border border-line bg-white p-3.5 text-sm leading-relaxed outline-none focus:border-rose"
           />
