@@ -20,7 +20,10 @@ interface Group {
 const GROUPS: Group[] = [
   {
     title: "현황",
-    items: [{ href: "/admin", label: "대시보드" }],
+    items: [
+      { href: "/admin", label: "대시보드" },
+      { href: "/admin/analytics", label: "통계·분석" },
+    ],
   },
   {
     title: "보도",

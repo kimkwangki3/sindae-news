@@ -163,3 +163,21 @@ export interface AdminCorrectionRow {
   status: ApprovalStatus;
   createdAt: string;
 }
+
+// --- 통계·분석 ---
+export interface ContentStatRow {
+  id: string;
+  slug?: string;
+  title: string;
+  category: string;
+  status?: string;
+  views: number;
+  comments: number;
+  reactions: number;
+}
+
+export interface CategoryTotal {
+  category: string;
+  count: number;
+  views: number;
+}

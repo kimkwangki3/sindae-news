@@ -25,6 +25,8 @@ import type {
   AdminReporterRow,
   AdminCorrectionRow,
   ReporterLevel,
+  ContentStatRow,
+  CategoryTotal,
 } from "@/lib/mock/admin-types";
 
 export type {
@@ -54,6 +56,8 @@ export type {
   AdminReporterAppRow,
   AdminReporterRow,
   AdminCorrectionRow,
+  ContentStatRow,
+  CategoryTotal,
 } from "@/lib/mock/admin-types";
 
 function embeddedCount(v: unknown): number {
@@ -634,4 +638,81 @@ export async function getAdminMembers(): Promise<AdminMemberRow[]> {
       isSuspended: row.is_suspended,
     };
   });
+}
+
+// --- 통계·분석 / 대시보드 인기 콘텐츠 -------------------------------
+// 기사별 통계(조회·댓글·공감). 통계 페이지 + 대시보드 인기 기사 공용.
+export async function getArticleStatsList(
+  limit = 500,
+): Promise<ContentStatRow[]> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("articles")
+    .select(
+      "id, slug, title, category_id, status, view_count, comments(count), article_reactions(count)",
+    )
+    .order("view_count", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((r) => {
+    const row = r as Record<string, unknown>;
+    return {
+      id: row.id as string,
+      slug: row.slug as string,
+      title: row.title as string,
+      category: catName(row.category_id as number | null),
+      status: row.status as string,
+      views: Number(row.view_count ?? 0),
+      comments: embeddedCount(row.comments),
+      reactions: embeddedCount(row.article_reactions),
+    };
+  });
+}
+
+// 인기 게시글(좋아요·조회·댓글)
+export async function getBoardStatsList(
+  limit = 100,
+): Promise<ContentStatRow[]> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("board_posts")
+    .select("id, title, category, like_count, view_count, board_comments(count)")
+    .eq("visibility", "visible")
+    .order("view_count", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((r) => {
+    const row = r as Record<string, unknown>;
+    return {
+      id: row.id as string,
+      title: row.title as string,
+      category: (row.category as string) ?? "",
+      views: Number(row.view_count ?? 0),
+      comments: embeddedCount(row.board_comments),
+      reactions: Number(row.like_count ?? 0),
+    };
+  });
+}
+
+// 카테고리별 합계(발행 기사 기준)
+export async function getCategoryTotals(): Promise<CategoryTotal[]> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("articles")
+    .select("category_id, view_count")
+    .eq("status", "published");
+  const map = new Map<string, { count: number; views: number }>();
+  for (const r of (data ?? []) as {
+    category_id: number | null;
+    view_count: number | null;
+  }[]) {
+    const name = catName(r.category_id);
+    const cur = map.get(name) ?? { count: 0, views: 0 };
+    cur.count += 1;
+    cur.views += r.view_count ?? 0;
+    map.set(name, cur);
+  }
+  return [...map.entries()].map(([category, v]) => ({
+    category,
+    count: v.count,
+    views: v.views,
+  }));
 }
