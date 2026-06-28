@@ -47,3 +47,31 @@ export interface AdminMemberRow {
   joinedAt: string;
   isSuspended: boolean;
 }
+
+// --- 광고 ---
+export type AdReqStatus = "pending" | "resolved" | "ignored";
+
+export interface AdRequestRow {
+  id: string;
+  advertiser: string;
+  slotLabel: string;
+  duration: string;
+  contact: string;
+  linkUrl: string | null;
+  status: AdReqStatus;
+  createdAt: string;
+}
+
+export interface AdRow {
+  id: string;
+  advertiser: string;
+  slotLabel: string;
+  linkUrl: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface AdSlotOption {
+  id: number;
+  label: string;
+}

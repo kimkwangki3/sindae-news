@@ -8,6 +8,7 @@ const ITEMS: { href: string; label: string }[] = [
   { href: "/admin/articles", label: "기사 관리" },
   { href: "/admin/comments", label: "댓글 관리" },
   { href: "/admin/reports", label: "신고 관리" },
+  { href: "/admin/ads", label: "광고 관리" },
   { href: "/admin/members", label: "회원 관리" },
 ];
 

@@ -122,3 +122,48 @@ export async function setMemberSuspended(
     .eq("id", id);
   revalidatePath("/admin/members");
 }
+
+// --- 광고 ---
+// 광고 신청 처리: resolved(승인/연락완료) / ignored(보류·거절)
+export async function setAdRequestStatus(
+  id: string,
+  status: "resolved" | "ignored",
+): Promise<void> {
+  await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase.from("ad_requests").update({ status }).eq("id", id);
+  revalidatePath("/admin/ads");
+}
+
+// 배너 광고 게재 등록 — 선택 슬롯에 활성 배너 추가.
+export async function createAd(formData: FormData): Promise<void> {
+  await assertAdmin();
+  const slotId = Number(formData.get("slot_id"));
+  const advertiser = String(formData.get("advertiser") ?? "").trim();
+  if (!slotId || advertiser.length < 1) {
+    throw new Error("슬롯과 광고주를 입력해 주세요.");
+  }
+  const supabase = createServiceClient();
+  const { error } = await supabase.from("ads").insert({
+    slot_id: slotId,
+    advertiser,
+    link_url: String(formData.get("link_url") ?? "").trim() || null,
+    is_active: formData.get("is_active") === "on",
+  });
+  if (error) throw new Error("등록에 실패했습니다.");
+  revalidatePath("/admin/ads");
+}
+
+export async function toggleAd(id: string, active: boolean): Promise<void> {
+  await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase.from("ads").update({ is_active: active }).eq("id", id);
+  revalidatePath("/admin/ads");
+}
+
+export async function deleteAd(id: string): Promise<void> {
+  await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase.from("ads").delete().eq("id", id);
+  revalidatePath("/admin/ads");
+}

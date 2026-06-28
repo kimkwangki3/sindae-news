@@ -9,6 +9,9 @@ import type {
   AdminCommentRow,
   AdminReportRow,
   AdminMemberRow,
+  AdRequestRow,
+  AdRow,
+  AdSlotOption,
 } from "@/lib/mock/admin-types";
 
 export type {
@@ -21,6 +24,10 @@ export type {
   AdminCommentRow,
   AdminReportRow,
   AdminMemberRow,
+  AdReqStatus,
+  AdRequestRow,
+  AdRow,
+  AdSlotOption,
 } from "@/lib/mock/admin-types";
 
 function fmtDate(ts: string | null): string | null {
@@ -184,6 +191,85 @@ export async function getAdminReports(): Promise<AdminReportRow[]> {
       status: row.status === "resolved" ? "resolved" : "pending",
       createdAt: fmtDateTime(row.created_at),
     };
+  });
+}
+
+// --- 광고 관리 --------------------------------------------------------
+function slotLabel(v: unknown): string {
+  return (v as { label?: string } | null)?.label ?? "(슬롯 미지정)";
+}
+
+export async function getAdRequests(): Promise<AdRequestRow[]> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("ad_requests")
+    .select(
+      "id, advertiser, duration, contact, link_url, status, created_at, slot:ad_slots(label)",
+    )
+    .order("created_at", { ascending: false })
+    .limit(200);
+  return (data ?? []).map((r) => {
+    const row = r as unknown as {
+      id: string;
+      advertiser: string;
+      duration: string | null;
+      contact: string | null;
+      link_url: string | null;
+      status: AdRequestRow["status"];
+      created_at: string;
+      slot?: { label?: string } | null;
+    };
+    return {
+      id: row.id,
+      advertiser: row.advertiser,
+      slotLabel: slotLabel(row.slot),
+      duration: row.duration ?? "-",
+      contact: row.contact ?? "-",
+      linkUrl: row.link_url,
+      status: row.status,
+      createdAt: fmtDateTime(row.created_at),
+    };
+  });
+}
+
+export async function getAds(): Promise<AdRow[]> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("ads")
+    .select(
+      "id, advertiser, link_url, is_active, created_at, slot:ad_slots(label)",
+    )
+    .order("created_at", { ascending: false })
+    .limit(200);
+  return (data ?? []).map((r) => {
+    const row = r as unknown as {
+      id: string;
+      advertiser: string | null;
+      link_url: string | null;
+      is_active: boolean;
+      created_at: string;
+      slot?: { label?: string } | null;
+    };
+    return {
+      id: row.id,
+      advertiser: row.advertiser ?? "(광고주 미상)",
+      slotLabel: slotLabel(row.slot),
+      linkUrl: row.link_url,
+      isActive: row.is_active,
+      createdAt: fmtDate(row.created_at) ?? "",
+    };
+  });
+}
+
+export async function getAdSlots(): Promise<AdSlotOption[]> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("ad_slots")
+    .select("id, label")
+    .order("id", { ascending: true });
+  return (data ?? []).map((r) => {
+    const row = r as { id: number; label: string };
+    return { id: row.id, label: row.label };
   });
 }
 
