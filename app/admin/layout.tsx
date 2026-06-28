@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import { getAdminQueueCounts } from "@/lib/mock/admin";
 import AdminNav from "@/components/admin/AdminNav";
 
 // 관리자 셸: admin/superadmin만 접근(UI 가드). 실제 보안은 RLS로 이중 방어.
@@ -13,6 +14,8 @@ export default async function AdminLayout({
   if (!user) redirect("/login");
   if (user.role !== "admin" && user.role !== "superadmin") redirect("/");
 
+  const counts = await getAdminQueueCounts();
+
   return (
     <div className="mx-auto flex min-h-dvh max-w-app flex-col bg-ivory lg:max-w-5xl lg:flex-row">
       {/* 브랜드 + 네비 (모바일: 상단 가로스크롤, lg: 좌측 사이드바) */}
@@ -23,7 +26,7 @@ export default async function AdminLayout({
           </p>
           <span className="text-xs text-muted">{user.nickname} 님</span>
         </div>
-        <AdminNav />
+        <AdminNav counts={counts} />
       </header>
 
       <main className="flex-1">{children}</main>

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./auth";
 import { createServiceClient } from "./supabase/server";
+import { logAdmin } from "./audit";
 import { CATEGORY_ID } from "./mock/articles-meta";
 import type {
   ArticleStatus,
@@ -31,6 +32,7 @@ export async function setArticleStatus(
   // 발행으로 전환 시 발행일 보정
   if (status === "published") patch.published_at = new Date().toISOString();
   await supabase.from("articles").update(patch).eq("slug", slug);
+  await logAdmin("set_article_status", { targetType: "article", targetId: slug, memo: status });
   revalidatePath("/admin/articles");
 }
 
@@ -38,6 +40,7 @@ export async function deleteArticle(slug: string): Promise<void> {
   await assertAdmin();
   const supabase = createServiceClient();
   await supabase.from("articles").delete().eq("slug", slug);
+  await logAdmin("delete_article", { targetType: "article", targetId: slug });
   revalidatePath("/admin/articles");
 }
 
@@ -68,6 +71,7 @@ export async function saveArticle(formData: FormData): Promise<void> {
     .from("articles")
     .upsert(row, { onConflict: "slug" });
   if (error) throw new Error("저장에 실패했습니다.");
+  await logAdmin("save_article", { targetType: "article", targetId: slug, memo: status });
   revalidatePath("/admin/articles");
   redirect("/admin/articles");
 }
@@ -85,6 +89,7 @@ export async function approveArticle(slug: string): Promise<void> {
       reviewed_at: new Date().toISOString(),
     })
     .eq("slug", slug);
+  await logAdmin("approve_article", { targetType: "article", targetId: slug });
   revalidatePath("/admin/articles");
 }
 
@@ -100,6 +105,7 @@ export async function rejectArticle(slug: string): Promise<void> {
       reviewed_at: new Date().toISOString(),
     })
     .eq("slug", slug);
+  await logAdmin("reject_article", { targetType: "article", targetId: slug });
   revalidatePath("/admin/articles");
 }
 
@@ -111,6 +117,7 @@ export async function setReporterLevel(
   await assertAdmin();
   const supabase = createServiceClient();
   await supabase.from("profiles").update({ reporter_level: level }).eq("id", id);
+  await logAdmin("set_reporter_level", { targetType: "profile", targetId: id, memo: level });
   revalidatePath("/admin/members");
 }
 
@@ -123,6 +130,7 @@ export async function setCommentStatus(
   // CommentStatus(visible/reported/hidden) → DB visibility(visible/hidden)
   const visibility = status === "hidden" ? "hidden" : "visible";
   await supabase.from("comments").update({ visibility }).eq("id", id);
+  await logAdmin("set_comment_status", { targetType: "comment", targetId: id, memo: visibility });
   revalidatePath("/admin/comments");
 }
 
@@ -130,6 +138,7 @@ export async function deleteComment(id: string): Promise<void> {
   await assertAdmin();
   const supabase = createServiceClient();
   await supabase.from("comments").delete().eq("id", id);
+  await logAdmin("delete_comment", { targetType: "comment", targetId: id });
   revalidatePath("/admin/comments");
 }
 
@@ -140,6 +149,7 @@ export async function resolveReport(id: string): Promise<void> {
     .from("reports")
     .update({ status: "resolved", handled_by: user.id })
     .eq("id", id);
+  await logAdmin("resolve_report", { targetType: "report", targetId: id });
   revalidatePath("/admin/reports");
 }
 
@@ -150,6 +160,7 @@ export async function setMemberRole(
   await assertAdmin();
   const supabase = createServiceClient();
   await supabase.from("profiles").update({ role }).eq("id", id);
+  await logAdmin("set_member_role", { targetType: "profile", targetId: id, memo: role });
   revalidatePath("/admin/members");
 }
 
@@ -163,6 +174,7 @@ export async function setMemberSuspended(
     .from("profiles")
     .update({ is_suspended: suspended })
     .eq("id", id);
+  await logAdmin("set_member_suspended", { targetType: "profile", targetId: id, memo: String(suspended) });
   revalidatePath("/admin/members");
 }
 
@@ -175,6 +187,7 @@ export async function setAdRequestStatus(
   await assertAdmin();
   const supabase = createServiceClient();
   await supabase.from("ad_requests").update({ status }).eq("id", id);
+  await logAdmin("set_ad_request_status", { targetType: "ad_request", targetId: id, memo: status });
   revalidatePath("/admin/ads");
 }
 
@@ -194,6 +207,7 @@ export async function createAd(formData: FormData): Promise<void> {
     is_active: formData.get("is_active") === "on",
   });
   if (error) throw new Error("등록에 실패했습니다.");
+  await logAdmin("create_ad", { targetType: "ad", memo: advertiser });
   revalidatePath("/admin/ads");
 }
 
@@ -201,6 +215,7 @@ export async function toggleAd(id: string, active: boolean): Promise<void> {
   await assertAdmin();
   const supabase = createServiceClient();
   await supabase.from("ads").update({ is_active: active }).eq("id", id);
+  await logAdmin("toggle_ad", { targetType: "ad", targetId: id, memo: String(active) });
   revalidatePath("/admin/ads");
 }
 
@@ -208,5 +223,6 @@ export async function deleteAd(id: string): Promise<void> {
   await assertAdmin();
   const supabase = createServiceClient();
   await supabase.from("ads").delete().eq("id", id);
+  await logAdmin("delete_ad", { targetType: "ad", targetId: id });
   revalidatePath("/admin/ads");
 }

@@ -41,6 +41,25 @@ function catName(id: number | null): string {
   return id ? CATEGORY_NAME[ID_TO_SLUG[id]] ?? "" : "";
 }
 
+// --- 사이드바 대기건수 배지 ------------------------------------------
+export interface AdminQueueCounts {
+  pendingArticles: number;
+  pendingReports: number;
+}
+
+export async function getAdminQueueCounts(): Promise<AdminQueueCounts> {
+  const supabase = createServiceClient();
+  const head = { count: "exact" as const, head: true };
+  const [a, r] = await Promise.all([
+    supabase.from("articles").select("*", head).eq("status", "pending"),
+    supabase.from("reports").select("*", head).eq("status", "pending"),
+  ]);
+  return {
+    pendingArticles: a.count ?? 0,
+    pendingReports: r.count ?? 0,
+  };
+}
+
 // --- 대시보드 통계 ----------------------------------------------------
 export async function getAdminStats(): Promise<AdminStat[]> {
   const supabase = createServiceClient();
