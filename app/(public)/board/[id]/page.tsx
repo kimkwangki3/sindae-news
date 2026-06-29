@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import PhotoGallery from "@/components/PhotoGallery";
 import ReportSheet from "@/components/ReportSheet";
 import PostComments from "@/components/community/PostComments";
 import PostOwnerControls from "@/components/community/PostOwnerControls";
@@ -61,6 +62,12 @@ export default async function BoardDetailPage({
       <p className="mt-5 whitespace-pre-line border-t border-line pt-5 text-[15px] leading-[1.85]">
         {post.body}
       </p>
+
+      {post.photos.length > 0 && (
+        <div className="mt-4">
+          <PhotoGallery photos={post.photos} alt={post.title} />
+        </div>
+      )}
 
       <div className="my-6 flex items-center justify-center gap-3">
         <BoardLike

@@ -17,6 +17,7 @@ export interface OrgPost {
   title: string;
   body: string;
   createdAt: string;
+  photoUrls: string[];
 }
 
 export interface PendingMember {
@@ -46,6 +47,7 @@ export interface Organization {
   acceptJoin: boolean;
   intro: string;
   photoCount: number;
+  photos: string[];
   posts: OrgPost[];
   pending: PendingMember[];
   members: OrgMember[];
@@ -75,6 +77,7 @@ function toOrgSummary(r: Record<string, unknown>): Organization {
     acceptJoin: Boolean(r.accept_join),
     intro: (r.intro as string) ?? "",
     photoCount: embeddedCount(r.org_photos),
+    photos: [],
     posts: [],
     pending: [],
     members: [],
@@ -108,10 +111,10 @@ export async function getOrg(id: string): Promise<Organization | null> {
 
   const base = toOrgSummary(data as Record<string, unknown>);
 
-  const [{ data: posts }, { data: mem }] = await Promise.all([
+  const [{ data: posts }, { data: mem }, { data: photos }] = await Promise.all([
     supabase
       .from("org_posts")
-      .select("id, title, category, body, created_at")
+      .select("id, title, category, body, created_at, photo_urls")
       .eq("org_id", id)
       .eq("visibility", "visible")
       .order("created_at", { ascending: false }),
@@ -119,7 +122,14 @@ export async function getOrg(id: string): Promise<Organization | null> {
       .from("org_members")
       .select("id, role, status, apply_name, neighborhood, motivation")
       .eq("org_id", id),
+    supabase
+      .from("org_photos")
+      .select("url, sort")
+      .eq("org_id", id)
+      .order("sort", { ascending: true }),
   ]);
+
+  base.photos = (photos ?? []).map((p) => (p as { url: string }).url);
 
   base.posts = (posts ?? []).map((p) => {
     const row = p as {
@@ -128,6 +138,7 @@ export async function getOrg(id: string): Promise<Organization | null> {
       category: string | null;
       body: string | null;
       created_at: string;
+      photo_urls: string[] | null;
     };
     return {
       id: row.id,
@@ -135,6 +146,7 @@ export async function getOrg(id: string): Promise<Organization | null> {
       title: row.title,
       body: row.body ?? "",
       createdAt: row.created_at.slice(0, 10).replace(/-/g, "."),
+      photoUrls: row.photo_urls ?? [],
     };
   });
 

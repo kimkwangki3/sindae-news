@@ -42,6 +42,7 @@ export async function submitAdRequest(
     advertiser,
     slot_id: slotId,
     link_url: String(formData.get("link") ?? "").trim() || null,
+    image_url: String(formData.get("image_url") ?? "").trim() || null,
     duration: String(formData.get("period") ?? "").trim() || null,
     contact,
   });

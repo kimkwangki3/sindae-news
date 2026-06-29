@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { createBoardPost, updateBoardPost } from "@/lib/community-actions";
 import LoginRequired from "@/components/community/LoginRequired";
+import ImageUpload from "@/components/ImageUpload";
 import {
   BOARD_WRITE_CATS,
   BOARD_CAT_NAME,
@@ -87,12 +88,13 @@ export default async function BoardWritePage({
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[13px] font-bold">사진 첨부 (최대 10장)</label>
-          <div className="flex h-24 items-center justify-center rounded-element border border-dashed border-line bg-white text-sm text-muted">
-            📷 사진 추가 (후속 연동)
-          </div>
-        </div>
+        <ImageUpload
+          name="photos"
+          bucket="board"
+          label="사진 첨부 (최대 10장)"
+          max={10}
+          defaultUrls={post?.photos ?? []}
+        />
 
         <button
           type="submit"

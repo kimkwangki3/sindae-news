@@ -11,6 +11,7 @@ export interface Ad {
   advertiser: string;
   text: string;
   href: string;
+  imageUrl: string | null;
 }
 
 export const SLOT_LABEL: Record<AdSlotKey, string> = {
@@ -32,17 +33,22 @@ export async function getAd(slot: AdSlotKey): Promise<Ad | null> {
   const supabase = createClient();
   const { data } = await supabase
     .from("ads")
-    .select("advertiser, link_url, ad_slots!inner(key)")
+    .select("advertiser, link_url, image_url, ad_slots!inner(key)")
     .eq("ad_slots.key", dbKey(slot))
     .eq("is_active", true)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
   if (!data) return null;
-  const ad = data as { advertiser: string | null; link_url: string | null };
+  const ad = data as {
+    advertiser: string | null;
+    link_url: string | null;
+    image_url: string | null;
+  };
   return {
     advertiser: ad.advertiser ?? "광고",
     text: "자세히 보기",
     href: ad.link_url ?? "#",
+    imageUrl: ad.image_url ?? null,
   };
 }

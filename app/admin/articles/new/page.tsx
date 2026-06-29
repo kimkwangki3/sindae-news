@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { saveArticle } from "@/lib/admin-actions";
 import { PageHead } from "@/components/admin/ui";
+import ImageUpload from "@/components/ImageUpload";
 import { CATEGORY_NAME, type CategorySlug } from "@/lib/mock/articles";
 
 export const metadata = { title: "기사 작성 · 관리자" };
@@ -87,12 +88,12 @@ export default function NewArticlePage({
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[13px] font-bold">대표 이미지</label>
-          <div className="flex h-28 items-center justify-center rounded-element border border-dashed border-line bg-white text-sm text-muted">
-            📷 썸네일 업로드 (후속 연동)
-          </div>
-        </div>
+        <ImageUpload
+          name="thumbnail_url"
+          bucket="articles"
+          label="대표 이미지"
+          hint="목록·상세 상단 썸네일. 6MB 이하 권장."
+        />
 
         {/* 발행 / 임시저장 — 같은 폼, status 값만 다름 */}
         <div className="mt-2 flex gap-3">

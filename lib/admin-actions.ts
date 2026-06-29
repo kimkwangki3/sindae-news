@@ -51,6 +51,7 @@ export async function saveArticle(formData: FormData): Promise<void> {
   const slug = String(formData.get("slug") ?? "").trim();
   const categorySlug = String(formData.get("category") ?? "local");
   const body = String(formData.get("body") ?? "").trim();
+  const thumbnailUrl = String(formData.get("thumbnail_url") ?? "").trim();
   const status = String(formData.get("status") ?? "draft") as ArticleStatus;
   if (title.length < 2 || slug.length < 2) {
     throw new Error("제목과 슬러그를 입력해 주세요.");
@@ -63,6 +64,7 @@ export async function saveArticle(formData: FormData): Promise<void> {
     category_id:
       CATEGORY_ID[categorySlug as keyof typeof CATEGORY_ID] ?? null,
     body: body || null,
+    thumbnail_url: thumbnailUrl || null,
     author_id: user.id,
     status,
     published_at: status === "published" ? new Date().toISOString() : null,
@@ -204,6 +206,7 @@ export async function createAd(formData: FormData): Promise<void> {
     slot_id: slotId,
     advertiser,
     link_url: String(formData.get("link_url") ?? "").trim() || null,
+    image_url: String(formData.get("image_url") ?? "").trim() || null,
     is_active: formData.get("is_active") === "on",
   });
   if (error) throw new Error("등록에 실패했습니다.");

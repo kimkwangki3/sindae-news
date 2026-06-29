@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { can } from "@/lib/permissions";
 import { writePromo } from "@/lib/local-actions";
 import LoginRequired from "@/components/community/LoginRequired";
+import ImageUpload from "@/components/ImageUpload";
 
 export const metadata = { title: "홍보 글쓰기 · 신대신문" };
 
@@ -99,12 +100,12 @@ export default async function PromoWritePage() {
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[13px] font-bold">사진 (최대 5장)</label>
-          <div className="flex h-24 items-center justify-center rounded-element border border-dashed border-line bg-white text-sm text-muted">
-            📷 사진 추가 (후속 연동)
-          </div>
-        </div>
+        <ImageUpload
+          name="photo_urls"
+          bucket="business"
+          label="사진 (최대 5장)"
+          max={5}
+        />
 
         <button
           type="submit"

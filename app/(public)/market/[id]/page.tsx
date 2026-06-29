@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Thumb from "@/components/Thumb";
+import PhotoGallery from "@/components/PhotoGallery";
 import ReportSheet from "@/components/ReportSheet";
 import PostComments from "@/components/community/PostComments";
 import PostOwnerControls from "@/components/community/PostOwnerControls";
@@ -48,17 +49,14 @@ export default async function MarketDetailPage({
         )}
       </div>
 
-      <Thumb
-        className="h-[220px] w-full"
-        rounded="rounded-card"
-        alt={post.title}
-      />
-      {post.photoCount > 1 && (
-        <div className="mt-2 flex gap-2">
-          {Array.from({ length: Math.min(post.photoCount, 4) }).map((_, i) => (
-            <Thumb key={i} className="h-14 w-14" alt="" />
-          ))}
-        </div>
+      {post.photos.length > 0 ? (
+        <PhotoGallery photos={post.photos} alt={post.title} />
+      ) : (
+        <Thumb
+          className="h-[220px] w-full"
+          rounded="rounded-card"
+          alt={post.title}
+        />
       )}
 
       <div className="mt-3 flex items-center gap-1.5">

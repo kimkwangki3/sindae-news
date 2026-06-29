@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ReportSheet from "@/components/ReportSheet";
 import { getCurrentUser } from "@/lib/auth";
 import { can } from "@/lib/permissions";
@@ -33,7 +34,20 @@ export default async function OrgDetailPage({
         </Link>
       </div>
 
-      <div className="h-[140px] w-full rounded-card bg-gradient-to-br from-[#CFE7D7] to-[#7FB894]" />
+      {org.photos.length > 0 ? (
+        <div className="flex gap-2 overflow-x-auto">
+          {org.photos.map((u) => (
+            <div
+              key={u}
+              className="relative h-[150px] w-[220px] flex-shrink-0 overflow-hidden rounded-card bg-ivory-2"
+            >
+              <Image src={u} alt={org.name} fill sizes="220px" className="object-cover" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="h-[140px] w-full rounded-card bg-gradient-to-br from-[#CFE7D7] to-[#7FB894]" />
+      )}
 
       <div className="mt-3">
         <span className="rounded-full bg-tag-org-bg px-2.5 py-1 text-[11px] font-bold text-tag-org-fg">
@@ -90,6 +104,18 @@ export default async function OrgDetailPage({
               </span>
               <h5 className="mt-1.5 text-sm font-bold">{p.title}</h5>
               <p className="mt-1 text-[13px] text-muted">{p.body}</p>
+              {p.photoUrls.length > 0 && (
+                <div className="mt-2 flex gap-2 overflow-x-auto">
+                  {p.photoUrls.map((u) => (
+                    <div
+                      key={u}
+                      className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-thumb bg-ivory-2"
+                    >
+                      <Image src={u} alt="" fill sizes="96px" className="object-cover" />
+                    </div>
+                  ))}
+                </div>
+              )}
               <p className="mt-1 text-[11px] text-muted">{p.createdAt}</p>
             </div>
           ))}

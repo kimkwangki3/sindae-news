@@ -2,6 +2,7 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import { submitAdRequest, type AdRequestState } from "@/lib/ads-actions";
+import ImageUpload from "@/components/ImageUpload";
 
 const INITIAL: AdRequestState = {};
 const POSITIONS = [
@@ -63,11 +64,12 @@ export default function AdApplyForm() {
       <Field label="업체명 / 광고주">
         <input name="advertiser" required placeholder="예) 봄날카페" className={INPUT} />
       </Field>
-      <Field label="배너 이미지">
-        <div className="flex h-24 items-center justify-center rounded-element border border-dashed border-line bg-white text-sm text-muted">
-          🖼 배너 업로드 (권장 1200×300, 후속 연동)
-        </div>
-      </Field>
+      <ImageUpload
+        name="image_url"
+        bucket="ads"
+        label="배너 이미지(선택)"
+        hint="권장 1200×300. 없으면 업체명 텍스트 배너로 노출됩니다."
+      />
       <Field label="연결 링크">
         <input name="link" placeholder="https://" className={INPUT} />
       </Field>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { saveReporterArticle, type WriteState } from "@/lib/reporter-actions";
 import { CATEGORY_NAME } from "@/lib/mock/articles-meta";
+import ImageUpload from "@/components/ImageUpload";
 
 const INITIAL: WriteState = {};
 const INPUT =
@@ -83,6 +84,13 @@ export default function ReporterWriteForm({
           className="w-full resize-y rounded-element border border-line bg-white p-3.5 text-sm leading-relaxed outline-none focus:border-rose"
         />
       </Field>
+
+      <ImageUpload
+        name="thumbnail_url"
+        bucket="articles"
+        label="대표 이미지(선택)"
+        hint="목록·상세 상단에 표시됩니다. 6MB 이하 권장."
+      />
 
       {/* 책임 서약 */}
       <label className="flex items-start gap-2.5 rounded-card border border-rose bg-rose-soft p-4 text-[13px] leading-relaxed">

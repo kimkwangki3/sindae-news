@@ -2,6 +2,7 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import { submitTip, type TipState } from "@/lib/community-actions";
+import ImageUpload from "@/components/ImageUpload";
 
 const INITIAL: TipState = {};
 const CATEGORIES = ["지역소식", "행정", "인물", "생활", "기타"];
@@ -71,11 +72,12 @@ export default function TipForm() {
         />
       </Field>
 
-      <Field label="사진 첨부 (선택)">
-        <div className="flex h-24 items-center justify-center rounded-element border border-dashed border-line bg-white text-sm text-muted">
-          📷 사진을 첨부하려면 눌러주세요 (후속 연동)
-        </div>
-      </Field>
+      <ImageUpload
+        name="photo_urls"
+        bucket="board"
+        label="사진 첨부 (선택, 최대 3장)"
+        max={3}
+      />
 
       <Field label="연락처 (선택)">
         <input

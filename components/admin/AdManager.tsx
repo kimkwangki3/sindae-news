@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { PageHead, Pill } from "@/components/admin/ui";
+import ImageUpload from "@/components/ImageUpload";
 import {
   setAdRequestStatus,
   createAd,
@@ -136,6 +137,12 @@ export default function AdManager({
           name="link_url"
           placeholder="연결 링크 (https:// 또는 /district/..)"
           className="min-h-[44px] rounded-element border border-line px-3 text-sm"
+        />
+        <ImageUpload
+          name="image_url"
+          bucket="ads"
+          label="배너 이미지(선택)"
+          hint="권장 가로형. 없으면 광고주명 텍스트 배너로 표시됩니다."
         />
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" name="is_active" defaultChecked />

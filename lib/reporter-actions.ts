@@ -28,6 +28,7 @@ export async function saveReporterArticle(
   const slug = String(formData.get("slug") ?? "").trim();
   const categorySlug = String(formData.get("category") ?? "local");
   const body = String(formData.get("body") ?? "").trim();
+  const thumbnailUrl = String(formData.get("thumbnail_url") ?? "").trim();
   const pledge = formData.get("pledge_ack") === "on";
 
   if (title.length < 2) return { error: "제목을 입력해 주세요." };
@@ -50,6 +51,7 @@ export async function saveReporterArticle(
     category_id:
       CATEGORY_ID[categorySlug as keyof typeof CATEGORY_ID] ?? null,
     body: body || null,
+    thumbnail_url: thumbnailUrl || null,
     author_id: user.id,
     status,
     pledge_ack: pledge,

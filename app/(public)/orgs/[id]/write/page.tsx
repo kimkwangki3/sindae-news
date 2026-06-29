@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { can } from "@/lib/permissions";
 import { writeOrgPost } from "@/lib/local-actions";
 import LoginRequired from "@/components/community/LoginRequired";
+import ImageUpload from "@/components/ImageUpload";
 import { getOrg } from "@/lib/mock/orgs";
 
 export const metadata = { title: "단체 소식 글쓰기 · 지역단체" };
@@ -98,12 +99,12 @@ export default async function OrgPostWritePage({
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[13px] font-bold">사진 (최대 5장)</label>
-          <div className="flex h-24 items-center justify-center rounded-element border border-dashed border-line bg-white text-sm text-muted">
-            📷 사진 추가 (후속 연동)
-          </div>
-        </div>
+        <ImageUpload
+          name="photo_urls"
+          bucket="org"
+          label="사진 (최대 5장)"
+          max={5}
+        />
 
         <button
           type="submit"

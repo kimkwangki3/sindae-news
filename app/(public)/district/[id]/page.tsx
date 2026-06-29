@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import Thumb from "@/components/Thumb";
 import ReportSheet from "@/components/ReportSheet";
 import { getCurrentUser } from "@/lib/auth";
@@ -44,14 +45,28 @@ export default async function StoreDetailPage({
 
       {/* 갤러리 */}
       <div className="flex gap-2 overflow-x-auto">
-        {Array.from({ length: Math.max(store.photoCount, 1) }).map((_, i) => (
+        {store.photos.length > 0 ? (
+          store.photos.map((u) => (
+            <div
+              key={u}
+              className="relative h-[150px] w-[200px] flex-shrink-0 overflow-hidden rounded-card bg-ivory-2"
+            >
+              <Image
+                src={u}
+                alt={store.name}
+                fill
+                sizes="200px"
+                className="object-cover"
+              />
+            </div>
+          ))
+        ) : (
           <Thumb
-            key={i}
             alt={store.name}
             rounded="rounded-card"
             className="h-[150px] w-[200px] flex-shrink-0"
           />
-        ))}
+        )}
       </div>
 
       <div className="mt-3 flex items-center gap-1.5">
@@ -118,6 +133,18 @@ export default async function StoreDetailPage({
               </span>
               <h5 className="mt-1.5 text-sm font-bold">{p.title}</h5>
               <p className="mt-1 text-[13px] text-muted">{p.body}</p>
+              {p.photoUrls.length > 0 && (
+                <div className="mt-2 flex gap-2 overflow-x-auto">
+                  {p.photoUrls.map((u) => (
+                    <div
+                      key={u}
+                      className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-thumb bg-ivory-2"
+                    >
+                      <Image src={u} alt="" fill sizes="96px" className="object-cover" />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </section>

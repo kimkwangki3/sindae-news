@@ -24,6 +24,7 @@ export interface PromoPost {
   title: string;
   body: string;
   createdAt: string;
+  photoUrls: string[];
 }
 
 export interface Business {
@@ -42,6 +43,7 @@ export interface Business {
   intro: string;
   isPromoted: boolean;
   photoCount: number;
+  photos: string[];
   menus: BizMenu[];
   promos: PromoPost[];
 }
@@ -79,6 +81,7 @@ function toBusinessSummary(r: Record<string, unknown>): Business {
     intro: (r.intro as string) ?? "",
     isPromoted: embeddedCount(r.promo_posts) > 0,
     photoCount: embeddedCount(r.business_photos),
+    photos: [],
     menus: [],
     promos: [],
   };
@@ -114,20 +117,28 @@ export async function getBusiness(id: string): Promise<Business | null> {
 
   const base = toBusinessSummary(data as Record<string, unknown>);
 
-  const [{ data: menus }, { data: promos }] = await Promise.all([
-    supabase
-      .from("business_menus")
-      .select("name, price")
-      .eq("business_id", id)
-      .order("sort", { ascending: true }),
-    supabase
-      .from("promo_posts")
-      .select("id, business_id, title, category, body, created_at")
-      .eq("business_id", id)
-      .eq("status", "approved")
-      .eq("visibility", "visible")
-      .order("created_at", { ascending: false }),
-  ]);
+  const [{ data: menus }, { data: promos }, { data: photos }] =
+    await Promise.all([
+      supabase
+        .from("business_menus")
+        .select("name, price")
+        .eq("business_id", id)
+        .order("sort", { ascending: true }),
+      supabase
+        .from("promo_posts")
+        .select("id, business_id, title, category, body, created_at, photo_urls")
+        .eq("business_id", id)
+        .eq("status", "approved")
+        .eq("visibility", "visible")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("business_photos")
+        .select("url, sort")
+        .eq("business_id", id)
+        .order("sort", { ascending: true }),
+    ]);
+
+  base.photos = (photos ?? []).map((p) => (p as { url: string }).url);
 
   base.menus = (menus ?? []).map((m) => {
     const row = m as { name: string; price: number | null };
@@ -141,6 +152,7 @@ export async function getBusiness(id: string): Promise<Business | null> {
       category: string | null;
       body: string | null;
       created_at: string;
+      photo_urls: string[] | null;
     };
     return {
       id: row.id,
@@ -149,6 +161,7 @@ export async function getBusiness(id: string): Promise<Business | null> {
       title: row.title,
       body: row.body ?? "",
       createdAt: row.created_at.slice(0, 10).replace(/-/g, "."),
+      photoUrls: row.photo_urls ?? [],
     };
   });
 

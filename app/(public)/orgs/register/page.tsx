@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { registerOrg } from "@/lib/local-actions";
 import LoginRequired from "@/components/community/LoginRequired";
+import ImageUpload from "@/components/ImageUpload";
 import { ORG_CAT_NAME, type OrgCategory } from "@/lib/mock/orgs";
 
 export const metadata = { title: "지역단체 등록 · 신대신문" };
@@ -66,11 +67,12 @@ export default async function OrgRegisterPage() {
             홈페이지에서 회원 가입 신청을 받습니다
           </label>
         </Field>
-        <Field label="대표 이미지 / 활동 사진">
-          <div className="flex h-24 items-center justify-center rounded-element border border-dashed border-line bg-white text-sm text-muted">
-            📷 사진 업로드 (후속 연동)
-          </div>
-        </Field>
+        <ImageUpload
+          name="photos"
+          bucket="org"
+          label="대표 이미지 / 활동 사진 (최대 5장)"
+          max={5}
+        />
         <Field label="단체 소개">
           <textarea
             name="intro"

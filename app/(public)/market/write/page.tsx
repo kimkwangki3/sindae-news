@@ -7,6 +7,7 @@ import {
 } from "@/lib/community-actions";
 import { getMarketPost } from "@/lib/mock/community";
 import LoginRequired from "@/components/community/LoginRequired";
+import ImageUpload from "@/components/ImageUpload";
 
 export const metadata = { title: "나눔마켓 글쓰기 · 신대신문" };
 
@@ -99,11 +100,13 @@ export default async function MarketWritePage({
           />
         </Field>
 
-        <Field label="사진 (최대 5장)">
-          <div className="flex h-24 items-center justify-center rounded-element border border-dashed border-line bg-white text-sm text-muted">
-            📷 사진 추가 (후속 연동)
-          </div>
-        </Field>
+        <ImageUpload
+          name="photos"
+          bucket="market"
+          label="사진 (최대 5장)"
+          max={5}
+          defaultUrls={post?.photos ?? []}
+        />
 
         <button
           type="submit"

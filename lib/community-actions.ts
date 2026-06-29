@@ -4,11 +4,38 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./auth";
 import { createClient } from "./supabase/server";
+import { parsePhotoUrls } from "./photos";
 import { type PostComment } from "./mock/community";
 
 // timestamptz → "06.28 14:20"
 function fmtShort(ts: string): string {
   return `${ts.slice(5, 10).replace("-", ".")} ${ts.slice(11, 16)}`;
+}
+
+// 사진 테이블(market_photos/board_photos)에 URL 행 삽입(정렬순).
+type DbClient = ReturnType<typeof createClient>;
+async function savePostPhotos(
+  supabase: DbClient,
+  table: "market_photos" | "board_photos",
+  fk: "post_id",
+  id: string,
+  urls: string[],
+): Promise<void> {
+  if (!urls.length) return;
+  await supabase
+    .from(table)
+    .insert(urls.map((url, sort) => ({ [fk]: id, url, sort })));
+}
+
+// 본인 글 수정 시 기존 사진 전부 교체.
+async function replacePostPhotos(
+  supabase: DbClient,
+  table: "market_photos" | "board_photos",
+  id: string,
+  urls: string[],
+): Promise<void> {
+  await supabase.from(table).delete().eq("post_id", id);
+  await savePostPhotos(supabase, table, "post_id", id, urls);
 }
 
 // 로그인 필수 가드(글쓰기 redirect형).
@@ -29,15 +56,21 @@ export async function createMarketPost(formData: FormData): Promise<void> {
   const body = String(formData.get("body") ?? "").trim();
   if (title.length < 2) throw new Error("제목을 입력해 주세요.");
 
+  const photoUrls = parsePhotoUrls(formData.get("photos"), 5);
   const supabase = createClient();
-  const { error } = await supabase.from("market_posts").insert({
-    author_id: user.id,
-    category,
-    title,
-    neighborhood: neighborhood || null,
-    body: body || null,
-  });
-  if (error) throw new Error("등록에 실패했습니다.");
+  const { data, error } = await supabase
+    .from("market_posts")
+    .insert({
+      author_id: user.id,
+      category,
+      title,
+      neighborhood: neighborhood || null,
+      body: body || null,
+    })
+    .select("id")
+    .single();
+  if (error || !data) throw new Error("등록에 실패했습니다.");
+  await savePostPhotos(supabase, "market_photos", "post_id", (data as { id: string }).id, photoUrls);
   revalidatePath("/market");
   redirect("/market");
 }
@@ -50,14 +83,20 @@ export async function createBoardPost(formData: FormData): Promise<void> {
   const body = String(formData.get("body") ?? "").trim();
   if (title.length < 2) throw new Error("제목을 입력해 주세요.");
 
+  const photoUrls = parsePhotoUrls(formData.get("photos"), 10);
   const supabase = createClient();
-  const { error } = await supabase.from("board_posts").insert({
-    author_id: user.id,
-    category,
-    title,
-    body: body || null,
-  });
-  if (error) throw new Error("등록에 실패했습니다.");
+  const { data, error } = await supabase
+    .from("board_posts")
+    .insert({
+      author_id: user.id,
+      category,
+      title,
+      body: body || null,
+    })
+    .select("id")
+    .single();
+  if (error || !data) throw new Error("등록에 실패했습니다.");
+  await savePostPhotos(supabase, "board_photos", "post_id", (data as { id: string }).id, photoUrls);
   revalidatePath("/board");
   redirect("/board");
 }
@@ -70,6 +109,7 @@ export async function updateMarketPost(
   const user = await requireMemberOrRedirect();
   const title = String(formData.get("title") ?? "").trim();
   if (title.length < 2) throw new Error("제목을 입력해 주세요.");
+  const photoUrls = parsePhotoUrls(formData.get("photos"), 5);
   const supabase = createClient();
   const { error } = await supabase
     .from("market_posts")
@@ -82,6 +122,7 @@ export async function updateMarketPost(
     .eq("id", id)
     .eq("author_id", user.id);
   if (error) throw new Error("수정에 실패했습니다.");
+  await replacePostPhotos(supabase, "market_photos", id, photoUrls);
   revalidatePath(`/market/${id}`);
   redirect(`/market/${id}`);
 }
@@ -94,6 +135,7 @@ export async function updateBoardPost(
   const user = await requireMemberOrRedirect();
   const title = String(formData.get("title") ?? "").trim();
   if (title.length < 2) throw new Error("제목을 입력해 주세요.");
+  const photoUrls = parsePhotoUrls(formData.get("photos"), 10);
   const supabase = createClient();
   const { error } = await supabase
     .from("board_posts")
@@ -105,6 +147,7 @@ export async function updateBoardPost(
     .eq("id", id)
     .eq("author_id", user.id);
   if (error) throw new Error("수정에 실패했습니다.");
+  await replacePostPhotos(supabase, "board_photos", id, photoUrls);
   revalidatePath(`/board/${id}`);
   redirect(`/board/${id}`);
 }
@@ -298,12 +341,14 @@ export async function submitTip(
   if (body.length < 5) return { error: "내용을 조금 더 자세히 적어주세요." };
 
   const user = await getCurrentUser();
+  const photoUrls = parsePhotoUrls(formData.get("photo_urls"), 3);
   const supabase = createClient();
   const { error } = await supabase.from("tips").insert({
     title,
     category: category || null,
     body,
     contact: contact || null,
+    photo_urls: photoUrls.length ? photoUrls : null,
     reporter_id: user?.id ?? null,
   });
   if (error) return { error: "전송에 실패했습니다. 잠시 후 다시 시도해 주세요." };

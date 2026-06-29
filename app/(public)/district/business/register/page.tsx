@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { registerBusiness } from "@/lib/local-actions";
 import LoginRequired from "@/components/community/LoginRequired";
+import ImageUpload from "@/components/ImageUpload";
 import { BIZ_CAT_NAME, type BizCategory } from "@/lib/mock/district";
 
 export const metadata = { title: "업체 등록 · 신대신문" };
@@ -83,11 +84,12 @@ export default async function BusinessRegisterPage() {
             24시간 영업
           </label>
         </Field>
-        <Field label="대표 이미지 / 매장 사진">
-          <div className="flex h-24 items-center justify-center rounded-element border border-dashed border-line bg-white text-sm text-muted">
-            📷 사진 업로드 (후속 연동)
-          </div>
-        </Field>
+        <ImageUpload
+          name="photos"
+          bucket="business"
+          label="대표 이미지 / 매장 사진 (최대 5장)"
+          max={5}
+        />
         <Field label="업체 소개">
           <textarea
             name="intro"

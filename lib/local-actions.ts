@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./auth";
 import { can } from "./permissions";
 import { createClient } from "./supabase/server";
+import { parsePhotoUrls } from "./photos";
 
 async function requireUser() {
   const user = await getCurrentUser();
@@ -20,24 +21,40 @@ export async function registerBusiness(formData: FormData): Promise<void> {
   const name = String(formData.get("name") ?? "").trim();
   if (name.length < 2) throw new Error("업체명을 입력해 주세요.");
 
+  const photoUrls = parsePhotoUrls(formData.get("photos"), 5);
   const supabase = createClient();
-  const { error } = await supabase.from("businesses").insert({
-    owner_id: user.id,
-    name,
-    category: String(formData.get("category") ?? "food"),
-    address: String(formData.get("address") ?? "").trim() || null,
-    phone: String(formData.get("phone") ?? "").trim() || null,
-    biz_reg_no: String(formData.get("biz_reg_no") ?? "").trim() || null,
-    kakao_channel: String(formData.get("kakao_channel") ?? "").trim() || null,
-    hours_open: String(formData.get("hours_open") ?? "") || null,
-    hours_close: String(formData.get("hours_close") ?? "") || null,
-    is_24h: formData.get("is_24h") === "on",
-    intro: String(formData.get("intro") ?? "").trim() || null,
-  });
-  if (error) {
+  const { data, error } = await supabase
+    .from("businesses")
+    .insert({
+      owner_id: user.id,
+      name,
+      category: String(formData.get("category") ?? "food"),
+      address: String(formData.get("address") ?? "").trim() || null,
+      phone: String(formData.get("phone") ?? "").trim() || null,
+      biz_reg_no: String(formData.get("biz_reg_no") ?? "").trim() || null,
+      kakao_channel: String(formData.get("kakao_channel") ?? "").trim() || null,
+      hours_open: String(formData.get("hours_open") ?? "") || null,
+      hours_close: String(formData.get("hours_close") ?? "") || null,
+      is_24h: formData.get("is_24h") === "on",
+      intro: String(formData.get("intro") ?? "").trim() || null,
+    })
+    .select("id")
+    .single();
+  if (error || !data) {
     throw new Error(
       "등록에 실패했습니다. 이미 등록한 업체가 있는지 확인해 주세요.",
     );
+  }
+  if (photoUrls.length) {
+    await supabase
+      .from("business_photos")
+      .insert(
+        photoUrls.map((url, sort) => ({
+          business_id: (data as { id: string }).id,
+          url,
+          sort,
+        })),
+      );
   }
   redirect("/district");
 }
@@ -53,6 +70,7 @@ export async function writePromo(formData: FormData): Promise<void> {
   const title = String(formData.get("title") ?? "").trim();
   if (title.length < 2) throw new Error("제목을 입력해 주세요.");
 
+  const photoUrls = parsePhotoUrls(formData.get("photo_urls"), 5);
   const supabase = createClient();
   const { error } = await supabase.from("promo_posts").insert({
     business_id: businessId,
@@ -60,6 +78,7 @@ export async function writePromo(formData: FormData): Promise<void> {
     title,
     category: String(formData.get("category") ?? "") || null,
     body: String(formData.get("body") ?? "").trim() || null,
+    photo_urls: photoUrls.length ? photoUrls : null,
   });
   if (error) throw new Error("등록에 실패했습니다.");
   revalidatePath(`/district/${businessId}`);
@@ -91,14 +110,23 @@ export async function registerOrg(formData: FormData): Promise<void> {
     .single();
   if (error || !data) throw new Error("등록에 실패했습니다.");
 
+  const orgId = (data as { id: string }).id;
+
   // 등록자는 owner(approved)로 멤버 등록
   await supabase.from("org_members").insert({
-    org_id: (data as { id: string }).id,
+    org_id: orgId,
     user_id: user.id,
     role: "owner",
     status: "approved",
     apply_name: user.nickname ?? null,
   });
+
+  const photoUrls = parsePhotoUrls(formData.get("photos"), 5);
+  if (photoUrls.length) {
+    await supabase
+      .from("org_photos")
+      .insert(photoUrls.map((url, sort) => ({ org_id: orgId, url, sort })));
+  }
   redirect("/orgs");
 }
 
@@ -150,6 +178,7 @@ export async function writeOrgPost(
   const title = String(formData.get("title") ?? "").trim();
   if (title.length < 2) throw new Error("제목을 입력해 주세요.");
 
+  const photoUrls = parsePhotoUrls(formData.get("photo_urls"), 5);
   const supabase = createClient();
   const { error } = await supabase.from("org_posts").insert({
     org_id: orgId,
@@ -157,6 +186,7 @@ export async function writeOrgPost(
     title,
     category: String(formData.get("category") ?? "") || null,
     body: String(formData.get("body") ?? "").trim() || null,
+    photo_urls: photoUrls.length ? photoUrls : null,
   });
   if (error) throw new Error("등록에 실패했습니다.");
   revalidatePath(`/orgs/${orgId}`);

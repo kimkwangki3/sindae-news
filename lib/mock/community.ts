@@ -29,6 +29,15 @@ function authorName(v: unknown): string {
   return (v as { nickname?: string } | null)?.nickname ?? "익명";
 }
 
+// 임베디드 사진 관계(`rel(url, sort)`) → 정렬된 URL 배열
+function embeddedPhotos(v: unknown): string[] {
+  if (!Array.isArray(v)) return [];
+  return (v as { url: string; sort?: number }[])
+    .slice()
+    .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+    .map((p) => p.url);
+}
+
 // --- 나눔마켓 --------------------------------------------------------
 export type MarketCategory = "share" | "request" | "done";
 
@@ -49,14 +58,16 @@ export interface MarketPost {
   commentCount: number;
   likeCount: number;
   photoCount: number;
+  photos: string[];
   pinned: boolean;
   mine?: boolean; // 현재 로그인 사용자가 작성
 }
 
 const MARKET_COLS =
-  "id, category, title, neighborhood, body, is_pinned, created_at, author_id, author:profiles(nickname), market_comments(count), market_photos(count)";
+  "id, category, title, neighborhood, body, is_pinned, created_at, author_id, author:profiles(nickname), market_comments(count), market_photos(url, sort)";
 
 function toMarketPost(r: Record<string, unknown>): MarketPost {
+  const photos = embeddedPhotos(r.market_photos);
   return {
     id: r.id as string,
     category: r.category as MarketCategory,
@@ -67,7 +78,8 @@ function toMarketPost(r: Record<string, unknown>): MarketPost {
     createdAt: fmtShort(r.created_at as string),
     commentCount: embeddedCount(r.market_comments),
     likeCount: 0, // 나눔마켓은 좋아요 없음(스키마 미보유)
-    photoCount: embeddedCount(r.market_photos),
+    photoCount: photos.length,
+    photos,
     pinned: Boolean(r.is_pinned),
   };
 }
@@ -132,12 +144,13 @@ export interface BoardPost {
   likeCount: number;
   commentCount: number;
   viewCount: number;
+  photos: string[];
   pinned: boolean;
   mine?: boolean; // 현재 로그인 사용자가 작성
 }
 
 const BOARD_COLS =
-  "id, category, title, body, like_count, view_count, is_pinned, created_at, author_id, author:profiles(nickname), board_comments(count)";
+  "id, category, title, body, like_count, view_count, is_pinned, created_at, author_id, author:profiles(nickname), board_comments(count), board_photos(url, sort)";
 
 function toBoardPost(r: Record<string, unknown>): BoardPost {
   return {
@@ -150,6 +163,7 @@ function toBoardPost(r: Record<string, unknown>): BoardPost {
     likeCount: Number(r.like_count ?? 0),
     commentCount: embeddedCount(r.board_comments),
     viewCount: Number(r.view_count ?? 0),
+    photos: embeddedPhotos(r.board_photos),
     pinned: Boolean(r.is_pinned),
   };
 }
