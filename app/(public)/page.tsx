@@ -42,6 +42,8 @@ export default async function HomePage() {
             </span>
             <Link href={`/article/${lead.slug}`} className="mt-3.5 block">
               <Thumb
+                src={lead.thumbnailUrl}
+                sizes="(max-width: 768px) 100vw, 720px"
                 className="h-[200px] w-full"
                 rounded="rounded-card"
                 alt={lead.title}

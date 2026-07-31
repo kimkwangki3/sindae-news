@@ -6,11 +6,15 @@ export default function Thumb({
   alt = "",
   className = "",
   rounded = "rounded-thumb",
+  // 목록 썸네일 기준값. 기사 상세처럼 가로 전체를 쓰는 곳은 100vw를 넘겨야
+  // 작은 이미지를 받아 흐릿해지지 않는다.
+  sizes = "(max-width: 480px) 40vw, 200px",
 }: {
   src?: string | null;
   alt?: string;
   className?: string;
   rounded?: string;
+  sizes?: string;
 }) {
   if (src) {
     return (
@@ -20,7 +24,7 @@ export default function Thumb({
           alt={alt}
           fill
           loading="lazy"
-          sizes="(max-width: 480px) 40vw, 200px"
+          sizes={sizes}
           className="object-cover"
         />
       </div>

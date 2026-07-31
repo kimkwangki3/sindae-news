@@ -71,7 +71,10 @@ export default async function ArticleDetailPage({
         </p>
       </div>
 
+      {/* 대표 이미지가 있으면 실제 사진, 없으면 자리표시 */}
       <Thumb
+        src={article.thumbnailUrl}
+        sizes="(max-width: 768px) 100vw, 720px"
         className="mt-4 h-[210px] w-full"
         rounded="rounded-card"
         alt={article.title}

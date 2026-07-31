@@ -76,7 +76,11 @@ export default async function MarketPage({
                 p.category === "done" ? "opacity-70" : ""
               }`}
             >
-              <Thumb alt={p.title} className="h-[72px] w-[72px] flex-shrink-0" />
+              <Thumb
+                src={p.photos[0]}
+                alt={p.title}
+                className="h-[72px] w-[72px] flex-shrink-0"
+              />
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-1.5">
                   {p.pinned && (

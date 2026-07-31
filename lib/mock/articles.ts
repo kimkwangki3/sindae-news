@@ -49,11 +49,22 @@ function fmtDate(ts: string | null): string {
   return ts.slice(0, 10).replace(/-/g, ".");
 }
 
-// 본문 text → 문단 배열 (빈 줄 기준 분리, 없으면 줄 단위)
+// 본문 text → 문단 배열.
+// 브라우저 textarea는 줄바꿈을 CRLF(\r\n)로 보낸다. 정규화하지 않으면
+// 빈 줄이 \r\n\r\n 이 되어 /\n{2,}/ 에 걸리지 않고 전부 한 문단으로 뭉친다.
+// 빈 줄이 있으면 그 기준으로, 없으면 단일 줄바꿈을 문단 구분으로 본다.
 function toParagraphs(body: string | null): string[] {
   if (!body) return [];
-  const parts = body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
-  return parts.length > 0 ? parts : [body.trim()].filter(Boolean);
+  const text = body.replace(/\r\n?/g, "\n");
+  const byBlankLine = text
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (byBlankLine.length > 1) return byBlankLine;
+  return text
+    .split(/\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
 }
 
 type ListRow = {
