@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { revalidatePublic } from "./revalidate";
 import { getCurrentUser } from "./auth";
 import { createServiceClient } from "./supabase/server";
 import { logAdmin } from "./audit";
@@ -45,6 +46,7 @@ export async function setPostVisibility(
     memo: visibility,
   });
   revalidatePath(PATH[kind]);
+  revalidatePublic();
 }
 
 // 상단 고정 토글(게시판 공지·나눔 상단)
@@ -62,6 +64,7 @@ export async function togglePostPin(
     memo: String(pinned),
   });
   revalidatePath(PATH[kind]);
+  revalidatePublic();
 }
 
 // 글 삭제
@@ -71,6 +74,7 @@ export async function deletePost(kind: PostKind, id: string): Promise<void> {
   await supabase.from(TABLE[kind]).delete().eq("id", id);
   await logAdmin("delete_post", { targetType: kind, targetId: id });
   revalidatePath(PATH[kind]);
+  revalidatePublic();
 }
 
 // 나눔마켓 완료 처리
@@ -83,6 +87,7 @@ export async function setMarketDone(id: string): Promise<void> {
     .eq("id", id);
   await logAdmin("market_done", { targetType: "market", targetId: id });
   revalidatePath("/admin/market");
+  revalidatePublic();
 }
 
 // 제보 상태 변경
@@ -138,6 +143,7 @@ export async function setEntityStatus(
     memo: status,
   });
   revalidatePath(ENTITY_PATH[kind]);
+  revalidatePublic();
 }
 
 // 업체/단체 삭제
@@ -150,6 +156,7 @@ export async function deleteEntity(
   await supabase.from(ENTITY_TABLE[kind]).delete().eq("id", id);
   await logAdmin("delete_entity", { targetType: kind, targetId: id });
   revalidatePath(ENTITY_PATH[kind]);
+  revalidatePublic();
 }
 
 // 홍보글 승인·반려
@@ -166,6 +173,7 @@ export async function setPromoStatus(
     memo: status,
   });
   revalidatePath("/admin/business");
+  revalidatePublic();
 }
 
 // --- 기자 신청 승인/반려 ---

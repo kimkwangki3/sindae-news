@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { revalidatePublic } from "./revalidate";
 import { getCurrentUser } from "./auth";
 import { createServiceClient } from "./supabase/server";
 import { logAdmin } from "./audit";
@@ -34,6 +35,7 @@ export async function setArticleStatus(
   await supabase.from("articles").update(patch).eq("slug", slug);
   await logAdmin("set_article_status", { targetType: "article", targetId: slug, memo: status });
   revalidatePath("/admin/articles");
+  revalidatePublic();
 }
 
 export async function deleteArticle(slug: string): Promise<void> {
@@ -42,6 +44,7 @@ export async function deleteArticle(slug: string): Promise<void> {
   await supabase.from("articles").delete().eq("slug", slug);
   await logAdmin("delete_article", { targetType: "article", targetId: slug });
   revalidatePath("/admin/articles");
+  revalidatePublic();
 }
 
 // 슬러그 정규화. 관리자 폼은 useFormState가 아니라 throw가 곧 크래시 페이지로 보이므로,
@@ -93,6 +96,7 @@ export async function saveArticle(formData: FormData): Promise<void> {
   if (error) throw new Error("저장에 실패했습니다.");
   await logAdmin("save_article", { targetType: "article", targetId: slug, memo: status });
   revalidatePath("/admin/articles");
+  revalidatePublic();
   redirect("/admin/articles");
 }
 
@@ -111,6 +115,7 @@ export async function approveArticle(slug: string): Promise<void> {
     .eq("slug", slug);
   await logAdmin("approve_article", { targetType: "article", targetId: slug });
   revalidatePath("/admin/articles");
+  revalidatePublic();
 }
 
 // 반려 — 임시저장으로 되돌림(기자가 수정 후 재제출). 검수 기록.
@@ -127,6 +132,7 @@ export async function rejectArticle(slug: string): Promise<void> {
     .eq("slug", slug);
   await logAdmin("reject_article", { targetType: "article", targetId: slug });
   revalidatePath("/admin/articles");
+  revalidatePublic();
 }
 
 // 기자 등급 지정/변경(기자신청자/준기자/정기자)
@@ -139,6 +145,7 @@ export async function setReporterLevel(
   await supabase.from("profiles").update({ reporter_level: level }).eq("id", id);
   await logAdmin("set_reporter_level", { targetType: "profile", targetId: id, memo: level });
   revalidatePath("/admin/members");
+  revalidatePublic();
 }
 
 export async function setCommentStatus(
@@ -152,6 +159,7 @@ export async function setCommentStatus(
   await supabase.from("comments").update({ visibility }).eq("id", id);
   await logAdmin("set_comment_status", { targetType: "comment", targetId: id, memo: visibility });
   revalidatePath("/admin/comments");
+  revalidatePublic();
 }
 
 export async function deleteComment(id: string): Promise<void> {
@@ -160,6 +168,7 @@ export async function deleteComment(id: string): Promise<void> {
   await supabase.from("comments").delete().eq("id", id);
   await logAdmin("delete_comment", { targetType: "comment", targetId: id });
   revalidatePath("/admin/comments");
+  revalidatePublic();
 }
 
 export async function resolveReport(id: string): Promise<void> {
@@ -182,6 +191,7 @@ export async function setMemberRole(
   await supabase.from("profiles").update({ role }).eq("id", id);
   await logAdmin("set_member_role", { targetType: "profile", targetId: id, memo: role });
   revalidatePath("/admin/members");
+  revalidatePublic();
 }
 
 export async function setMemberSuspended(
@@ -196,6 +206,7 @@ export async function setMemberSuspended(
     .eq("id", id);
   await logAdmin("set_member_suspended", { targetType: "profile", targetId: id, memo: String(suspended) });
   revalidatePath("/admin/members");
+  revalidatePublic();
 }
 
 // --- 광고 ---
@@ -209,6 +220,7 @@ export async function setAdRequestStatus(
   await supabase.from("ad_requests").update({ status }).eq("id", id);
   await logAdmin("set_ad_request_status", { targetType: "ad_request", targetId: id, memo: status });
   revalidatePath("/admin/ads");
+  revalidatePublic();
 }
 
 // 배너 광고 게재 등록 — 선택 슬롯에 활성 배너 추가.
@@ -230,6 +242,7 @@ export async function createAd(formData: FormData): Promise<void> {
   if (error) throw new Error("등록에 실패했습니다.");
   await logAdmin("create_ad", { targetType: "ad", memo: advertiser });
   revalidatePath("/admin/ads");
+  revalidatePublic();
 }
 
 export async function toggleAd(id: string, active: boolean): Promise<void> {
@@ -238,6 +251,7 @@ export async function toggleAd(id: string, active: boolean): Promise<void> {
   await supabase.from("ads").update({ is_active: active }).eq("id", id);
   await logAdmin("toggle_ad", { targetType: "ad", targetId: id, memo: String(active) });
   revalidatePath("/admin/ads");
+  revalidatePublic();
 }
 
 export async function deleteAd(id: string): Promise<void> {
@@ -246,4 +260,5 @@ export async function deleteAd(id: string): Promise<void> {
   await supabase.from("ads").delete().eq("id", id);
   await logAdmin("delete_ad", { targetType: "ad", targetId: id });
   revalidatePath("/admin/ads");
+  revalidatePublic();
 }

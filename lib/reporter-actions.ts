@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { revalidatePublic } from "./revalidate";
 import { getCurrentUser } from "./auth";
 import { canWriteArticle, articleStatusOnSubmit } from "./permissions";
 import { createClient } from "./supabase/server";
@@ -82,5 +83,7 @@ export async function saveReporterArticle(
   }
 
   revalidatePath("/reporter/articles");
+  // 정기자가 즉시 발행하면 공개 목록·홈에도 바로 반영돼야 한다.
+  revalidatePublic();
   redirect("/reporter/articles");
 }
