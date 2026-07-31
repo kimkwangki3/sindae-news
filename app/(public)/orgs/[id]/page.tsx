@@ -132,8 +132,9 @@ export default async function OrgDetailPage({
         />
       </div>
 
-      {/* 하단 액션 바 */}
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-w-app gap-2 border-t border-line bg-white p-3">
+      {/* 하단 액션 바 — fixed로 두면 하단 탭바와 푸터를 덮는다.
+          sticky + 탭바 높이만큼 띄워서 겹치지 않게 한다. */}
+      <div className="sticky bottom-[calc(var(--bottom-nav-h)+env(safe-area-inset-bottom))] z-20 -mx-[18px] mt-6 flex gap-2 border-t border-line bg-white p-3">
         {org.kakaoChannel && (
           <a
             href={org.kakaoChannel}

@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* 하단 탭바(BottomNav) 실측 높이. 업체·단체 상세의 액션바가 탭바를
+       가리지 않도록 이만큼 위로 띄운다. 탭바 여백을 바꾸면 여기도 같이 조정. */
+    --bottom-nav-h: 70px;
+  }
+
   html {
     /* iOS 탭 하이라이트 제거, 모바일 우선 */
     -webkit-tap-highlight-color: transparent;

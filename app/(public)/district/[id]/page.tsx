@@ -38,18 +38,12 @@ export default async function StoreDetailPage({
 
   return (
     <div className="px-[18px] pb-28">
+      {/* 홍보 글쓰기 진입은 발행인 요청으로 숨김(2026-07-31).
+          /district/promo/write 라우트와 권한 로직은 그대로 두어 되살리기 쉽게 한다. */}
       <div className="flex items-center justify-between py-3">
         <Link href="/district" className="text-sm text-muted">
           ‹ 해룡상권
         </Link>
-        {isOwner && (
-          <Link
-            href="/district/promo/write"
-            className="rounded-element bg-rose-deep px-3 py-1.5 text-xs font-bold text-white"
-          >
-            ＋ 홍보 글쓰기
-          </Link>
-        )}
       </div>
 
       {/* 갤러리 */}
@@ -184,8 +178,9 @@ export default async function StoreDetailPage({
         />
       </div>
 
-      {/* 하단 액션 바 */}
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-w-app gap-2 border-t border-line bg-white p-3">
+      {/* 하단 액션 바 — fixed로 두면 하단 탭바와 푸터를 덮는다.
+          sticky + 탭바 높이만큼 띄워서 겹치지 않게 한다. */}
+      <div className="sticky bottom-[calc(var(--bottom-nav-h)+env(safe-area-inset-bottom))] z-20 -mx-[18px] mt-6 flex gap-2 border-t border-line bg-white p-3">
         <a
           href={`tel:${store.phone}`}
           className="flex min-h-[48px] flex-1 items-center justify-center rounded-element border border-line text-sm font-bold"
