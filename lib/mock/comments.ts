@@ -29,7 +29,7 @@ export async function getComments(slug: string): Promise<MockComment[]> {
   const [{ data }, user] = await Promise.all([
     supabase
       .from("comments")
-      .select("id, body, created_at, author_id, author:profiles(nickname)")
+      .select("id, body, created_at, author_id, author:profiles!author_id(nickname)")
       .eq("article_id", (art as { id: string }).id)
       .eq("visibility", "visible")
       .order("created_at", { ascending: true }),

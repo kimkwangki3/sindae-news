@@ -64,7 +64,7 @@ export interface MarketPost {
 }
 
 const MARKET_COLS =
-  "id, category, title, neighborhood, body, is_pinned, created_at, author_id, author:profiles(nickname), market_comments(count), market_photos(url, sort)";
+  "id, category, title, neighborhood, body, is_pinned, created_at, author_id, author:profiles!author_id(nickname), market_comments(count), market_photos(url, sort)";
 
 function toMarketPost(r: Record<string, unknown>): MarketPost {
   const photos = embeddedPhotos(r.market_photos);
@@ -150,7 +150,7 @@ export interface BoardPost {
 }
 
 const BOARD_COLS =
-  "id, category, title, body, like_count, view_count, is_pinned, created_at, author_id, author:profiles(nickname), board_comments(count), board_photos(url, sort)";
+  "id, category, title, body, like_count, view_count, is_pinned, created_at, author_id, author:profiles!author_id(nickname), board_comments(count), board_photos(url, sort)";
 
 function toBoardPost(r: Record<string, unknown>): BoardPost {
   return {
@@ -220,7 +220,7 @@ async function getPostComments(
   const [{ data }, user] = await Promise.all([
     supabase
       .from(table)
-      .select("id, body, created_at, author_id, author:profiles(nickname)")
+      .select("id, body, created_at, author_id, author:profiles!author_id(nickname)")
       .eq("post_id", postId)
       .eq("visibility", "visible")
       .order("created_at", { ascending: true }),

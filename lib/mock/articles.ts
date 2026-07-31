@@ -116,12 +116,15 @@ export async function getArticleBySlug(
   const { data, error } = await supabase
     .from("articles")
     .select(
-      "id, slug, title, subtitle, body, thumbnail_url, category_id, view_count, published_at, ai_text, ai_image, source_name, source_url, author:profiles(nickname)",
+      "id, slug, title, subtitle, body, thumbnail_url, category_id, view_count, published_at, ai_text, ai_image, source_name, source_url, author:profiles!author_id(nickname)",
     )
     .eq("slug", slug)
     .eq("status", "published")
     .maybeSingle();
 
+  // 조회 오류를 그냥 null로 넘기면 화면엔 404만 뜨고 원인이 안 남는다.
+  // eslint-disable-next-line no-console
+  if (error) console.error(`[article] ${slug} 조회 실패:`, error.message);
   if (error || !data) return null;
 
   const a = data as unknown as {

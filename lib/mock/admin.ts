@@ -135,7 +135,7 @@ export async function getAdminPosts(
     let q = supabase
       .from("board_posts")
       .select(
-        "id, title, category, visibility, is_pinned, like_count, view_count, created_at, author:profiles(nickname), board_comments(count)",
+        "id, title, category, visibility, is_pinned, like_count, view_count, created_at, author:profiles!author_id(nickname), board_comments(count)",
       )
       .order("is_pinned", { ascending: false })
       .order("created_at", { ascending: false });
@@ -161,7 +161,7 @@ export async function getAdminPosts(
   let q = supabase
     .from("market_posts")
     .select(
-      "id, title, category, neighborhood, visibility, is_pinned, created_at, author:profiles(nickname), market_comments(count)",
+      "id, title, category, neighborhood, visibility, is_pinned, created_at, author:profiles!author_id(nickname), market_comments(count)",
     )
     .order("is_pinned", { ascending: false })
     .order("created_at", { ascending: false });
@@ -191,7 +191,7 @@ export async function getAdminTips(
   let q = supabase
     .from("tips")
     .select(
-      "id, title, body, category, contact, status, created_at, reporter:profiles(nickname)",
+      "id, title, body, category, contact, status, created_at, reporter:profiles!reporter_id(nickname)",
     )
     .order("created_at", { ascending: false })
     .limit(200);
@@ -246,12 +246,15 @@ export async function getAdminArticles(
   let q = supabase
     .from("articles")
     .select(
-      "slug, title, category_id, status, view_count, published_at, created_at, pledge_ack, author:profiles(nickname, reporter_level)",
+      "slug, title, category_id, status, view_count, published_at, created_at, pledge_ack, author:profiles!author_id(nickname, reporter_level)",
     )
     .in("status", ["published", "draft", "pending"])
     .order("created_at", { ascending: false });
   if (status !== "all") q = q.eq("status", status);
-  const { data } = await q;
+  const { data, error } = await q;
+  // 조회 실패를 빈 목록으로 삼키면 "기사가 없습니다"로만 보여 원인을 못 찾는다.
+  // eslint-disable-next-line no-console
+  if (error) console.error("[admin] getAdminArticles 실패:", error.message);
   return (data ?? []).map((r) => {
     const row = r as unknown as {
       slug: string;
@@ -283,7 +286,7 @@ export async function getAdminComments(): Promise<AdminCommentRow[]> {
   const { data } = await supabase
     .from("comments")
     .select(
-      "id, body, visibility, created_at, author:profiles(nickname), article:articles(title)",
+      "id, body, visibility, created_at, author:profiles!author_id(nickname), article:articles(title)",
     )
     .order("created_at", { ascending: false })
     .limit(100);
@@ -461,7 +464,7 @@ export async function getAdminEntities(
   if (kind === "business") {
     let q = supabase
       .from("businesses")
-      .select("id, name, category, status, phone, created_at, owner:profiles(nickname)")
+      .select("id, name, category, status, phone, created_at, owner:profiles!owner_id(nickname)")
       .order("created_at", { ascending: false });
     if (filter !== "all") q = q.eq("status", filter);
     const { data } = await q;
@@ -479,7 +482,7 @@ export async function getAdminEntities(
   }
   let q = supabase
     .from("organizations")
-    .select("id, name, category, status, created_at, owner:profiles(nickname), org_members(count)")
+    .select("id, name, category, status, created_at, owner:profiles!owner_id(nickname), org_members(count)")
     .order("created_at", { ascending: false });
   if (filter !== "all") q = q.eq("status", filter);
   const { data } = await q;
@@ -728,7 +731,7 @@ export async function getAuditLogs(limit = 200): Promise<AuditLogRow[]> {
   const supabase = createServiceClient();
   const { data, error } = await supabase
     .from("admin_audit_logs")
-    .select("id, action, target_type, target_id, memo, created_at, actor:profiles(nickname)")
+    .select("id, action, target_type, target_id, memo, created_at, actor:profiles!actor_id(nickname)")
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) return [];
