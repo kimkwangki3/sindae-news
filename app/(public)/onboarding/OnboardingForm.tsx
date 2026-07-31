@@ -48,7 +48,7 @@ export default function OnboardingForm() {
         name="neighborhood"
         maxLength={20}
         autoComplete="off"
-        placeholder="예: 신대동"
+        placeholder="예: 신대지구"
         className="mt-2 min-h-[48px] w-full rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose"
       />
 

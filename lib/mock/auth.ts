@@ -6,7 +6,7 @@ import type { CurrentUser } from "@/lib/types";
 
 export type DemoPersona = "member" | "reporter" | "business" | "admin";
 
-export const DEMO_COOKIE = "sindae_demo_user";
+export const DEMO_COOKIE = "haeryong_demo_user";
 
 interface PersonaDef {
   label: string;
@@ -22,7 +22,7 @@ export const DEMO_PERSONAS: Record<DemoPersona, PersonaDef> = {
     user: {
       id: "demo-member",
       nickname: "이웃사랑",
-      neighborhood: "신대동",
+      neighborhood: "신대지구",
       avatar_url: null,
       role: "user",
       is_suspended: false,
@@ -37,7 +37,7 @@ export const DEMO_PERSONAS: Record<DemoPersona, PersonaDef> = {
     user: {
       id: "demo-reporter",
       nickname: "김기자",
-      neighborhood: "신대동",
+      neighborhood: "신대지구",
       avatar_url: null,
       role: "reporter",
       reporter_level: "senior",
@@ -45,7 +45,7 @@ export const DEMO_PERSONAS: Record<DemoPersona, PersonaDef> = {
       deleted_at: null,
       business: null,
       orgs: [
-        { org_id: "org-1", name: "신대주민자치회", role: "staff", status: "approved" },
+        { org_id: "org-1", name: "해룡면 주민자치회", role: "staff", status: "approved" },
       ],
     },
   },
@@ -55,7 +55,7 @@ export const DEMO_PERSONAS: Record<DemoPersona, PersonaDef> = {
     user: {
       id: "demo-business",
       nickname: "분식왕",
-      neighborhood: "신대동",
+      neighborhood: "신대지구",
       avatar_url: null,
       role: "user",
       is_suspended: false,

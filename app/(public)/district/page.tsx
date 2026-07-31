@@ -7,7 +7,7 @@ import {
   type BizCategory,
 } from "@/lib/mock/district";
 
-export const metadata = { title: "신대상권 · 신대신문" };
+export const metadata = { title: "해룡상권 · 해룡신문" };
 
 const CHIPS: { key: BizCategory | "all"; label: string }[] = [
   { key: "all", label: "전체" },

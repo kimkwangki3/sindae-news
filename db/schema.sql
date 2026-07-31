@@ -1,5 +1,5 @@
 -- =====================================================================
---  신대신문 (DSBH) — Database Schema  [PostgreSQL / Supabase]
+--  해룡신문 (DSBH) — Database Schema  [PostgreSQL / Supabase]
 --  작성: 2026-06  ·  설계 기준: design-mockup.html 의 전체 화면
 --  실행 순서: 이 파일을 Supabase SQL Editor 에 그대로 붙여넣어 실행
 -- =====================================================================
@@ -235,7 +235,7 @@ create table board_likes (
 );
 
 -- ---------------------------------------------------------------------
--- 5. 신대상권 (업체)
+-- 5. 해룡상권 (업체)
 -- ---------------------------------------------------------------------
 create table businesses (
   id              uuid primary key default gen_random_uuid(),

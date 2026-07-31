@@ -74,7 +74,7 @@ export default function AnalyticsView({
           <button
             type="button"
             onClick={() =>
-              downloadCsv(`sindae-${tab}-stats.csv`, rows)
+              downloadCsv(`haeryong-${tab}-stats.csv`, rows)
             }
             className="min-h-[40px] rounded-element border border-line px-3 text-xs font-bold text-rose-deep"
           >

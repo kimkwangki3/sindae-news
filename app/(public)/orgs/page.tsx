@@ -2,7 +2,7 @@ import Link from "next/link";
 import Thumb from "@/components/Thumb";
 import { getOrgs, ORG_CAT_NAME, type OrgCategory } from "@/lib/mock/orgs";
 
-export const metadata = { title: "지역단체 · 신대신문" };
+export const metadata = { title: "지역단체 · 해룡신문" };
 
 const CHIPS: { key: OrgCategory | "all"; label: string }[] = [
   { key: "all", label: "전체" },

@@ -5,7 +5,7 @@ import { logout } from "@/lib/auth-actions";
 import { canWriteArticle, REPORTER_LEVEL_LABEL } from "@/lib/permissions";
 import type { UserRole } from "@/lib/types";
 
-export const metadata = { title: "마이페이지 · 신대신문" };
+export const metadata = { title: "마이페이지 · 해룡신문" };
 
 const ROLE_LABEL: Record<UserRole, string> = {
   user: "일반회원",

@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-// 신대신문 디자인 토큰 (design-mockup.html :root 변수 이식)
+// 해룡신문 디자인 토큰 (design-mockup.html :root 변수 이식)
 const config: Config = {
   content: [
     "./app/**/*.{ts,tsx}",

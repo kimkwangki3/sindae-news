@@ -1,4 +1,4 @@
-// 신대상권(업체) 데이터 액세스 — Supabase 실연동.
+// 해룡상권(업체) 데이터 액세스 — Supabase 실연동.
 // 주의: rating/reviewCount/neighborhood는 현재 스키마에 없음 → 기본값(후속 리뷰 기능).
 import { createClient } from "@/lib/supabase/server";
 

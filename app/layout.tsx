@@ -19,26 +19,26 @@ const gowunDodum = Gowun_Dodum({
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const DESCRIPTION =
-  "신대지구(순천시) 이웃들의 소식을 전하는 인터넷 신문 · 운영사 DSBH";
+  "순천시 해룡면(신대·복성·선월지구) 이웃들의 소식을 전하는 인터넷 신문 · 운영사 DSBH";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "신대신문 — 신대지구 이웃 소식",
+    default: "해룡신문 — 해룡면 이웃 소식",
     template: "%s",
   },
   description: DESCRIPTION,
-  applicationName: "신대신문",
+  applicationName: "해룡신문",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    siteName: "신대신문",
+    siteName: "해룡신문",
     locale: "ko_KR",
     url: SITE_URL,
-    title: "신대신문 — 신대지구 이웃 소식",
+    title: "해룡신문 — 해룡면 이웃 소식",
     description: DESCRIPTION,
   },
-  twitter: { card: "summary", title: "신대신문", description: DESCRIPTION },
+  twitter: { card: "summary", title: "해룡신문", description: DESCRIPTION },
   robots: { index: true, follow: true },
 };
 

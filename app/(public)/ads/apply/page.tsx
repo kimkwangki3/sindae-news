@@ -3,7 +3,7 @@ import AdApplyForm from "@/components/AdApplyForm";
 import LoginRequired from "@/components/community/LoginRequired";
 import { getCurrentUser } from "@/lib/auth";
 
-export const metadata = { title: "배너 광고 신청 · 신대신문" };
+export const metadata = { title: "배너 광고 신청 · 해룡신문" };
 
 export default async function AdApplyPage() {
   const user = await getCurrentUser();
@@ -38,7 +38,7 @@ export default async function AdApplyPage() {
     <div className="px-[18px] py-6">
       <h1 className="text-xl text-rose-deep">배너 광고 신청</h1>
       <p className="mt-2 text-sm leading-relaxed text-muted">
-        신대신문에 배너 광고를 신청하세요. 지역 주민에게 노출됩니다.
+        해룡신문에 배너 광고를 신청하세요. 지역 주민에게 노출됩니다.
       </p>
       <p className="mt-1 text-xs text-muted">
         신청 업체: <b>{user.business.name}</b>

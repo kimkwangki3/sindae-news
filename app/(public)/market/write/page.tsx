@@ -9,9 +9,9 @@ import { getMarketPost } from "@/lib/mock/community";
 import LoginRequired from "@/components/community/LoginRequired";
 import ImageUpload from "@/components/ImageUpload";
 
-export const metadata = { title: "나눔마켓 글쓰기 · 신대신문" };
+export const metadata = { title: "나눔마켓 글쓰기 · 해룡신문" };
 
-const NEIGHBORHOODS = ["신대동", "중앙동", "덕암동", "기타"];
+const NEIGHBORHOODS = ["신대지구", "복성지구", "선월지구", "기타"];
 
 export default async function MarketWritePage({
   searchParams,

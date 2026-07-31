@@ -19,7 +19,7 @@ export async function generateMetadata({
   params: { id: string };
 }) {
   const p = await getBoardPost(params.id);
-  return { title: p ? `${p.title} · 자유게시판` : "자유게시판 · 신대신문" };
+  return { title: p ? `${p.title} · 자유게시판` : "자유게시판 · 해룡신문" };
 }
 
 export default async function BoardDetailPage({

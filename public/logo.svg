@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 88" role="img" aria-label="신대신문">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 88" role="img" aria-label="해룡신문">
   <!-- 말풍선형 신문 아이콘 -->
   <g fill="none" stroke="#C77B8B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
     <rect x="10" y="10" width="66" height="58" rx="14"/>
@@ -14,5 +14,5 @@
   </g>
   <!-- 워드마크 -->
   <text x="96" y="60" font-family="'Gowun Dodum','Noto Sans KR','Apple SD Gothic Neo',sans-serif"
-        font-size="52" font-weight="800" fill="#2B2426" letter-spacing="3">신대신문</text>
+        font-size="52" font-weight="800" fill="#2B2426" letter-spacing="3">해룡신문</text>
 </svg>

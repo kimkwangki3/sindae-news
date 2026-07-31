@@ -12,7 +12,7 @@ export async function generateMetadata({
   params: { id: string };
 }) {
   const b = await getBusiness(params.id);
-  return { title: b ? `${b.name} · 신대상권` : "신대상권 · 신대신문" };
+  return { title: b ? `${b.name} · 해룡상권` : "해룡상권 · 해룡신문" };
 }
 
 export default async function StoreDetailPage({
@@ -31,7 +31,7 @@ export default async function StoreDetailPage({
     <div className="px-[18px] pb-28">
       <div className="flex items-center justify-between py-3">
         <Link href="/district" className="text-sm text-muted">
-          ‹ 신대상권
+          ‹ 해룡상권
         </Link>
         {isOwner && (
           <Link

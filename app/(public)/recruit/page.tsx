@@ -1,6 +1,6 @@
 import RecruitForm from "@/components/RecruitForm";
 
-export const metadata = { title: "기자 모집 · 신대신문" };
+export const metadata = { title: "기자 모집 · 해룡신문" };
 
 export default function RecruitPage() {
   return (
@@ -9,7 +9,7 @@ export default function RecruitPage() {
         함께할 시민기자를 찾습니다
       </span>
       <h1 className="mt-3 text-[22px] font-extrabold leading-snug">
-        신대지구 소식, 직접 전해보세요
+        해룡면 소식, 직접 전해보세요
       </h1>
       <p className="mt-2 text-sm leading-relaxed text-muted">
         우리 동네 이야기를 취재하고 기사로 쓰는 시민기자를 모집합니다. 승인 후

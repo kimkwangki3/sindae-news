@@ -20,7 +20,7 @@ export async function generateMetadata({
   params: { slug: string };
 }) {
   const a = await getArticleBySlug(params.slug);
-  return { title: a ? `${a.title} · 신대신문` : "기사 · 신대신문" };
+  return { title: a ? `${a.title} · 해룡신문` : "기사 · 해룡신문" };
 }
 
 export default async function ArticleDetailPage({

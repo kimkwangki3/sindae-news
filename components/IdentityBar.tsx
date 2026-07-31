@@ -7,7 +7,7 @@ export default function IdentityBar({ user }: { user: CurrentUser | null }) {
     return (
       <div className="flex items-center justify-between border-b border-line bg-white px-[18px] py-2.5">
         <span className="text-[13px] text-muted">
-          신대지구 이웃들의 소식 · 신대신문
+          해룡면 이웃들의 소식 · 해룡신문
         </span>
         <Link href="/login" className="text-xs font-bold text-rose-deep">
           로그인 ›

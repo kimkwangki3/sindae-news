@@ -22,7 +22,7 @@ export default async function AdminLayout({
       <header className="sticky top-0 z-20 border-b border-line bg-white lg:static lg:w-56 lg:flex-shrink-0 lg:border-b-0 lg:border-r">
         <div className="flex items-center justify-between px-[18px] py-3 lg:block">
           <p className="text-base font-bold text-rose-deep">
-            신대신문 <span className="text-[11px] font-normal text-muted">관리자</span>
+            해룡신문 <span className="text-[11px] font-normal text-muted">관리자</span>
           </p>
           <span className="text-xs text-muted">{user.nickname} 님</span>
         </div>

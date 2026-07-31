@@ -45,7 +45,7 @@ console.log(`업체 ${BIZ.length}건 삽입`);
 
 // --- 단체 ---
 const ORGS = [
-  { name: "신대주민자치회", category: "self", leader: "홍길동 회장", region: "순천시 신대지구 일대", contact: "061-000-0000", kakao_channel: "http://pf.kakao.com/_jachi", accept_join: true, intro: "마을 환경 개선, 정원 가꾸기, 이웃 돌봄 활동을 펼칩니다.", posts: [["모집", "봄맞이 정원 가꾸기 자원봉사 모집", "이번 주말 함께하실 분을 찾습니다."], ["공지", "6월 정기 회의 안내", "6월 30일 저녁 7시, 주민센터 2층."]], approved: ["홍길동", "김기자"], pending: [["이웃님", "신대동", "마을 활동에 참여하고 싶어요"], ["박주민", "중앙동", "봉사활동 함께하고 싶습니다"]] },
+  { name: "해룡면 주민자치회", category: "self", leader: "홍길동 회장", region: "순천시 신대지구 일대", contact: "061-000-0000", kakao_channel: "http://pf.kakao.com/_jachi", accept_join: true, intro: "마을 환경 개선, 정원 가꾸기, 이웃 돌봄 활동을 펼칩니다.", posts: [["모집", "봄맞이 정원 가꾸기 자원봉사 모집", "이번 주말 함께하실 분을 찾습니다."], ["공지", "6월 정기 회의 안내", "6월 30일 저녁 7시, 주민센터 2층."]], approved: ["홍길동", "김기자"], pending: [["이웃님", "신대지구", "마을 활동에 참여하고 싶어요"], ["박주민", "복성지구", "봉사활동 함께하고 싶습니다"]] },
   { name: "해피나눔 봉사단", category: "volunteer", leader: "이봉사 단장", region: "순천시 신대지구", contact: "061-111-2222", kakao_channel: null, accept_join: true, intro: "이웃과 함께 나누는 따뜻한 봉사단입니다.", posts: [["활동후기", "5월 무료 급식 봉사 후기", "따뜻한 한 끼를 나눴습니다. 감사합니다!"]], approved: ["이봉사"], pending: [] },
   { name: "신대 둘레길 걷기 모임", category: "club", leader: "정걷기 모임장", region: "순천시 신대지구 둘레길", contact: "010-1234-5678", kakao_channel: "http://pf.kakao.com/_walk", accept_join: true, intro: "매주 토요일 아침 함께 걷는 건강 모임. 초보 환영!", posts: [], approved: ["정걷기"], pending: [] },
   { name: "신대 합창단", category: "culture", leader: "최노래 단장", region: "순천시 신대지구", contact: "061-555-6666", kakao_channel: null, accept_join: false, intro: "노래로 하나 되는 동네 합창단.", posts: [], approved: ["최노래"], pending: [] },

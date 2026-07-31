@@ -22,7 +22,7 @@ export function generateMetadata({
   params: { category: string };
 }) {
   const name = CATEGORY_NAME[params.category as CategorySlug];
-  return { title: name ? `${name} · 신대신문` : "기사 · 신대신문" };
+  return { title: name ? `${name} · 해룡신문` : "기사 · 해룡신문" };
 }
 
 export default async function CategoryPage({

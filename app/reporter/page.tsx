@@ -11,7 +11,7 @@ import {
   ARTICLE_STATUS_LABEL,
 } from "@/lib/mock/reporter";
 
-export const metadata = { title: "기자 대시보드 · 신대신문" };
+export const metadata = { title: "기자 대시보드 · 해룡신문" };
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (

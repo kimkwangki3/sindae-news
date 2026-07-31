@@ -71,7 +71,7 @@ export default function ReporterWriteForm({
         <input
           name="slug"
           required
-          placeholder="예: sindae-festival-2026 (영문/숫자/-)"
+          placeholder="예: haeryong-festival-2026 (영문/숫자/-)"
           className={INPUT}
         />
       </Field>

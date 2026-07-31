@@ -54,10 +54,10 @@ else console.log(`기사 댓글 ${comments.length}건 삽입`);
 // 2) 광고 배너 — AdSlot이 쓰는 4개 슬롯에 게재중 배너 1건씩
 //    슬롯 키: home_top / article_mid / district_top / market_infeed
 const BANNERS = [
-  { key: "home_top", advertiser: "신대분식", link_url: "https://www.sindae.net/district" },
-  { key: "article_mid", advertiser: "봄날카페", link_url: "https://www.sindae.net/district" },
-  { key: "district_top", advertiser: "신대지구 상인회", link_url: "https://www.sindae.net/district" },
-  { key: "market_infeed", advertiser: "할매손칼국수", link_url: "https://www.sindae.net/district" },
+  { key: "home_top", advertiser: "신대분식", link_url: "https://www.sdtime.net/district" },
+  { key: "article_mid", advertiser: "봄날카페", link_url: "https://www.sdtime.net/district" },
+  { key: "district_top", advertiser: "신대지구 상인회", link_url: "https://www.sdtime.net/district" },
+  { key: "market_infeed", advertiser: "할매손칼국수", link_url: "https://www.sdtime.net/district" },
 ];
 const { data: slots } = await sb.from("ad_slots").select("id, key");
 const slotId = Object.fromEntries((slots || []).map((s) => [s.key, s.id]));
@@ -85,7 +85,7 @@ else console.log(`제보 ${TIPS.length}건 삽입`);
 
 // 4) 광고 신청(ad_requests) — 관리자 광고관리 승인 대기 점검용
 const REQS = [
-  { advertiser: "신대세탁소", slot_id: slotId["home_mid"], link_url: "https://www.sindae.net/district", duration: "1개월", contact: "061-444-5566", status: "pending" },
+  { advertiser: "신대세탁소", slot_id: slotId["home_mid"], link_url: "https://www.sdtime.net/district", duration: "1개월", contact: "061-444-5566", status: "pending" },
 ];
 await sb.from("ad_requests").delete().in("advertiser", REQS.map((r) => r.advertiser));
 const { error: arErr } = await sb.from("ad_requests").insert(REQS);

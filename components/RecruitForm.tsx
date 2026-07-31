@@ -7,7 +7,7 @@ import {
 } from "@/lib/recruit-actions";
 
 const INITIAL: RecruitState = {};
-const NEIGHBORHOODS = ["신대동", "중앙동", "덕암동", "기타"];
+const NEIGHBORHOODS = ["신대지구", "복성지구", "선월지구", "기타"];
 const INTERESTS = ["지역소식", "행정", "인물", "생활"];
 const INPUT =
   "min-h-[48px] w-full rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose";
@@ -106,7 +106,7 @@ export default function RecruitForm() {
           </p>
           <p>
             명예훼손, 허위사실 유포, 저작권·개인정보 침해 등으로 발생하는{" "}
-            <b>민·형사상 모든 책임은 작성 기자가 부담</b>하며, 신대신문(운영사
+            <b>민·형사상 모든 책임은 작성 기자가 부담</b>하며, 해룡신문(운영사
             DSBH)은 이에 대한 책임을 지지 않습니다.
           </p>
           <p>취재·보도 시 언론윤리강령과 관련 법령을 준수할 것을 서약합니다.</p>

@@ -64,7 +64,7 @@ export async function searchAll(query: string): Promise<SearchGroup[]> {
     { key: "article", label: "기사", hits: articles },
     { key: "market", label: "나눔마켓", hits: market },
     { key: "board", label: "자유게시판", hits: board },
-    { key: "district", label: "신대상권", hits: stores },
+    { key: "district", label: "해룡상권", hits: stores },
     { key: "orgs", label: "지역단체", hits: orgs },
   ].filter((g) => g.hits.length > 0);
 }

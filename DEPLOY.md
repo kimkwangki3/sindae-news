@@ -1,6 +1,6 @@
 # 배포 가이드 (Vercel)
 
-신대신문 모바일 웹의 배포·운영 전 체크리스트.
+해룡신문 모바일 웹의 배포·운영 전 체크리스트.
 
 ## 1. 선결: Supabase 실연동 (목 → 실데이터)
 
@@ -10,7 +10,7 @@
 2. SQL Editor에서 `db/schema.sql` 전체 실행 (34테이블 + RLS)
 3. Storage 버킷 생성: `articles` `board` `market` `business` `org` `ads`
 4. Auth > Providers에서 **카카오** 활성화, 카카오 개발자 앱의 REST 키 등록
-   - Redirect URL에 `https://<배포도메인>/auth/callback` 추가
+   - Redirect URL에 `https://www.sdtime.net/auth/callback` 추가
 5. 카카오 개발자 콘솔: 사이트 도메인·Redirect URI 등록
 
 > `.env`가 채워지면 `lib/auth.ts`의 데모(쿠키) 인증은 자동 비활성되고 실제 카카오 OAuth로 동작한다.
@@ -23,14 +23,20 @@
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=        # 서버 전용. 절대 NEXT_PUBLIC_ 금지
-NEXT_PUBLIC_SITE_URL=https://<배포도메인>   # sitemap/robots/OG에 사용
+NEXT_PUBLIC_SITE_URL=https://www.sdtime.net   # sitemap/robots/OG에 사용
 ```
 
 ## 3. 배포
 
 1. GitHub 저장소 연결 후 Vercel `Import Project` (Framework: Next.js 자동 인식)
 2. 위 환경변수 등록 → `Deploy`
-3. 커스텀 도메인 연결 (예: sindaenews.kr) → `NEXT_PUBLIC_SITE_URL`을 해당 도메인으로 갱신 후 재배포
+3. 커스텀 도메인 연결 — **운영 도메인 `www.sdtime.net`** (apex `sdtime.net`은 www로 리다이렉트)
+   - Vercel Project > Domains에 `sdtime.net`, `www.sdtime.net` 추가 후 `www`를 Primary로 지정
+   - DNS: `www` → CNAME `cname.vercel-dns.com`, `@` → A `76.76.21.21`
+   - `NEXT_PUBLIC_SITE_URL=https://www.sdtime.net`로 갱신 후 재배포
+   - Supabase URL Configuration의 Site URL·Redirect URLs에 `https://www.sdtime.net/**` 추가
+   - 카카오 developers: 사이트 도메인에 `https://www.sdtime.net` 추가
+   - 구 도메인 `sindae.net`은 폐기(리다이렉트 없음) — Vercel Domains·DNS에서 제거
 
 ## 4. 배포 후 확인
 

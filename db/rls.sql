@@ -1,5 +1,5 @@
 -- =====================================================================
--- 신대신문 RLS 정책 (배포 전 보안)  — Supabase SQL Editor에서 실행
+-- 해룡신문 RLS 정책 (배포 전 보안)  — Supabase SQL Editor에서 실행
 -- =====================================================================
 -- 전제
 --  * 관리자 화면/액션은 service_role 키로 동작 → RLS를 우회한다.
@@ -206,7 +206,7 @@ create policy blike_delete on board_likes
   for delete using (user_id = auth.uid());
 
 -- ---------------------------------------------------------------------
--- 9. 신대상권 (업체)
+-- 9. 해룡상권 (업체)
 -- ---------------------------------------------------------------------
 alter table businesses enable row level security;
 drop policy if exists biz_read   on businesses;

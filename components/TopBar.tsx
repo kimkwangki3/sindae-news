@@ -6,10 +6,10 @@ export default function TopBar() {
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-ivory/90 px-[18px] py-3.5 backdrop-blur">
       <div className="flex items-center gap-2">
-        <Link href="/" className="flex items-center" aria-label="신대신문 홈">
+        <Link href="/" className="flex items-center" aria-label="해룡신문 홈">
           <Image
             src="/logo.svg"
-            alt="신대신문"
+            alt="해룡신문"
             width={96}
             height={26}
             priority

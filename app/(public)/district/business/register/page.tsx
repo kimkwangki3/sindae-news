@@ -5,7 +5,7 @@ import LoginRequired from "@/components/community/LoginRequired";
 import ImageUpload from "@/components/ImageUpload";
 import { BIZ_CAT_NAME, type BizCategory } from "@/lib/mock/district";
 
-export const metadata = { title: "업체 등록 · 신대신문" };
+export const metadata = { title: "업체 등록 · 해룡신문" };
 
 const CATS = Object.entries(BIZ_CAT_NAME) as [BizCategory, string][];
 

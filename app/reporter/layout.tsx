@@ -23,7 +23,7 @@ export default async function ReporterLayout({
           ✍ 기자 공간
         </Link>
         <Link href="/" className="text-xs text-muted">
-          신대신문 홈 ›
+          해룡신문 홈 ›
         </Link>
       </header>
       {children}

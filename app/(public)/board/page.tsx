@@ -5,7 +5,7 @@ import {
   type BoardCategory,
 } from "@/lib/mock/community";
 
-export const metadata = { title: "자유게시판 · 신대신문" };
+export const metadata = { title: "자유게시판 · 해룡신문" };
 
 type ChipKey = "all" | "popular" | BoardCategory;
 

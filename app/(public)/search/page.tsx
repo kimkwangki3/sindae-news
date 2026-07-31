@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { searchAll } from "@/lib/mock/search";
 
-export const metadata = { title: "검색 · 신대신문" };
+export const metadata = { title: "검색 · 해룡신문" };
 
 export default async function SearchPage({
   searchParams,

@@ -5,7 +5,7 @@ import LoginRequired from "@/components/community/LoginRequired";
 import ImageUpload from "@/components/ImageUpload";
 import { ORG_CAT_NAME, type OrgCategory } from "@/lib/mock/orgs";
 
-export const metadata = { title: "지역단체 등록 · 신대신문" };
+export const metadata = { title: "지역단체 등록 · 해룡신문" };
 
 const CATS = Object.entries(ORG_CAT_NAME) as [OrgCategory, string][];
 const INPUT =
@@ -29,7 +29,7 @@ export default async function OrgRegisterPage() {
 
       <form action={registerOrg} className="flex flex-col gap-4">
         <Field label="단체명">
-          <input name="name" required placeholder="예) 신대동 주민자치회" className={INPUT} />
+          <input name="name" required placeholder="예) 해룡면 주민자치회" className={INPUT} />
         </Field>
         <Field label="분류">
           <select name="category" className={INPUT}>

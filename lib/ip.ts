@@ -8,6 +8,6 @@ export function getIpHash(): string {
   const fwd = h.get("x-forwarded-for") ?? "";
   const ip =
     fwd.split(",")[0].trim() || h.get("x-real-ip") || "0.0.0.0";
-  const salt = process.env.IP_HASH_SALT ?? "sindae-news";
+  const salt = process.env.IP_HASH_SALT ?? "haeryong-news";
   return createHash("sha256").update(`${ip}:${salt}`).digest("hex");
 }

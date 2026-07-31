@@ -12,7 +12,7 @@ export async function generateMetadata({
   params: { id: string };
 }) {
   const o = await getOrg(params.id);
-  return { title: o ? `${o.name} · 지역단체` : "지역단체 · 신대신문" };
+  return { title: o ? `${o.name} · 지역단체` : "지역단체 · 해룡신문" };
 }
 
 export default async function OrgDetailPage({

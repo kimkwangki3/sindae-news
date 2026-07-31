@@ -19,7 +19,7 @@ export async function generateMetadata({
   params: { id: string };
 }) {
   const p = await getMarketPost(params.id);
-  return { title: p ? `${p.title} · 나눔마켓` : "나눔마켓 · 신대신문" };
+  return { title: p ? `${p.title} · 나눔마켓` : "나눔마켓 · 해룡신문" };
 }
 
 export default async function MarketDetailPage({

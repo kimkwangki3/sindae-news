@@ -4,7 +4,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { joinOrg, type JoinState } from "@/lib/local-actions";
 
 const INITIAL: JoinState = {};
-const NEIGHBORHOODS = ["신대동", "중앙동", "덕암동", "기타"];
+const NEIGHBORHOODS = ["신대지구", "복성지구", "선월지구", "기타"];
 const INPUT =
   "min-h-[48px] w-full rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose";
 

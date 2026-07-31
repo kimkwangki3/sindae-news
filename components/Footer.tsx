@@ -23,11 +23,11 @@ export default function Footer() {
       </nav>
 
       <div className="mt-4 flex flex-col gap-0.5 leading-relaxed">
-        <p className="font-bold text-ink">신대신문</p>
-        <p>운영사 DSBH · 신대지구(순천시) 인터넷 신문</p>
+        <p className="font-bold text-ink">해룡신문</p>
+        <p>운영사 DSBH · 순천시 해룡면 인터넷 신문</p>
         <p>발행인·편집인 ⚠️확인요망 · 청소년보호책임자 ⚠️확인요망</p>
         <p className="mt-2 text-[11px]">
-          © 2026 신대신문. All rights reserved.
+          © 2026 해룡신문. All rights reserved.
         </p>
       </div>
     </footer>

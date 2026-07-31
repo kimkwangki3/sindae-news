@@ -11,7 +11,7 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
   const doc = getLegalDoc(params.slug);
-  return { title: doc ? `${doc.title} · 신대신문` : "신대신문" };
+  return { title: doc ? `${doc.title} · 해룡신문` : "해룡신문" };
 }
 
 export default async function LegalPage({

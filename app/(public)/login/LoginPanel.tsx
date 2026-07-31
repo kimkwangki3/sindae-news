@@ -22,9 +22,9 @@ export default function LoginPanel({ demo }: { demo: boolean }) {
 
   return (
     <div className="flex min-h-[70dvh] flex-col items-center justify-center px-7 text-center">
-      <h1 className="text-2xl text-rose-deep">신대신문</h1>
+      <h1 className="text-2xl text-rose-deep">해룡신문</h1>
       <p className="mt-2 text-sm text-muted">
-        신대지구 이웃들의 소식, 함께 나눠요
+        해룡면 이웃들의 소식, 함께 나눠요
       </p>
 
       <div className="mt-9 w-full max-w-[320px]">

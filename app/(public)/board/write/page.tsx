@@ -10,7 +10,7 @@ import {
   getBoardPost,
 } from "@/lib/mock/community";
 
-export const metadata = { title: "게시판 글쓰기 · 신대신문" };
+export const metadata = { title: "게시판 글쓰기 · 해룡신문" };
 
 export default async function BoardWritePage({
   searchParams,
