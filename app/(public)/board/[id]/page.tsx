@@ -49,9 +49,20 @@ export default async function BoardDetailPage({
         )}
       </div>
 
-      <span className="inline-block rounded-full bg-rose-soft px-2.5 py-1 text-[11px] font-bold text-rose">
-        {BOARD_CAT_NAME[post.category]}
-      </span>
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="inline-block rounded-full bg-rose-soft px-2.5 py-1 text-[11px] font-bold text-rose">
+          {BOARD_CAT_NAME[post.category]}
+        </span>
+        {/* 단체 명의 글이면 해당 단체로 바로 갈 수 있게 */}
+        {post.orgId && post.orgName && (
+          <Link
+            href={`/orgs/${post.orgId}`}
+            className="inline-block rounded-full bg-tag-org-bg px-2.5 py-1 text-[11px] font-bold text-tag-org-fg"
+          >
+            🏛 {post.orgName}
+          </Link>
+        )}
+      </div>
       <h1 className="mt-2.5 text-[21px] font-extrabold leading-snug">
         {post.title}
       </h1>

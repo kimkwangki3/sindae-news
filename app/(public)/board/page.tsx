@@ -7,11 +7,12 @@ import {
 
 export const metadata = { title: "자유게시판 · 해룡신문" };
 
-type ChipKey = "all" | "popular" | BoardCategory;
+type ChipKey = "all" | "popular" | "org" | BoardCategory;
 
 const CHIPS: { key: ChipKey; label: string }[] = [
   { key: "all", label: "전체" },
   { key: "popular", label: "🔥 인기" },
+  { key: "org", label: "🏛 단체" },
   { key: "question", label: "질문" },
   { key: "daily", label: "일상" },
   { key: "local", label: "동네소식" },
@@ -82,6 +83,12 @@ export default async function BoardPage({
                   {p.pinned && p.category === "notice" ? "📌 " : ""}
                   {BOARD_CAT_NAME[p.category]}
                 </span>
+                {/* 단체 명의 글이면 어느 단체인지 바로 보이게 */}
+                {p.orgName && (
+                  <span className="max-w-[45%] truncate rounded-full bg-tag-org-bg px-2 py-0.5 text-[10px] font-bold text-tag-org-fg">
+                    🏛 {p.orgName}
+                  </span>
+                )}
                 <h4 className="line-clamp-1 flex-1 text-[15px] font-bold">
                   {p.title}
                 </h4>

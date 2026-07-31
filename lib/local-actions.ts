@@ -193,19 +193,36 @@ export async function writeOrgPost(
   const title = String(formData.get("title") ?? "").trim();
   if (title.length < 2) throw new Error("제목을 입력해 주세요.");
 
+  // 단체 소식은 별도 테이블이 아니라 동네 게시판에 올린다(org_id로 소속 표시).
+  // 그래야 단체 활동이 게시판에서도 보이고, 단체 상세에서는 걸러 보여줄 수 있다.
   const photoUrls = parsePhotoUrls(formData.get("photo_urls"), 5);
   const supabase = createClient();
-  const { error } = await supabase.from("org_posts").insert({
-    org_id: orgId,
-    author_id: user.id,
-    title,
-    category: String(formData.get("category") ?? "") || null,
-    body: String(formData.get("body") ?? "").trim() || null,
-    photo_urls: photoUrls.length ? photoUrls : null,
-  });
-  if (error) throw new Error("등록에 실패했습니다.");
+  const { data, error } = await supabase
+    .from("board_posts")
+    .insert({
+      org_id: orgId,
+      author_id: user.id,
+      title,
+      category: String(formData.get("category") ?? "") || "동네소식",
+      body: String(formData.get("body") ?? "").trim() || null,
+    })
+    .select("id")
+    .single();
+  if (error || !data) throw new Error("등록에 실패했습니다.");
+
+  if (photoUrls.length) {
+    await supabase.from("board_photos").insert(
+      photoUrls.map((url, sort) => ({
+        post_id: (data as { id: string }).id,
+        url,
+        sort,
+      })),
+    );
+  }
+
   revalidatePath(`/orgs/${orgId}`);
-  redirect(`/orgs/${orgId}`);
+  revalidatePath("/board");
+  redirect(`/board/${(data as { id: string }).id}`);
 }
 
 // 가입 신청 승인/거절 — 운영진만. org_members update(status).

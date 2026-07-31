@@ -5,6 +5,7 @@ import ReportSheet from "@/components/ReportSheet";
 import { getCurrentUser } from "@/lib/auth";
 import { can } from "@/lib/permissions";
 import { getOrg, ORG_CAT_NAME } from "@/lib/mock/orgs";
+import { getOrgBoardPosts } from "@/lib/mock/community";
 
 export async function generateMetadata({
   params,
@@ -17,13 +18,20 @@ export async function generateMetadata({
 
 export default async function OrgDetailPage({
   params,
+  searchParams,
 }: {
   params: { id: string };
+  searchParams: { p?: string };
 }) {
   const org = await getOrg(params.id);
   if (!org) notFound();
 
-  const user = await getCurrentUser();
+  // 단체 소식 = 게시판 글 중 이 단체 것. 5개씩 페이지로 넘긴다.
+  const page = Math.max(1, Number(searchParams.p ?? 1) || 1);
+  const [user, news] = await Promise.all([
+    getCurrentUser(),
+    getOrgBoardPosts(org.id, page, 5),
+  ]);
   const isStaff = can(user, "write_org_post", { orgId: org.id });
 
   return (
@@ -91,36 +99,63 @@ export default async function OrgDetailPage({
         </p>
       </section>
 
-      {org.posts.length > 0 && (
-        <section className="mt-6">
-          <h2 className="mb-2 text-base text-rose-deep">단체 소식</h2>
-          {org.posts.map((p) => (
-            <div
-              key={p.id}
-              className="mb-2 rounded-card border border-line bg-white p-4"
-            >
-              <span className="rounded-full bg-tag-org-bg px-2 py-0.5 text-[10px] font-bold text-tag-org-fg">
-                {p.category}
-              </span>
-              <h5 className="mt-1.5 text-sm font-bold">{p.title}</h5>
-              <p className="mt-1 text-[13px] text-muted">{p.body}</p>
-              {p.photoUrls.length > 0 && (
-                <div className="mt-2 flex gap-2 overflow-x-auto">
-                  {p.photoUrls.map((u) => (
-                    <div
-                      key={u}
-                      className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-thumb bg-ivory-2"
-                    >
-                      <Image src={u} alt="" fill sizes="96px" className="object-cover" />
-                    </div>
-                  ))}
-                </div>
-              )}
-              <p className="mt-1 text-[11px] text-muted">{p.createdAt}</p>
-            </div>
-          ))}
-        </section>
-      )}
+      {/* 단체 소식 — 게시판에 올라간 이 단체 글의 제목만. 5개씩. */}
+      <section className="mt-6">
+        <div className="mb-2 flex items-baseline justify-between">
+          <h2 className="text-base text-rose-deep">단체 소식</h2>
+          {news.total > 0 && (
+            <span className="text-[11px] text-muted">전체 {news.total}건</span>
+          )}
+        </div>
+
+        {news.items.length === 0 ? (
+          <p className="rounded-card border border-line bg-white p-5 text-center text-[13px] text-muted">
+            아직 올라온 소식이 없습니다
+          </p>
+        ) : (
+          <ul className="overflow-hidden rounded-card border border-line bg-white">
+            {news.items.map((n) => (
+              <li key={n.id} className="border-t border-line first:border-t-0">
+                <Link
+                  href={`/board/${n.id}`}
+                  className="flex min-h-[52px] items-center gap-2 px-4 py-3"
+                >
+                  <span className="min-w-0 flex-1 truncate text-[14px]">
+                    {n.title}
+                  </span>
+                  {n.commentCount > 0 && (
+                    <span className="text-[11px] text-rose">
+                      💬 {n.commentCount}
+                    </span>
+                  )}
+                  <span className="text-[11px] text-muted">{n.createdAt}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {news.totalPages > 1 && (
+          <nav className="mt-3 flex justify-center gap-1.5">
+            {Array.from({ length: news.totalPages }, (_, i) => i + 1).map(
+              (n) => (
+                <Link
+                  key={n}
+                  href={`/orgs/${org.id}?p=${n}`}
+                  aria-current={n === news.page ? "page" : undefined}
+                  className={`flex h-9 min-w-9 items-center justify-center rounded-element border px-2 text-xs ${
+                    n === news.page
+                      ? "border-rose bg-rose-soft font-bold text-rose-deep"
+                      : "border-line text-muted"
+                  }`}
+                >
+                  {n}
+                </Link>
+              ),
+            )}
+          </nav>
+        )}
+      </section>
 
       <div className="mt-6 flex justify-center">
         <ReportSheet

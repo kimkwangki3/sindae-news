@@ -147,10 +147,12 @@ export interface BoardPost {
   photos: string[];
   pinned: boolean;
   mine?: boolean; // 현재 로그인 사용자가 작성
+  orgId: string | null; // 단체 명의 글이면 해당 단체
+  orgName: string | null;
 }
 
 const BOARD_COLS =
-  "id, category, title, body, like_count, view_count, is_pinned, created_at, author_id, author:profiles!author_id(nickname), board_comments(count), board_photos(url, sort)";
+  "id, category, title, body, like_count, view_count, is_pinned, created_at, author_id, org_id, author:profiles!author_id(nickname), org:organizations!org_id(name), board_comments(count), board_photos(url, sort)";
 
 function toBoardPost(r: Record<string, unknown>): BoardPost {
   return {
@@ -165,11 +167,13 @@ function toBoardPost(r: Record<string, unknown>): BoardPost {
     viewCount: Number(r.view_count ?? 0),
     photos: embeddedPhotos(r.board_photos),
     pinned: Boolean(r.is_pinned),
+    orgId: (r.org_id as string) ?? null,
+    orgName: (r.org as { name?: string } | null)?.name ?? null,
   };
 }
 
 export async function getBoardPosts(
-  category: BoardCategory | "all" | "popular" = "all",
+  category: BoardCategory | "all" | "popular" | "org" = "all",
 ): Promise<BoardPost[]> {
   const supabase = createClient();
   let q = supabase
@@ -177,10 +181,13 @@ export async function getBoardPosts(
     .select(BOARD_COLS)
     .eq("visibility", "visible");
 
+  // '단체' 필터 — 단체 명의로 올라온 글만
+  if (category === "org") q = q.not("org_id", "is", null);
+
   if (category === "popular") {
     q = q.order("like_count", { ascending: false });
   } else {
-    if (category !== "all") q = q.eq("category", category);
+    if (category !== "all" && category !== "org") q = q.eq("category", category);
     q = q
       .order("is_pinned", { ascending: false })
       .order("created_at", { ascending: false });
@@ -236,4 +243,46 @@ async function getPostComments(
       mine: !!user && row.author_id === user.id,
     };
   });
+}
+
+// ---------------------------------------------------------------------
+// 단체 소식 — 게시판 글 중 해당 단체 것만. 단체 상세에서 5개씩 페이지로 본다.
+// ---------------------------------------------------------------------
+export interface OrgBoardPage {
+  items: { id: string; title: string; createdAt: string; commentCount: number }[];
+  page: number; // 1부터
+  totalPages: number;
+  total: number;
+}
+
+export async function getOrgBoardPosts(
+  orgId: string,
+  page = 1,
+  perPage = 5,
+): Promise<OrgBoardPage> {
+  const supabase = createClient();
+  const from = (page - 1) * perPage;
+  const { data, count } = await supabase
+    .from("board_posts")
+    .select("id, title, created_at, board_comments(count)", { count: "exact" })
+    .eq("org_id", orgId)
+    .eq("visibility", "visible")
+    .order("created_at", { ascending: false })
+    .range(from, from + perPage - 1);
+
+  const total = count ?? 0;
+  return {
+    items: (data ?? []).map((r) => {
+      const row = r as Record<string, unknown>;
+      return {
+        id: row.id as string,
+        title: row.title as string,
+        createdAt: fmtShort(row.created_at as string),
+        commentCount: embeddedCount(row.board_comments),
+      };
+    }),
+    page,
+    totalPages: Math.max(1, Math.ceil(total / perPage)),
+    total,
+  };
 }
