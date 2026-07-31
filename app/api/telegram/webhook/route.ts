@@ -54,7 +54,7 @@ export async function POST(req: Request): Promise<Response> {
   const { data: draft } = await supabase
     .from("news_drafts")
     .select(
-      "id, title, subtitle, body, category_slug, source_name, source_url, status, published_slug",
+      "id, title, subtitle, body, category_slug, source_name, source_url, image_prompt, status, published_slug",
     )
     .eq("id", draftId)
     .maybeSingle();
@@ -72,6 +72,7 @@ export async function POST(req: Request): Promise<Response> {
     category_slug: string;
     source_name: string | null;
     source_url: string | null;
+    image_prompt: string | null;
     status: string;
     published_slug: string | null;
   };
@@ -145,13 +146,33 @@ export async function POST(req: Request): Promise<Response> {
 
   revalidatePublic();
 
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/article/${slug}`;
+  // 게재 직후 필요한 것을 한 화면에 모아 준다. 이미지는 나중에 수정으로 붙이는
+  // 흐름이라, 프롬프트와 수정 링크가 여기 없으면 폰에서 이어가기 어렵다.
+  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const url = `${site}/article/${slug}`;
+  const editUrl = `${site}/admin/articles/new?slug=${encodeURIComponent(slug)}`;
+  const esc = (t: string) =>
+    t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  const parts = [
+    "<b>✅ 게재 완료</b>",
+    esc(d.title),
+    "",
+    `<a href="${url}">${MEDIA.name}에서 보기</a>`,
+    `<a href="${editUrl}">이미지 추가·수정하기</a>`,
+  ];
+  if (d.image_prompt) {
+    parts.push(
+      "",
+      "🎨 <b>대표 이미지 프롬프트</b>",
+      `<pre>${esc(d.image_prompt)}</pre>`,
+      "만든 뒤 위 '이미지 추가·수정하기'에서 올리고 AI 생성 고지를 체크하세요.",
+    );
+  }
+
   await answerCallback(cq.id, "게재했습니다.");
   if (messageId) {
-    await settleDraftMessage(
-      messageId,
-      `<b>✅ 게재 완료</b>\n${d.title}\n\n<a href="${url}">${MEDIA.name}에서 보기</a>`,
-    );
+    await settleDraftMessage(messageId, parts.join("\n"));
   }
 
   return NextResponse.json({ ok: true });
