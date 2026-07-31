@@ -3,6 +3,7 @@ import CategoryNav from "@/components/CategoryNav";
 import AdSlot from "@/components/AdSlot";
 import Thumb from "@/components/Thumb";
 import ArticleListItem from "@/components/ArticleListItem";
+import { MEDIA } from "@/lib/media";
 import {
   CATEGORY_NAME,
   getArticlesPage,
@@ -82,7 +83,7 @@ export default async function HomePage() {
           href="/legal/youth"
           className="flex min-h-[44px] items-center justify-between rounded-card border border-line bg-ivory-2 px-4 py-3 text-[12px] text-muted"
         >
-          <span>청소년보호정책 · 청소년보호책임자 김광기</span>
+          <span>청소년보호정책 · 청소년보호책임자 {MEDIA.youthOfficer}</span>
           <span aria-hidden>›</span>
         </Link>
       </div>

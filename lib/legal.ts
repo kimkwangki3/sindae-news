@@ -88,7 +88,7 @@ const DOCS: LegalDoc[] = [
       {
         heading: "3. 청소년보호책임자",
         body: [
-          `청소년보호책임자: ${MEDIA.youthOfficer} (발행인 겸 편집인)`,
+          `청소년보호책임자: ${MEDIA.youthOfficer}`,
           `연락처: ${MEDIA.email}`,
         ],
       },
@@ -139,9 +139,9 @@ const DOCS: LegalDoc[] = [
       {
         heading: "청구 방법",
         body: [
-          "해당 보도가 있음을 안 날부터 3개월 이내(게재 후 6개월 이내)에 서면 또는 이메일로 청구할 수 있습니다.",
+          "해당 보도가 있음을 안 날부터 3개월 이내(게재 후 6개월 이내)에 이메일로 청구할 수 있습니다.",
           `청구 접수: ${MEDIA.email}`,
-          `담당: 편집인 ${MEDIA.editor}`,
+          `담당: ${MEDIA.editor}(편집인)`,
         ],
       },
       {
