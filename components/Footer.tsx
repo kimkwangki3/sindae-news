@@ -26,7 +26,7 @@ export default function Footer() {
       <div className="mt-4 flex flex-col gap-0.5 leading-relaxed">
         <p className="font-bold text-ink">해룡신문</p>
         <p>등록번호 전남광주,아00766 · 2026.07.27 등록 · 인터넷신문</p>
-        <p>발행소 순천시 오천4길 39 · 전화 010-3535-1221</p>
+        <p>발행소 순천시 오천4길 39 · 문의 ghkdtk85@gmail.com</p>
         <p>발행인·편집인 김광기 · 청소년보호책임자 김광기</p>
         <p>운영사 DSBH</p>
         <p className="mt-2 text-[11px]">
