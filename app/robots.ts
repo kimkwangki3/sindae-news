@@ -10,6 +10,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin", "/me", "/onboarding", "/login", "/auth/"],
     },
-    sitemap: `${SITE_URL}/sitemap.xml`,
+    // 일반 사이트맵 + 뉴스 사이트맵(최근 48시간 기사)을 함께 알린다.
+    sitemap: [`${SITE_URL}/sitemap.xml`, `${SITE_URL}/news-sitemap.xml`],
   };
 }

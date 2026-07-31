@@ -32,7 +32,9 @@ export interface MockArticle {
   excerpt: string;
   body: string[]; // 문단 배열
   author: string;
-  publishedAt: string; // "2026.06.25"
+  publishedAt: string; // "2026.06.25" — 화면 표시용
+  publishedAtIso: string | null; // 구조화 데이터(datePublished)용 원본
+  updatedAtIso: string | null; // dateModified용. 발행 후 수정한 적 없으면 null
   views: { day: number; week: number; month: number };
   likeCount: number;
   dislikeCount: number;
@@ -127,7 +129,7 @@ export async function getArticleBySlug(
   const { data, error } = await supabase
     .from("articles")
     .select(
-      "id, slug, title, subtitle, body, thumbnail_url, category_id, view_count, published_at, ai_text, ai_image, source_name, source_url, author:profiles!author_id(nickname)",
+      "id, slug, title, subtitle, body, thumbnail_url, category_id, view_count, published_at, updated_at, ai_text, ai_image, source_name, source_url, author:profiles!author_id(nickname)",
     )
     .eq("slug", slug)
     .eq("status", "published")
@@ -148,6 +150,7 @@ export async function getArticleBySlug(
     category_id: number | null;
     view_count: number | null;
     published_at: string | null;
+    updated_at: string | null;
     ai_text: boolean | null;
     ai_image: boolean | null;
     source_name: string | null;
@@ -182,6 +185,13 @@ export async function getArticleBySlug(
     body: toParagraphs(a.body),
     author: a.author?.nickname ?? "편집부",
     publishedAt: fmtDate(a.published_at),
+    publishedAtIso: a.published_at,
+    // 발행 이후 실제로 고친 적이 있을 때만 dateModified로 쓴다.
+    // 없는데 최신 시각을 넣으면 검색엔진이 날짜 조작으로 본다.
+    updatedAtIso:
+      a.updated_at && a.published_at && a.updated_at > a.published_at
+        ? a.updated_at
+        : null,
     views: { day: views, week: views, month: views },
     likeCount: likeCount ?? 0,
     dislikeCount: dislikeCount ?? 0,

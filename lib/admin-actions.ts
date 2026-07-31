@@ -103,6 +103,9 @@ export async function saveArticle(formData: FormData): Promise<void> {
     ai_image: formData.get("ai_image") === "on",
     source_name: String(formData.get("source_name") ?? "").trim() || null,
     source_url: String(formData.get("source_url") ?? "").trim() || null,
+    // 최종수정일시 — 구조화 데이터의 dateModified로 쓰인다. Postgres가 자동으로
+    // 갱신해주지 않으므로 저장할 때마다 직접 넣는다.
+    updated_at: new Date().toISOString(),
     published_at:
       status === "published"
         ? (prevPublishedAt ?? new Date().toISOString())
