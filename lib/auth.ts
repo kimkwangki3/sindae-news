@@ -38,13 +38,18 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
   if (!profile) return null;
 
-  // 본인 업체(1인 1개)
-  const { data: business } = await supabase
+  // 본인 업체 — maybeSingle()로 받으면 행이 둘 이상일 때 오류가 나 로그인
+  // 자체가 깨진다. 목록으로 받아 대표 하나를 고른다.
+  const { data: bizRows } = await supabase
     .from("businesses")
     .select("id, name, status")
     .eq("owner_id", user.id)
     .in("status", ["pending", "approved"])
-    .maybeSingle();
+    .order("created_at", { ascending: true });
+
+  const businesses = (bizRows ?? []) as CurrentUser["businesses"];
+  const business =
+    businesses.find((b) => b.status === "approved") ?? businesses[0] ?? null;
 
   // 가입 단체 목록
   const { data: orgRows } = await supabase
@@ -63,8 +68,9 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   }));
 
   return {
-    ...(profile as Omit<CurrentUser, "business" | "orgs">),
-    business: business ?? null,
+    ...(profile as Omit<CurrentUser, "business" | "businesses" | "orgs">),
+    businesses,
+    business,
     orgs,
   };
 });

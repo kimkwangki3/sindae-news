@@ -56,8 +56,10 @@ export interface PermissionTarget {
 }
 
 function ownsApprovedBusiness(user: CurrentUser, businessId?: string | null) {
-  if (!user.business || user.business.status !== "approved") return false;
-  return !businessId || user.business.id === businessId;
+  // 업체를 여러 개 가질 수 있으므로 승인된 것 중 하나라도 맞으면 통과
+  const approved = user.businesses.filter((b) => b.status === "approved");
+  if (approved.length === 0) return false;
+  return !businessId || approved.some((b) => b.id === businessId);
 }
 
 function isOrgStaff(user: CurrentUser, orgId?: string | null) {

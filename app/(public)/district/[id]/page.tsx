@@ -33,8 +33,10 @@ export default async function StoreDetailPage({
     getBusinessReviews(params.id),
   ]);
   const myReview = reviews.find((r) => r.mine) ?? null;
-  const isOwner =
-    user?.business?.status === "approved" && user.business.id === store.id;
+  // 업체를 여러 개 소유할 수 있으므로 그중 이 가게가 있는지로 판단
+  const isOwner = Boolean(
+    user?.businesses.some((b) => b.status === "approved" && b.id === store.id),
+  );
 
   return (
     <div className="px-[18px] pb-28">

@@ -20,7 +20,10 @@ export interface Profile {
 
 // 현재 로그인 사용자의 통합 신원(권한 판정에 필요한 소속 포함)
 export interface CurrentUser extends Profile {
-  // 승인된 본인 업체 (1인 1개) — 없으면 null
+  // 본인이 소유한 업체 전부. 현재 등록 화면은 1인 1개를 막지만, 관리자가
+  // 직접 넣거나 정책이 바뀌면 여러 개가 될 수 있어 목록으로 다룬다.
+  businesses: { id: string; name: string; status: ReviewStatus }[];
+  // 대표 업체(승인분 우선) — 기존 권한/게이트 호출부 호환용
   business: { id: string; name: string; status: ReviewStatus } | null;
   // 가입한 단체 목록 (역할/상태 포함)
   orgs: { org_id: string; name: string; role: OrgRole; status: "pending" | "approved" | "rejected" }[];
