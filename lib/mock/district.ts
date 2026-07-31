@@ -1,6 +1,8 @@
 // 해룡상권(업체) 데이터 액세스 — Supabase 실연동.
-// 주의: rating/reviewCount/neighborhood는 현재 스키마에 없음 → 기본값(후속 리뷰 기능).
+// 주의: neighborhood는 현재 스키마에 없음 → 기본값.
+// 평점/리뷰수는 business_reviews 임베드를 JS로 집계한다(업체 수가 적은 단계).
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth";
 
 export type BizCategory = "food" | "cafe" | "life" | "medical";
 
@@ -59,17 +61,39 @@ function fmtHours(open: string | null, close: string | null): string {
   return `${open.slice(0, 5)} ~ ${close.slice(0, 5)}`;
 }
 
+// 목록에서도 대표 사진 1장과 평점이 필요하므로 url/rating까지 함께 가져온다.
 const LIST_COLS =
-  "id, name, category, address, kakao_channel, phone, is_24h, hours_open, hours_close, closed_days, intro, business_photos(count), promo_posts(count)";
+  "id, name, category, address, kakao_channel, phone, is_24h, hours_open, hours_close, closed_days, intro, business_photos(url, sort), promo_posts(count), business_reviews(rating)";
+
+// 임베드된 리뷰 배열 → 평균 별점(소수 첫째 자리)과 개수
+function aggregateRating(v: unknown): { rating: number; reviewCount: number } {
+  const rows = Array.isArray(v) ? (v as { rating: number }[]) : [];
+  if (rows.length === 0) return { rating: 0, reviewCount: 0 };
+  const sum = rows.reduce((acc, r) => acc + Number(r.rating ?? 0), 0);
+  return {
+    rating: Math.round((sum / rows.length) * 10) / 10,
+    reviewCount: rows.length,
+  };
+}
+
+// 임베드된 사진 배열 → sort 순 url 목록
+function embeddedPhotoUrls(v: unknown): string[] {
+  const rows = Array.isArray(v) ? (v as { url: string; sort: number | null }[]) : [];
+  return [...rows]
+    .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+    .map((r) => r.url);
+}
 
 function toBusinessSummary(r: Record<string, unknown>): Business {
+  const { rating, reviewCount } = aggregateRating(r.business_reviews);
+  const photos = embeddedPhotoUrls(r.business_photos);
   return {
     id: r.id as string,
     name: r.name as string,
     category: r.category as BizCategory,
     neighborhood: "",
-    rating: 0,
-    reviewCount: 0,
+    rating,
+    reviewCount,
     address: (r.address as string) ?? "",
     phone: (r.phone as string) ?? "",
     kakaoChannel: (r.kakao_channel as string) ?? null,
@@ -80,8 +104,8 @@ function toBusinessSummary(r: Record<string, unknown>): Business {
       : "",
     intro: (r.intro as string) ?? "",
     isPromoted: embeddedCount(r.promo_posts) > 0,
-    photoCount: embeddedCount(r.business_photos),
-    photos: [],
+    photoCount: photos.length,
+    photos,
     menus: [],
     promos: [],
   };
@@ -117,7 +141,8 @@ export async function getBusiness(id: string): Promise<Business | null> {
 
   const base = toBusinessSummary(data as Record<string, unknown>);
 
-  const [{ data: menus }, { data: promos }, { data: photos }] =
+  // 사진은 LIST_COLS 임베드로 이미 채워져 있다.
+  const [{ data: menus }, { data: promos }] =
     await Promise.all([
       supabase
         .from("business_menus")
@@ -131,14 +156,7 @@ export async function getBusiness(id: string): Promise<Business | null> {
         .eq("status", "approved")
         .eq("visibility", "visible")
         .order("created_at", { ascending: false }),
-      supabase
-        .from("business_photos")
-        .select("url, sort")
-        .eq("business_id", id)
-        .order("sort", { ascending: true }),
     ]);
-
-  base.photos = (photos ?? []).map((p) => (p as { url: string }).url);
 
   base.menus = (menus ?? []).map((m) => {
     const row = m as { name: string; price: number | null };
@@ -166,4 +184,60 @@ export async function getBusiness(id: string): Promise<Business | null> {
   });
 
   return base;
+}
+
+// ---------------------------------------------------------------------
+// 리뷰·별점 (business_reviews). 1인 1업체 1건.
+// ---------------------------------------------------------------------
+export interface BizReview {
+  id: string;
+  author: string;
+  rating: number;
+  body: string;
+  createdAt: string;
+  mine: boolean; // 본인 작성분 → 수정·삭제 노출
+}
+
+export async function getBusinessReviews(
+  businessId: string,
+): Promise<BizReview[]> {
+  const supabase = createClient();
+  const [{ data }, user] = await Promise.all([
+    supabase
+      .from("business_reviews")
+      .select("id, rating, body, created_at, author_id, author:profiles!author_id(nickname)")
+      .eq("business_id", businessId)
+      .eq("visibility", "visible")
+      .order("created_at", { ascending: false }),
+    getCurrentUser(),
+  ]);
+
+  return (data ?? []).map((r) => {
+    const row = r as unknown as {
+      id: string;
+      rating: number;
+      body: string | null;
+      created_at: string;
+      author_id: string;
+      author?: { nickname?: string } | null;
+    };
+    return {
+      id: row.id,
+      author: row.author?.nickname ?? "익명",
+      rating: row.rating,
+      body: row.body ?? "",
+      createdAt: row.created_at.slice(0, 10).replace(/-/g, "."),
+      mine: Boolean(user && user.id === row.author_id),
+    };
+  });
+}
+
+// 현재 로그인 회원이 이 업체에 이미 남긴 리뷰(수정 폼 초기값용)
+export async function getMyBusinessReview(
+  businessId: string,
+): Promise<BizReview | null> {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  const reviews = await getBusinessReviews(businessId);
+  return reviews.find((r) => r.mine) ?? null;
 }

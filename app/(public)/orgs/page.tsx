@@ -62,7 +62,11 @@ export default async function OrgsPage({
               href={`/orgs/${o.id}`}
               className="flex gap-3 rounded-card border border-line bg-white p-3"
             >
-              <Thumb alt={o.name} className="h-[76px] w-[76px] flex-shrink-0" />
+              <Thumb
+                  src={o.photos[0]}
+                  alt={o.name}
+                  className="h-[76px] w-[76px] flex-shrink-0"
+                />
               <div className="min-w-0 flex-1">
                 <span className="rounded-full bg-tag-org-bg px-2 py-0.5 text-[10px] font-bold text-tag-org-fg">
                   {ORG_CAT_NAME[o.category]}

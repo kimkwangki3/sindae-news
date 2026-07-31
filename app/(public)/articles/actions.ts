@@ -185,11 +185,27 @@ export async function trackArticleView(ev: ArticleViewEvent): Promise<void> {
 
   const supabase = createClient();
   const user = await getCurrentUser();
-  await supabase.from("article_views").insert({
+  const { error } = await supabase.from("article_views").insert({
     article_id: articleId,
     ip_hash: getIpHash(),
     user_id: user?.id ?? null,
     scroll_pct: Math.max(0, Math.min(100, Math.round(ev.scrollPct))),
     dwell_ms: Math.max(0, Math.round(ev.dwellMs)),
   });
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error("[view] article_views 기록 실패:", error.message);
+    return;
+  }
+
+  // 화면에 보이는 조회수는 articles.view_count다. 로그만 쌓고 이걸 올리지
+  // 않으면 계속 0으로 보인다. anon에게 articles UPDATE를 열지 않으려고
+  // security definer 함수로 원자적 증가시킨다(db/view-count-migration.sql).
+  const { error: incErr } = await supabase.rpc("increment_article_view", {
+    p_article_id: articleId,
+  });
+  if (incErr) {
+    // eslint-disable-next-line no-console
+    console.error("[view] 조회수 증가 실패:", incErr.message);
+  }
 }

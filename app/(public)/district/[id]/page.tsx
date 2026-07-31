@@ -4,7 +4,12 @@ import Image from "next/image";
 import Thumb from "@/components/Thumb";
 import ReportSheet from "@/components/ReportSheet";
 import { getCurrentUser } from "@/lib/auth";
-import { getBusiness, BIZ_CAT_NAME } from "@/lib/mock/district";
+import BusinessReviews from "@/components/district/BusinessReviews";
+import {
+  getBusiness,
+  getBusinessReviews,
+  BIZ_CAT_NAME,
+} from "@/lib/mock/district";
 
 export async function generateMetadata({
   params,
@@ -23,7 +28,11 @@ export default async function StoreDetailPage({
   const store = await getBusiness(params.id);
   if (!store) notFound();
 
-  const user = await getCurrentUser();
+  const [user, reviews] = await Promise.all([
+    getCurrentUser(),
+    getBusinessReviews(params.id),
+  ]);
+  const myReview = reviews.find((r) => r.mine) ?? null;
   const isOwner =
     user?.business?.status === "approved" && user.business.id === store.id;
 
@@ -81,8 +90,16 @@ export default async function StoreDetailPage({
       </div>
       <h1 className="mt-2 text-[22px] font-extrabold">{store.name}</h1>
       <p className="mt-1 text-[13px] text-muted">
-        <span className="font-bold text-rose">★ {store.rating}</span> · 리뷰{" "}
-        {store.reviewCount} · {store.neighborhood}
+        {store.reviewCount > 0 ? (
+          <>
+            <span className="font-bold text-rose">
+              ★ {store.rating.toFixed(1)}
+            </span>{" "}
+            · 리뷰 {store.reviewCount}
+          </>
+        ) : (
+          "아직 리뷰가 없습니다"
+        )}
       </p>
 
       {/* 정보 */}
@@ -149,6 +166,13 @@ export default async function StoreDetailPage({
           ))}
         </section>
       )}
+
+      <BusinessReviews
+        businessId={store.id}
+        reviews={reviews}
+        mine={myReview}
+        loggedIn={Boolean(user)}
+      />
 
       <div className="mt-6 flex justify-center">
         <ReportSheet

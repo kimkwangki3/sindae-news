@@ -244,3 +244,60 @@ export async function removeMember(
     .eq("org_id", orgId);
   revalidatePath(`/orgs/${orgId}/manage`);
 }
+
+// ---------------------------------------------------------------------
+// 업체 리뷰·별점 — 로그인 회원, 1업체 1건. 다시 쓰면 기존 리뷰가 갱신된다.
+// ---------------------------------------------------------------------
+export interface ReviewState {
+  ok?: boolean;
+  error?: string;
+}
+
+export async function saveBusinessReview(
+  businessId: string,
+  _prev: ReviewState,
+  formData: FormData,
+): Promise<ReviewState> {
+  const user = await getCurrentUser();
+  if (!user) return { error: "로그인이 필요합니다." };
+  if (user.is_suspended) return { error: "정지된 계정은 이용할 수 없습니다." };
+
+  const rating = Number(formData.get("rating") ?? 0);
+  const body = String(formData.get("body") ?? "").trim();
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return { error: "별점을 선택해 주세요." };
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase.from("business_reviews").upsert(
+    {
+      business_id: businessId,
+      author_id: user.id,
+      rating,
+      body: body || null,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "business_id,author_id" },
+  );
+  if (error) return { error: "저장에 실패했습니다. 잠시 후 다시 시도해 주세요." };
+
+  revalidatePath(`/district/${businessId}`);
+  revalidatePath("/district");
+  return { ok: true };
+}
+
+export async function deleteBusinessReview(
+  businessId: string,
+  reviewId: string,
+): Promise<void> {
+  const user = await requireUser();
+  const supabase = createClient();
+  // RLS가 본인/운영진만 삭제하도록 막지만, 앱에서도 작성자를 한 번 더 건다.
+  await supabase
+    .from("business_reviews")
+    .delete()
+    .eq("id", reviewId)
+    .eq("author_id", user.id);
+  revalidatePath(`/district/${businessId}`);
+  revalidatePath("/district");
+}

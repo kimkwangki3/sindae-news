@@ -60,9 +60,16 @@ function embeddedCount(v: unknown): number {
 }
 
 const LIST_COLS =
-  "id, name, category, leader, region, contact, kakao_channel, accept_join, intro, created_at, org_members(count), org_photos(count)";
+  "id, name, category, leader, region, contact, kakao_channel, accept_join, intro, created_at, org_members(count), org_photos(url, sort)";
+
+// 임베드된 사진 배열 → sort 순 url 목록
+function embeddedPhotoUrls(v: unknown): string[] {
+  const rows = Array.isArray(v) ? (v as { url: string; sort: number | null }[]) : [];
+  return [...rows].sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)).map((r) => r.url);
+}
 
 function toOrgSummary(r: Record<string, unknown>): Organization {
+  const photos = embeddedPhotoUrls(r.org_photos);
   return {
     id: r.id as string,
     name: r.name as string,
@@ -76,8 +83,8 @@ function toOrgSummary(r: Record<string, unknown>): Organization {
     kakaoChannel: (r.kakao_channel as string) ?? null,
     acceptJoin: Boolean(r.accept_join),
     intro: (r.intro as string) ?? "",
-    photoCount: embeddedCount(r.org_photos),
-    photos: [],
+    photoCount: photos.length,
+    photos,
     posts: [],
     pending: [],
     members: [],

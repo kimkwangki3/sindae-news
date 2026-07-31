@@ -69,7 +69,11 @@ export default async function DistrictPage({
                 href={`/district/${s.id}`}
                 className="flex gap-3 rounded-card border border-line bg-white p-3"
               >
-                <Thumb alt={s.name} className="h-[76px] w-[76px] flex-shrink-0" />
+                <Thumb
+                  src={s.photos[0]}
+                  alt={s.name}
+                  className="h-[76px] w-[76px] flex-shrink-0"
+                />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
                     <span className="rounded-full bg-ivory-2 px-2 py-0.5 text-[10px] font-bold text-muted">
@@ -84,10 +88,18 @@ export default async function DistrictPage({
                   <h4 className="mt-1 line-clamp-1 text-[15px] font-bold">
                     {s.name}
                   </h4>
+                  {/* 리뷰가 없으면 ★0 대신 안내 문구 — 0점으로 오해되지 않게 */}
                   <div className="mt-1.5 flex gap-2 text-[11px] text-muted">
-                    <span className="font-bold text-rose">★ {s.rating}</span>
-                    <span>{s.neighborhood}</span>
-                    <span>리뷰 {s.reviewCount}</span>
+                    {s.reviewCount > 0 ? (
+                      <>
+                        <span className="font-bold text-rose">
+                          ★ {s.rating.toFixed(1)}
+                        </span>
+                        <span>리뷰 {s.reviewCount}</span>
+                      </>
+                    ) : (
+                      <span>리뷰 없음</span>
+                    )}
                   </div>
                 </div>
               </Link>
