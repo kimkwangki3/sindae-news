@@ -5,6 +5,7 @@ import { getBusinesses } from "@/lib/mock/district";
 import { getOrgs } from "@/lib/mock/orgs";
 import { LEGAL_LINKS } from "@/lib/legal";
 import { FEATURES } from "@/lib/features";
+import { STAFF } from "@/lib/staff";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -26,6 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/tips",
     "/recruit",
     "/search",
+    "/reporters",
     "/ads/apply",
   ];
 
@@ -48,10 +50,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
   const orgs = (await getOrgs("all")).map((o) => u(`/orgs/${o.id}`));
   const legal = LEGAL_LINKS.map((l) => u(`/legal/${l.slug}`));
+  const reporters = STAFF.map((s) => u(`/reporters/${s.handle}`));
 
   return [
     ...staticPaths.map((p) => u(p)),
     ...articles,
+    ...reporters,
     ...market,
     ...board,
     ...district,

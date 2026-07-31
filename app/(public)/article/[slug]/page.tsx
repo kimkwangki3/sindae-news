@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import Thumb from "@/components/Thumb";
 import AdSlot from "@/components/AdSlot";
 import ArticleListItem from "@/components/ArticleListItem";
@@ -9,6 +10,7 @@ import ReportSheet from "@/components/ReportSheet";
 import ArticleAiNotice from "@/components/ArticleAiNotice";
 import NewsArticleJsonLd from "@/components/article/NewsArticleJsonLd";
 import { MEDIA } from "@/lib/media";
+import { findStaffByName } from "@/lib/staff";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -58,6 +60,9 @@ export default async function ArticleDetailPage({
     getRelated(article.slug),
   ]);
 
+  // 바이라인이 등록된 필자면 프로필로 연결한다.
+  const staff = findStaffByName(article.author);
+
   return (
     <article className="px-[18px] pb-10">
       <ReadTracker slug={article.slug} />
@@ -87,7 +92,17 @@ export default async function ArticleDetailPage({
         {/* 신문법상 발행연월일은 인터넷신문의 경우 기사별 게재일자로 갈음한다.
             수정한 적이 있으면 최종수정일시도 함께 밝힌다(뉴스 신뢰 신호). */}
         <p className="mt-2 text-xs text-muted">
-          {article.author} · 입력 {article.publishedAt}
+          {staff ? (
+            <Link
+              href={`/reporters/${staff.handle}`}
+              className="font-bold text-ink underline"
+            >
+              {staff.name} {staff.title}
+            </Link>
+          ) : (
+            article.author
+          )}{" "}
+          · 입력 {article.publishedAt}
           {article.updatedAtIso && (
             <> · 최종수정 {fmtDay(article.updatedAtIso)}</>
           )}{" "}

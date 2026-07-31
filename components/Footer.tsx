@@ -18,6 +18,9 @@ export default function Footer() {
             {l.title}
           </Link>
         ))}
+        <Link href="/reporters" className="min-h-[24px]">
+          필자 소개
+        </Link>
         <Link href="/ads/apply" className="min-h-[24px]">
           광고 문의
         </Link>
