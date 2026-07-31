@@ -8,10 +8,11 @@ import {
 import { getMarketPost } from "@/lib/mock/community";
 import LoginRequired from "@/components/community/LoginRequired";
 import ImageUpload from "@/components/ImageUpload";
+import { REGIONS } from "@/lib/region";
 
 export const metadata = { title: "나눔마켓 글쓰기 · 해룡신문" };
 
-const NEIGHBORHOODS = ["신대지구", "복성지구", "선월지구", "기타"];
+
 
 export default async function MarketWritePage({
   searchParams,
@@ -79,10 +80,10 @@ export default async function MarketWritePage({
         <Field label="동네">
           <select
             name="neighborhood"
-            defaultValue={post?.neighborhood || NEIGHBORHOODS[0]}
+            defaultValue={post?.neighborhood || REGIONS[0]}
             className="min-h-[48px] w-full rounded-element border border-line bg-white px-3 text-sm outline-none focus:border-rose"
           >
-            {NEIGHBORHOODS.map((n) => (
+            {REGIONS.map((n) => (
               <option key={n} value={n}>
                 {n}
               </option>

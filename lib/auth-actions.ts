@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "./supabase/server";
 import { isDemoMode } from "./auth";
 import { DEMO_COOKIE, isDemoPersona } from "./mock/auth";
+import { isRegion } from "./region";
 
 const WEEK = 60 * 60 * 24 * 7;
 
@@ -43,10 +44,14 @@ export async function setNickname(
   formData: FormData,
 ): Promise<NicknameState> {
   const nickname = String(formData.get("nickname") ?? "").trim();
-  const neighborhood = String(formData.get("neighborhood") ?? "").trim() || null;
+  const neighborhood = String(formData.get("neighborhood") ?? "").trim();
 
   if (nickname.length < 2 || nickname.length > 12) {
     return { error: "닉네임은 2~12자로 입력해 주세요." };
+  }
+  // 거주 지역은 필수. 브라우저 required와 이중으로 확인한다.
+  if (!isRegion(neighborhood)) {
+    return { error: "거주 지역을 선택해 주세요." };
   }
   if (!/^[가-힣a-zA-Z0-9_]+$/.test(nickname)) {
     return { error: "한글·영문·숫자·밑줄(_)만 사용할 수 있어요." };

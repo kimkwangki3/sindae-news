@@ -2,9 +2,10 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import { joinOrg, type JoinState } from "@/lib/local-actions";
+import { REGIONS } from "@/lib/region";
 
 const INITIAL: JoinState = {};
-const NEIGHBORHOODS = ["신대지구", "복성지구", "선월지구", "기타"];
+
 const INPUT =
   "min-h-[48px] w-full rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose";
 
@@ -63,7 +64,7 @@ export default function OrgJoinForm({
       </Field>
       <Field label="거주 동네">
         <select name="neighborhood" className={INPUT}>
-          {NEIGHBORHOODS.map((n) => (
+          {REGIONS.map((n) => (
             <option key={n} value={n}>
               {n}
             </option>

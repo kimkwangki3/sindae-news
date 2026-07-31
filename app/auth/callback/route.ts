@@ -20,17 +20,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/login?error=auth`);
   }
 
-  // 닉네임 설정 여부로 신규/기존 판별 → 신규면 온보딩.
+  // 신규 가입(닉네임 미설정)이거나, 거주 지역이 비어 있으면 온보딩으로 보낸다.
+  // 지역을 필수로 받기 전에 가입한 회원도 한 번은 답하게 하려는 것.
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("nickname_set_at")
+      .select("nickname_set_at, neighborhood")
       .eq("id", user.id)
       .maybeSingle();
-    if (!profile?.nickname_set_at) {
+    if (!profile?.nickname_set_at || !profile?.neighborhood) {
       return NextResponse.redirect(`${origin}/onboarding`);
     }
   }
