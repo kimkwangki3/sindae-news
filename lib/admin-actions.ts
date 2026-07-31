@@ -7,6 +7,7 @@ import { getCurrentUser } from "./auth";
 import { createServiceClient } from "./supabase/server";
 import { logAdmin } from "./audit";
 import { CATEGORY_ID } from "./mock/articles-meta";
+import { normalizeSlug } from "./slug";
 import type {
   ArticleStatus,
   CommentStatus,
@@ -45,20 +46,6 @@ export async function deleteArticle(slug: string): Promise<void> {
   await logAdmin("delete_article", { targetType: "article", targetId: slug });
   revalidatePath("/admin/articles");
   revalidatePublic();
-}
-
-// 슬러그 정규화. 관리자 폼은 useFormState가 아니라 throw가 곧 크래시 페이지로 보이므로,
-// 비었거나 쓸 수 없는 문자뿐이면 막지 말고 날짜 기반으로 자동 생성한다.
-function normalizeSlug(raw: string): string {
-  const s = raw
-    .toLowerCase()
-    .replace(/[^a-z0-9-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  if (s.length >= 2) return s;
-
-  const d = new Date();
-  const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
-  return `article-${ymd}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
 // 기사 저장(작성/편집). slug 충돌 시 upsert로 갱신.
