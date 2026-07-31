@@ -801,3 +801,52 @@ export async function getLegalPages(): Promise<LegalPageRow[]> {
     };
   });
 }
+
+// 관리자 편집용 기사 원본 — 임시저장·승인대기까지 상태 무관하게 가져온다.
+export interface AdminArticleEdit {
+  slug: string;
+  title: string;
+  subtitle: string;
+  categorySlug: string;
+  body: string;
+  thumbnailUrl: string;
+  sourceName: string;
+  sourceUrl: string;
+  aiText: boolean;
+  aiImage: boolean;
+  status: ArticleStatus;
+}
+
+export async function getArticleForEdit(
+  slug: string,
+): Promise<AdminArticleEdit | null> {
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from("articles")
+    .select(
+      "slug, title, subtitle, category_id, body, thumbnail_url, source_name, source_url, ai_text, ai_image, status",
+    )
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error("[admin] getArticleForEdit 실패:", error.message);
+    return null;
+  }
+  if (!data) return null;
+
+  const r = data as Record<string, unknown>;
+  return {
+    slug: r.slug as string,
+    title: r.title as string,
+    subtitle: (r.subtitle as string) ?? "",
+    categorySlug: r.category_id ? ID_TO_SLUG[r.category_id as number] : "local",
+    body: (r.body as string) ?? "",
+    thumbnailUrl: (r.thumbnail_url as string) ?? "",
+    sourceName: (r.source_name as string) ?? "",
+    sourceUrl: (r.source_url as string) ?? "",
+    aiText: Boolean(r.ai_text),
+    aiImage: Boolean(r.ai_image),
+    status: r.status as ArticleStatus,
+  };
+}

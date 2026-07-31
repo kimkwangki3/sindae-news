@@ -155,6 +155,13 @@ export default function ArticleManager({
               <Pill tone="muted">임시</Pill>
             )}
             <div className="flex flex-shrink-0 items-center gap-1">
+              {/* 수정은 상태와 무관하게 항상 가능 */}
+              <Link
+                href={`/admin/articles/new?slug=${encodeURIComponent(a.slug)}`}
+                className="min-h-[44px] px-2 text-xs font-bold leading-[44px] text-ink"
+              >
+                수정
+              </Link>
               {a.status === "pending" ? (
                 <>
                   <button

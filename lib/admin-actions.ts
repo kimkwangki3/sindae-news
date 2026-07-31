@@ -74,6 +74,21 @@ export async function saveArticle(formData: FormData): Promise<void> {
   if (title.length < 2) throw new Error("제목을 입력해 주세요.");
 
   const supabase = createServiceClient();
+
+  // 편집이면 대상 글을 원래 슬러그로 찾는다(슬러그를 바꿔도 새 글이 생기지 않게).
+  const originalSlug = String(formData.get("original_slug") ?? "").trim();
+  const target = originalSlug || slug;
+
+  // 이미 발행된 글은 게재일자를 유지한다. 매번 now로 덮으면 수정할 때마다
+  // 발행일이 오늘로 바뀌어 기사 순서와 법정 게재일자가 어긋난다.
+  const { data: prev } = await supabase
+    .from("articles")
+    .select("published_at")
+    .eq("slug", target)
+    .maybeSingle();
+  const prevPublishedAt = (prev as { published_at: string | null } | null)
+    ?.published_at;
+
   const row: Record<string, unknown> = {
     slug,
     title,
@@ -88,12 +103,22 @@ export async function saveArticle(formData: FormData): Promise<void> {
     ai_image: formData.get("ai_image") === "on",
     source_name: String(formData.get("source_name") ?? "").trim() || null,
     source_url: String(formData.get("source_url") ?? "").trim() || null,
-    published_at: status === "published" ? new Date().toISOString() : null,
+    published_at:
+      status === "published"
+        ? (prevPublishedAt ?? new Date().toISOString())
+        : null,
   };
-  const { error } = await supabase
-    .from("articles")
-    .upsert(row, { onConflict: "slug" });
-  if (error) throw new Error("저장에 실패했습니다.");
+
+  // 편집이면 원래 글을 갱신(슬러그 변경 포함), 신규면 upsert.
+  const { error } = originalSlug
+    ? await supabase.from("articles").update(row).eq("slug", originalSlug)
+    : await supabase.from("articles").upsert(row, { onConflict: "slug" });
+  if (error) {
+    if (error.code === "23505") {
+      throw new Error("이미 사용 중인 슬러그입니다. 다른 값으로 바꿔주세요.");
+    }
+    throw new Error("저장에 실패했습니다.");
+  }
   await logAdmin("save_article", { targetType: "article", targetId: slug, memo: status });
   revalidatePath("/admin/articles");
   revalidatePublic();

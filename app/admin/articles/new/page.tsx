@@ -4,25 +4,37 @@ import { PageHead } from "@/components/admin/ui";
 import ImageUpload from "@/components/ImageUpload";
 import ArticleAiFields from "@/components/ArticleAiFields";
 import { CATEGORY_NAME, type CategorySlug } from "@/lib/mock/articles";
+import { getArticleForEdit } from "@/lib/mock/admin";
+import { notFound } from "next/navigation";
 
 export const metadata = { title: "기사 작성 · 관리자" };
 
 const CATEGORIES = Object.entries(CATEGORY_NAME) as [CategorySlug, string][];
 
-// 기사 작성/편집. 제목·본문 + 분류·슬러그·상태. 발행/임시저장 버튼이 status를 실어 보낸다.
-// ?title=&body= 로 들어오면 프리필(제보 → 기사화 연동).
-export default function NewArticlePage({
+// 기사 작성/편집.
+//  · ?slug=  → 기존 기사 편집(전 항목 프리필, original_slug로 대상 고정)
+//  · ?title=&body= → 제보 기사화 프리필
+export default async function NewArticlePage({
   searchParams,
 }: {
-  searchParams: { title?: string; body?: string };
+  searchParams: { title?: string; body?: string; slug?: string };
 }) {
-  const preTitle = searchParams.title ?? "";
-  const preBody = searchParams.body ?? "";
+  const editing = searchParams.slug
+    ? await getArticleForEdit(searchParams.slug)
+    : null;
+  if (searchParams.slug && !editing) notFound();
+
+  const preTitle = editing?.title ?? searchParams.title ?? "";
+  const preBody = editing?.body ?? searchParams.body ?? "";
   return (
     <div className="px-[18px] py-5">
       <PageHead
-        title="기사 작성"
-        sub="제목·본문을 작성하고 발행 또는 임시저장하세요"
+        title={editing ? "기사 수정" : "기사 작성"}
+        sub={
+          editing
+            ? "수정 후 발행하면 게재일자는 그대로 유지됩니다"
+            : "제목·본문을 작성하고 발행 또는 임시저장하세요"
+        }
         action={
           <Link href="/admin/articles" className="text-xs text-muted">
             ‹ 목록
@@ -31,6 +43,11 @@ export default function NewArticlePage({
       />
 
       <form action={saveArticle} className="flex flex-col gap-4">
+        {/* 편집 대상 고정 — 슬러그를 바꿔도 새 글이 아니라 이 글이 수정된다 */}
+        {editing && (
+          <input type="hidden" name="original_slug" value={editing.slug} />
+        )}
+
         <div className="flex flex-col gap-1.5">
           <label htmlFor="title" className="text-[13px] font-bold">
             제목
@@ -52,6 +69,7 @@ export default function NewArticlePage({
           <input
             id="subtitle"
             name="subtitle"
+            defaultValue={editing?.subtitle ?? ""}
             placeholder="주제목을 보완하는 한 줄. 상세 화면에만 표시됩니다"
             className="min-h-[48px] rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose"
           />
@@ -65,6 +83,7 @@ export default function NewArticlePage({
             <select
               id="category"
               name="category"
+              defaultValue={editing?.categorySlug}
               className="min-h-[48px] rounded-element border border-line bg-white px-3 text-sm outline-none focus:border-rose"
             >
               {CATEGORIES.map(([slug, name]) => (
@@ -82,6 +101,7 @@ export default function NewArticlePage({
             <input
               id="slug"
               name="slug"
+              defaultValue={editing?.slug ?? ""}
               placeholder="village-garden-2026"
               className="min-h-[48px] rounded-element border border-line bg-white px-3.5 text-xs outline-none focus:border-rose"
             />
@@ -107,9 +127,15 @@ export default function NewArticlePage({
           bucket="articles"
           label="대표 이미지"
           hint="목록·상세 상단 썸네일. 6MB 이하 권장."
+          defaultUrls={editing?.thumbnailUrl ? [editing.thumbnailUrl] : []}
         />
 
-        <ArticleAiFields />
+        <ArticleAiFields
+          defaultText={editing?.aiText}
+          defaultImage={editing?.aiImage}
+          defaultSourceName={editing?.sourceName}
+          defaultSourceUrl={editing?.sourceUrl}
+        />
 
         {/* 발행 / 임시저장 — 같은 폼, status 값만 다름 */}
         <div className="mt-2 flex gap-3">
