@@ -44,18 +44,31 @@ export async function deleteArticle(slug: string): Promise<void> {
   revalidatePath("/admin/articles");
 }
 
+// 슬러그 정규화. 관리자 폼은 useFormState가 아니라 throw가 곧 크래시 페이지로 보이므로,
+// 비었거나 쓸 수 없는 문자뿐이면 막지 말고 날짜 기반으로 자동 생성한다.
+function normalizeSlug(raw: string): string {
+  const s = raw
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  if (s.length >= 2) return s;
+
+  const d = new Date();
+  const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+  return `article-${ymd}-${Math.random().toString(36).slice(2, 6)}`;
+}
+
 // 기사 저장(작성/편집). slug 충돌 시 upsert로 갱신.
 export async function saveArticle(formData: FormData): Promise<void> {
   const user = await assertAdmin();
   const title = String(formData.get("title") ?? "").trim();
-  const slug = String(formData.get("slug") ?? "").trim();
+  const slug = normalizeSlug(String(formData.get("slug") ?? ""));
   const categorySlug = String(formData.get("category") ?? "local");
   const body = String(formData.get("body") ?? "").trim();
   const thumbnailUrl = String(formData.get("thumbnail_url") ?? "").trim();
   const status = String(formData.get("status") ?? "draft") as ArticleStatus;
-  if (title.length < 2 || slug.length < 2) {
-    throw new Error("제목과 슬러그를 입력해 주세요.");
-  }
+  // 슬러그는 위에서 항상 유효한 값으로 보정되므로 제목만 확인한다.
+  if (title.length < 2) throw new Error("제목을 입력해 주세요.");
 
   const supabase = createServiceClient();
   const row: Record<string, unknown> = {

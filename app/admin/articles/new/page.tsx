@@ -76,7 +76,8 @@ export default function NewArticlePage({
           </div>
           <div className="flex flex-col gap-1.5">
             <label htmlFor="slug" className="text-[13px] font-bold">
-              슬러그(URL)
+              슬러그(URL){" "}
+              <span className="font-normal text-muted">— 비우면 자동 생성</span>
             </label>
             <input
               id="slug"
