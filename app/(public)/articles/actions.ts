@@ -8,7 +8,7 @@ import {
 } from "@/lib/mock/articles";
 import { type MockComment, fmtDateTime } from "@/lib/mock/comments";
 import { type ArticleViewEvent } from "@/lib/mock/views";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getIpHash } from "@/lib/ip";
 
@@ -198,14 +198,25 @@ export async function trackArticleView(ev: ArticleViewEvent): Promise<void> {
     return;
   }
 
-  // 화면에 보이는 조회수는 articles.view_count다. 로그만 쌓고 이걸 올리지
-  // 않으면 계속 0으로 보인다. anon에게 articles UPDATE를 열지 않으려고
-  // security definer 함수로 원자적 증가시킨다(db/view-count-migration.sql).
-  const { error: incErr } = await supabase.rpc("increment_article_view", {
-    p_article_id: articleId,
-  });
+  // 화면에 보이는 조회수는 articles.view_count다. 로그만 쌓고 이걸 갱신하지
+  // 않으면 계속 0으로 보인다.
+  //
+  // +1 누적이 아니라 article_views 실제 건수로 덮어쓴다. 동시에 여러 명이
+  // 읽어도 값이 어긋나지 않고, 어긋나 있었더라도 다음 조회 때 스스로 맞춰진다.
+  // article_views는 RLS로 anon 조회가 막혀 있고 articles UPDATE도 열지 않았으므로
+  // 이 두 쿼리만 service role로 처리한다(서버 전용 경로).
+  const admin = createServiceClient();
+  const { count } = await admin
+    .from("article_views")
+    .select("*", { count: "exact", head: true })
+    .eq("article_id", articleId);
+
+  const { error: incErr } = await admin
+    .from("articles")
+    .update({ view_count: count ?? 0 })
+    .eq("id", articleId);
   if (incErr) {
     // eslint-disable-next-line no-console
-    console.error("[view] 조회수 증가 실패:", incErr.message);
+    console.error("[view] 조회수 갱신 실패:", incErr.message);
   }
 }
