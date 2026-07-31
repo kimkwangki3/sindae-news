@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { PageHead, Pill } from "@/components/admin/ui";
-import { setTipStatus } from "@/lib/admin-content-actions";
+import { setTipStatus, deleteTip } from "@/lib/admin-content-actions";
 import type { AdminTipRow, TipStatus } from "@/lib/mock/admin-types";
 
 const STATUS_LABEL: Record<TipStatus, string> = {
@@ -21,6 +21,12 @@ export default function TipManager({ initial }: { initial: AdminTipRow[] }) {
   function setStatus(id: string, status: TipStatus) {
     setRows((p) => p.map((t) => (t.id === id ? { ...t, status } : t)));
     startTransition(() => setTipStatus(id, status));
+  }
+
+  function remove(id: string) {
+    if (!confirm("이 제보를 삭제할까요? 되돌릴 수 없습니다.")) return;
+    setRows((p) => p.filter((t) => t.id !== id));
+    startTransition(() => deleteTip(id));
   }
 
   return (
@@ -87,6 +93,13 @@ export default function TipManager({ initial }: { initial: AdminTipRow[] }) {
                   반려
                 </button>
               )}
+              <button
+                type="button"
+                onClick={() => remove(t.id)}
+                className="min-h-[36px] rounded-element border border-line px-3 text-xs text-rose"
+              >
+                삭제
+              </button>
             </div>
           </li>
         ))}

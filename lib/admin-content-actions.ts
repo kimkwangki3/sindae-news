@@ -101,6 +101,15 @@ export async function setTipStatus(
   revalidatePath("/admin/tips");
 }
 
+// 제보 삭제 — 되돌릴 수 없다. 처리 이력은 감사로그에 남긴다.
+export async function deleteTip(id: string): Promise<void> {
+  await assertAdmin();
+  const supabase = createServiceClient();
+  await supabase.from("tips").delete().eq("id", id);
+  await logAdmin("delete_tip", { targetType: "tip", targetId: id });
+  revalidatePath("/admin/tips");
+}
+
 // --- 상권/업체 · 지역단체 승인 ---
 const ENTITY_TABLE: Record<ApprovalKind, string> = {
   business: "businesses",
