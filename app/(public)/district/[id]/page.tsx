@@ -5,6 +5,7 @@ import Thumb from "@/components/Thumb";
 import ReportSheet from "@/components/ReportSheet";
 import { getCurrentUser } from "@/lib/auth";
 import BusinessReviews from "@/components/district/BusinessReviews";
+import ShareButton from "@/components/ShareButton";
 import {
   getBusiness,
   getBusinessReviews,
@@ -170,7 +171,8 @@ export default async function StoreDetailPage({
         loggedIn={Boolean(user)}
       />
 
-      <div className="mt-6 flex justify-center">
+      <div className="mt-6 flex items-center justify-between gap-2">
+        <ShareButton title={store.name} text={store.intro} label="가게 공유" />
         <ReportSheet
           targetType="business"
           targetId={store.id}

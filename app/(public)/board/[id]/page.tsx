@@ -7,6 +7,7 @@ import PostOwnerControls from "@/components/community/PostOwnerControls";
 import BoardLike from "@/components/community/BoardLike";
 import { getCurrentUser } from "@/lib/auth";
 import { deleteBoardPost } from "@/lib/community-actions";
+import ShareButton from "@/components/ShareButton";
 import {
   getBoardPost,
   getBoardComments,
@@ -88,7 +89,8 @@ export default async function BoardDetailPage({
       />
       </div>
 
-      <div className="flex justify-end">
+      <div className="mt-4 flex items-center justify-between gap-2">
+        <ShareButton title={post.title} label="글 공유" />
         <ReportSheet
           targetType="board_post"
           targetId={post.id}

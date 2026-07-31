@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { can } from "@/lib/permissions";
 import { getOrg, ORG_CAT_NAME } from "@/lib/mock/orgs";
 import { getOrgBoardPosts } from "@/lib/mock/community";
+import ShareButton from "@/components/ShareButton";
 
 export async function generateMetadata({
   params,
@@ -159,7 +160,8 @@ export default async function OrgDetailPage({
         )}
       </section>
 
-      <div className="mt-6 flex justify-center">
+      <div className="mt-6 flex items-center justify-between gap-2">
+        <ShareButton title={org.name} text={org.intro} label="단체 공유" />
         <ReportSheet
           targetType="organization"
           targetId={org.id}

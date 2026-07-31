@@ -137,7 +137,8 @@ export default async function MePage() {
         {writeAllowed && (
           <MeLink href="/reporter" label="기자 공간" icon="✍️" />
         )}
-        <MeLink href="/market" label="내 나눔글" icon="🤝" />
+        {/* 나눔마켓을 다시 열 때 아래 한 줄을 되살리면 된다(하단 탭도 lib/nav.ts에서 함께).
+        <MeLink href="/market" label="내 나눔글" icon="🤝" /> */}
         <MeLink href="/board" label="내 게시글" icon="💬" />
         {!user.business && (
           <MeLink href="/district" label="업체 등록" icon="🏪" />

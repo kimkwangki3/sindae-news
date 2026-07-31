@@ -15,6 +15,7 @@ import {
 } from "@/lib/mock/articles";
 import { getComments } from "@/lib/mock/comments";
 import { getCurrentUser } from "@/lib/auth";
+import ShareButton from "@/components/ShareButton";
 
 export async function generateMetadata({
   params,
@@ -101,8 +102,13 @@ export default async function ArticleDetailPage({
         dislikeCount={article.dislikeCount}
       />
 
-      {/* 통합 신고 시트 */}
-      <div className="flex justify-end">
+      {/* 공유 + 통합 신고 시트 */}
+      <div className="mt-4 flex items-center justify-between gap-2">
+        <ShareButton
+          title={article.title}
+          text={article.subtitle ?? undefined}
+          label="기사 공유"
+        />
         <ReportSheet
           targetType="article"
           targetId={article.slug}
