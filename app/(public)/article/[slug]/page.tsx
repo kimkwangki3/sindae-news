@@ -7,6 +7,7 @@ import Comments from "@/components/article/Comments";
 import ReadTracker from "@/components/article/ReadTracker";
 import ReportSheet from "@/components/ReportSheet";
 import ArticleAiNotice from "@/components/ArticleAiNotice";
+import { MEDIA } from "@/lib/media";
 import {
   CATEGORY_NAME,
   getArticleBySlug,
@@ -21,7 +22,17 @@ export async function generateMetadata({
   params: { slug: string };
 }) {
   const a = await getArticleBySlug(params.slug);
-  return { title: a ? `${a.title} · 해룡신문` : "기사 · 해룡신문" };
+  if (!a) return { title: `기사 · ${MEDIA.name}` };
+
+  // 부제가 있으면 검색·카톡 공유 미리보기 설명으로 쓴다(없으면 본문 첫 문단).
+  const description = a.subtitle ?? a.body[0]?.slice(0, 150) ?? undefined;
+  const title = `${a.title} · ${MEDIA.name}`;
+  return {
+    title,
+    description,
+    openGraph: { title, description, type: "article" },
+    twitter: { card: "summary", title, description },
+  };
 }
 
 export default async function ArticleDetailPage({
@@ -48,6 +59,11 @@ export default async function ArticleDetailPage({
         <h1 className="mt-3 text-[22px] font-extrabold leading-snug">
           {article.title}
         </h1>
+        {article.subtitle && (
+          <p className="mt-2 border-l-[3px] border-rose-soft pl-3 text-[15px] leading-relaxed text-ink/80">
+            {article.subtitle}
+          </p>
+        )}
         {/* 신문법상 발행연월일은 인터넷신문의 경우 기사별 게재일자로 갈음한다 */}
         <p className="mt-2 text-xs text-muted">
           {article.author} · 입력 {article.publishedAt} · 조회{" "}

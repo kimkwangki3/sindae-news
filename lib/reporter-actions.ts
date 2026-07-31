@@ -49,6 +49,7 @@ export async function saveReporterArticle(
   const { error } = await supabase.from("articles").insert({
     slug,
     title,
+    subtitle: String(formData.get("subtitle") ?? "").trim() || null,
     category_id:
       CATEGORY_ID[categorySlug as keyof typeof CATEGORY_ID] ?? null,
     body: body || null,

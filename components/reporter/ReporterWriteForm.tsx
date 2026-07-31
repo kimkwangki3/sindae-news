@@ -58,6 +58,14 @@ export default function ReporterWriteForm({
         <input name="title" required placeholder="기사 제목" className={INPUT} />
       </Field>
 
+      <Field label="부제 (선택)">
+        <input
+          name="subtitle"
+          placeholder="주제목을 보완하는 한 줄. 상세 화면에만 표시됩니다"
+          className={INPUT}
+        />
+      </Field>
+
       <Field label="분류">
         <select name="category" className={INPUT}>
           {CATS.map(([v, l]) => (

@@ -45,6 +45,18 @@ export default function NewArticlePage({
           />
         </div>
 
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="subtitle" className="text-[13px] font-bold">
+            부제 (선택)
+          </label>
+          <input
+            id="subtitle"
+            name="subtitle"
+            placeholder="주제목을 보완하는 한 줄. 상세 화면에만 표시됩니다"
+            className="min-h-[48px] rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose"
+          />
+        </div>
+
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
             <label htmlFor="category" className="text-[13px] font-bold">

@@ -28,6 +28,7 @@ export interface MockArticle {
   slug: string;
   category: CategorySlug;
   title: string;
+  subtitle: string | null; // 부제 — 상세 화면에만 노출
   excerpt: string;
   body: string[]; // 문단 배열
   author: string;
@@ -115,7 +116,7 @@ export async function getArticleBySlug(
   const { data, error } = await supabase
     .from("articles")
     .select(
-      "id, slug, title, body, thumbnail_url, category_id, view_count, published_at, ai_text, ai_image, source_name, source_url, author:profiles(nickname)",
+      "id, slug, title, subtitle, body, thumbnail_url, category_id, view_count, published_at, ai_text, ai_image, source_name, source_url, author:profiles(nickname)",
     )
     .eq("slug", slug)
     .eq("status", "published")
@@ -127,6 +128,7 @@ export async function getArticleBySlug(
     id: string;
     slug: string;
     title: string;
+    subtitle: string | null;
     body: string | null;
     thumbnail_url: string | null;
     category_id: number | null;
@@ -161,6 +163,7 @@ export async function getArticleBySlug(
     slug: a.slug,
     category: cat,
     title: a.title,
+    subtitle: a.subtitle,
     excerpt: "",
     body: toParagraphs(a.body),
     author: a.author?.nickname ?? "편집부",
