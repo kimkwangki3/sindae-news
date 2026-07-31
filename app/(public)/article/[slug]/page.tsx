@@ -47,8 +47,10 @@ export default async function ArticleDetailPage({
         <h1 className="mt-3 text-[22px] font-extrabold leading-snug">
           {article.title}
         </h1>
+        {/* 신문법상 발행연월일은 인터넷신문의 경우 기사별 게재일자로 갈음한다 */}
         <p className="mt-2 text-xs text-muted">
-          {article.author} · {article.publishedAt} · 조회 {article.views.month}
+          {article.author} · 입력 {article.publishedAt} · 조회{" "}
+          {article.views.month}
         </p>
       </div>
 

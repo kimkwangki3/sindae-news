@@ -18,13 +18,15 @@ const gowunDodum = Gowun_Dodum({
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+// 제목·설명은 OG/트위터까지 동일 기조로 통일(검색 노출용).
+const TITLE = "해룡신문 — 순천시 해룡면 지역 인터넷신문";
 const DESCRIPTION =
-  "순천시 해룡면(신대·복성·선월지구) 이웃들의 소식을 전하는 인터넷 신문 · 운영사 DSBH";
+  "순천시 해룡면 신대·선월·복성지구 소식을 전하는 지역 인터넷신문. 지역 행정, 생활, 문화, 경제 소식을 가장 빠르게 전합니다.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "해룡신문 — 해룡면 이웃 소식",
+    default: TITLE,
     template: "%s",
   },
   description: DESCRIPTION,
@@ -35,10 +37,10 @@ export const metadata: Metadata = {
     siteName: "해룡신문",
     locale: "ko_KR",
     url: SITE_URL,
-    title: "해룡신문 — 해룡면 이웃 소식",
+    title: TITLE,
     description: DESCRIPTION,
   },
-  twitter: { card: "summary", title: "해룡신문", description: DESCRIPTION },
+  twitter: { card: "summary", title: TITLE, description: DESCRIPTION },
   robots: { index: true, follow: true },
 };
 

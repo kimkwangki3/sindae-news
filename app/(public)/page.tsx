@@ -74,6 +74,15 @@ export default async function HomePage() {
             <ArticleListItem key={a.slug} article={a} />
           ))}
         </section>
+
+        {/* 신문법 제21조 단서 — 청소년보호 정책·책임자는 첫 화면에 노출해야 한다 */}
+        <Link
+          href="/legal/youth"
+          className="flex min-h-[44px] items-center justify-between rounded-card border border-line bg-ivory-2 px-4 py-3 text-[12px] text-muted"
+        >
+          <span>청소년보호정책 · 청소년보호책임자 김광기</span>
+          <span aria-hidden>›</span>
+        </Link>
       </div>
     </>
   );

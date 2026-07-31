@@ -22,10 +22,13 @@ export default function Footer() {
         </Link>
       </nav>
 
+      {/* 신문법 제21조 필요적 게재사항 — 등록증 표기와 글자 그대로 일치시킬 것 */}
       <div className="mt-4 flex flex-col gap-0.5 leading-relaxed">
         <p className="font-bold text-ink">해룡신문</p>
-        <p>운영사 DSBH · 순천시 해룡면 인터넷 신문</p>
-        <p>발행인·편집인 ⚠️확인요망 · 청소년보호책임자 ⚠️확인요망</p>
+        <p>등록번호 전남광주,아00766 · 2026.07.27 등록 · 인터넷신문</p>
+        <p>발행소 순천시 오천4길 39 · 전화 010-3535-1221</p>
+        <p>발행인·편집인 김광기 · 청소년보호책임자 김광기</p>
+        <p>운영사 DSBH</p>
         <p className="mt-2 text-[11px]">
           © 2026 해룡신문. All rights reserved.
         </p>
