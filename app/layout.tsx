@@ -42,6 +42,14 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary", title: TITLE, description: DESCRIPTION },
   robots: { index: true, follow: true },
+  // 검색엔진 소유 확인용 메타 태그. 확인이 끝나도 지우면 안 된다
+  // (네이버·구글이 주기적으로 재확인하며, 사라지면 소유권이 해제된다).
+  verification: {
+    other: {
+      "naver-site-verification":
+        "96c63e5b46982a913875aab53bab2339e4d0bab5",
+    },
+  },
 };
 
 // 모바일 우선: 사용자 확대 허용, 색상 테마
