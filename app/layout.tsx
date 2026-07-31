@@ -31,7 +31,11 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   applicationName: "해룡신문",
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    // RSS 자동 발견용. 이게 있으면 크롤러·리더가 피드를 알아서 찾는다.
+    types: { "application/rss+xml": `${SITE_URL}/rss.xml` },
+  },
   openGraph: {
     type: "website",
     siteName: "해룡신문",
