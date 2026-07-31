@@ -33,6 +33,8 @@ export default async function OrgDetailPage({
     getOrgBoardPosts(org.id, page, 5),
   ]);
   const isStaff = can(user, "write_org_post", { orgId: org.id });
+  // 이 단체와의 관계. 이미 회원이거나 신청 대기 중이면 가입 버튼을 띄우지 않는다.
+  const membership = user?.orgs.find((o) => o.org_id === org.id) ?? null;
 
   return (
     <div className="px-[18px] pb-28">
@@ -180,7 +182,17 @@ export default async function OrgDetailPage({
             💬 카톡 문의
           </a>
         )}
-        {org.acceptJoin ? (
+        {/* 이미 회원이면 가입 버튼 대신 상태만 알린다. 반려된 경우는 다시 신청할 수 있게 둔다. */}
+        {membership?.status === "approved" ? (
+          <span className="flex min-h-[48px] flex-1 items-center justify-center rounded-element border border-line text-sm text-muted">
+            ✅ 가입된 단체
+            {membership.role !== "member" && " · 운영진"}
+          </span>
+        ) : membership?.status === "pending" ? (
+          <span className="flex min-h-[48px] flex-1 items-center justify-center rounded-element border border-line text-sm text-muted">
+            ⏳ 가입 승인 대기 중
+          </span>
+        ) : org.acceptJoin ? (
           <Link
             href={`/orgs/${org.id}/join`}
             className="flex min-h-[48px] flex-1 items-center justify-center rounded-element bg-rose-deep text-sm font-bold text-white"

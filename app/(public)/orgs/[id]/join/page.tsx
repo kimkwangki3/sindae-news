@@ -19,6 +19,12 @@ export default async function OrgJoinPage({
   const user = await getCurrentUser();
   if (!user) return <LoginRequired message="가입 신청은 로그인 후 가능합니다" />;
 
+  // 주소로 직접 들어오는 경우까지 막는다. 이미 회원이거나 대기 중이면 단체로 되돌린다.
+  const membership = user.orgs.find((o) => o.org_id === org.id);
+  if (membership && membership.status !== "rejected") {
+    redirect(`/orgs/${org.id}`);
+  }
+
   return (
     <div className="px-[18px] py-5">
       <div className="mb-1 flex items-center justify-between">
