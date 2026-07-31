@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./auth";
 import { canWriteArticle, articleStatusOnSubmit } from "./permissions";
 import { createClient } from "./supabase/server";
+import { notify } from "./telegram";
 import { CATEGORY_ID } from "./mock/articles-meta";
 
 export interface WriteState {
@@ -63,6 +64,16 @@ export async function saveReporterArticle(
     if (error.code === "23505")
       return { error: "이미 사용 중인 슬러그예요. 다른 값으로 바꿔주세요." };
     return { error: "저장에 실패했습니다." };
+  }
+
+  // 준기자 제출분만 관리자 승인이 필요 → 그때만 알린다(임시저장·정기자 발행은 제외).
+  if (status === "pending") {
+    await notify({
+      type: "article_pending",
+      title,
+      author: user.nickname ?? "익명",
+      slug,
+    });
   }
 
   revalidatePath("/reporter/articles");

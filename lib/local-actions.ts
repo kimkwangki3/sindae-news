@@ -6,6 +6,7 @@ import { getCurrentUser } from "./auth";
 import { can } from "./permissions";
 import { createClient } from "./supabase/server";
 import { parsePhotoUrls } from "./photos";
+import { notify } from "./telegram";
 
 async function requireUser() {
   const user = await getCurrentUser();
@@ -56,6 +57,13 @@ export async function registerBusiness(formData: FormData): Promise<void> {
         })),
       );
   }
+
+  await notify({
+    type: "business",
+    name,
+    category: String(formData.get("category") ?? "food"),
+    owner: user.nickname ?? "익명",
+  });
   redirect("/district");
 }
 
@@ -127,6 +135,13 @@ export async function registerOrg(formData: FormData): Promise<void> {
       .from("org_photos")
       .insert(photoUrls.map((url, sort) => ({ org_id: orgId, url, sort })));
   }
+
+  await notify({
+    type: "organization",
+    name,
+    category: String(formData.get("category") ?? "self"),
+    owner: user.nickname ?? "익명",
+  });
   redirect("/orgs");
 }
 

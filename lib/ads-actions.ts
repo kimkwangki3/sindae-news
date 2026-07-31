@@ -2,6 +2,7 @@
 
 import { createClient } from "./supabase/server";
 import { getCurrentUser } from "./auth";
+import { notify } from "./telegram";
 
 export interface AdRequestState {
   ok?: boolean;
@@ -47,5 +48,7 @@ export async function submitAdRequest(
     contact,
   });
   if (error) return { error: "신청에 실패했습니다. 잠시 후 다시 시도해 주세요." };
+
+  await notify({ type: "ad_request", advertiser, position, contact });
   return { ok: true };
 }

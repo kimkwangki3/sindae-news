@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./auth";
 import { createClient } from "./supabase/server";
 import { parsePhotoUrls } from "./photos";
+import { notify } from "./telegram";
 import { type PostComment } from "./mock/community";
 
 // timestamptz → "06.28 14:20"
@@ -352,5 +353,14 @@ export async function submitTip(
     reporter_id: user?.id ?? null,
   });
   if (error) return { error: "전송에 실패했습니다. 잠시 후 다시 시도해 주세요." };
+
+  await notify({
+    type: "tip",
+    title,
+    category,
+    body,
+    contact,
+    byMember: Boolean(user),
+  });
   return { ok: true };
 }

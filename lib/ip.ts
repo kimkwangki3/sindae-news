@@ -1,13 +1,17 @@
 import { headers } from "next/headers";
 import { createHash } from "crypto";
 
+// 요청자 IP 원문. 서약 동의·신고처럼 "누가 언제 동의/접수했나"를 남겨야 하는
+// 증빙 용도로만 쓴다. 통계·중복방지에는 getIpHash()를 쓸 것.
+export function getClientIp(): string {
+  const h = headers();
+  const fwd = h.get("x-forwarded-for") ?? "";
+  return fwd.split(",")[0].trim() || h.get("x-real-ip") || "0.0.0.0";
+}
+
 // 방문자 IP를 단방향 해시로. 좋아요/조회 중복 방지 키(개인정보 원문 미저장).
 // 운영 시 IP_HASH_SALT를 .env에 설정하면 레인보우/추적 저항이 올라감.
 export function getIpHash(): string {
-  const h = headers();
-  const fwd = h.get("x-forwarded-for") ?? "";
-  const ip =
-    fwd.split(",")[0].trim() || h.get("x-real-ip") || "0.0.0.0";
   const salt = process.env.IP_HASH_SALT ?? "haeryong-news";
-  return createHash("sha256").update(`${ip}:${salt}`).digest("hex");
+  return createHash("sha256").update(`${getClientIp()}:${salt}`).digest("hex");
 }
