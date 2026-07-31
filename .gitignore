@@ -29,3 +29,6 @@ next-env.d.ts
 
 # vercel
 .vercel
+
+# 작업용 명세 문서 — 저장소에 올리지 않음
+텔레그램봇_명세.md
