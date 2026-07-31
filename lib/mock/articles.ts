@@ -36,6 +36,10 @@ export interface MockArticle {
   likeCount: number;
   dislikeCount: number;
   thumbnailUrl: string | null;
+  aiText: boolean; // 본문을 AI로 작성·생성했는지
+  aiImage: boolean; // 대표 이미지를 AI로 생성했는지
+  sourceName: string | null; // 출처 기관 (보도자료 재구성 시)
+  sourceUrl: string | null; // 원문 링크
 }
 
 // timestamptz → "2026.06.25" (로케일 비의존)
@@ -111,7 +115,7 @@ export async function getArticleBySlug(
   const { data, error } = await supabase
     .from("articles")
     .select(
-      "id, slug, title, body, thumbnail_url, category_id, view_count, published_at, author:profiles(nickname)",
+      "id, slug, title, body, thumbnail_url, category_id, view_count, published_at, ai_text, ai_image, source_name, source_url, author:profiles(nickname)",
     )
     .eq("slug", slug)
     .eq("status", "published")
@@ -128,6 +132,10 @@ export async function getArticleBySlug(
     category_id: number | null;
     view_count: number | null;
     published_at: string | null;
+    ai_text: boolean | null;
+    ai_image: boolean | null;
+    source_name: string | null;
+    source_url: string | null;
     author?: { nickname?: string } | null;
   };
 
@@ -161,6 +169,10 @@ export async function getArticleBySlug(
     likeCount: likeCount ?? 0,
     dislikeCount: dislikeCount ?? 0,
     thumbnailUrl: a.thumbnail_url,
+    aiText: a.ai_text ?? false,
+    aiImage: a.ai_image ?? false,
+    sourceName: a.source_name,
+    sourceUrl: a.source_url,
   };
 }
 

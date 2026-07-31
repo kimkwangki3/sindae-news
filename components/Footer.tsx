@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LEGAL_LINKS } from "@/lib/legal";
+import { MEDIA } from "@/lib/media";
 
 // 공개 영역 공통 푸터: 매체 정보 + 법적 페이지 링크 + 광고 문의.
 export default function Footer() {
@@ -22,15 +23,22 @@ export default function Footer() {
         </Link>
       </nav>
 
-      {/* 신문법 제21조 필요적 게재사항 — 등록증 표기와 글자 그대로 일치시킬 것 */}
+      {/* 신문법 제21조 필요적 게재사항 — 값은 lib/media.ts 한 곳에서만 바꾼다 */}
       <div className="mt-4 flex flex-col gap-0.5 leading-relaxed">
-        <p className="font-bold text-ink">해룡신문</p>
-        <p>등록번호 전남광주,아00766 · 2026.07.27 등록 · 인터넷신문</p>
-        <p>발행소 순천시 오천4길 39 · 문의 ghkdtk85@gmail.com</p>
-        <p>발행인·편집인 김광기 · 청소년보호책임자 김광기</p>
-        <p>운영사 DSBH</p>
+        <p className="font-bold text-ink">{MEDIA.name}</p>
+        <p>
+          등록번호 {MEDIA.regNo} · {MEDIA.regDateShort} 등록 · {MEDIA.kind}
+        </p>
+        <p>
+          발행소 {MEDIA.addressShort} · 문의 {MEDIA.email}
+        </p>
+        <p>
+          발행인·편집인 {MEDIA.publisher} · 청소년보호책임자{" "}
+          {MEDIA.youthOfficer}
+        </p>
+        <p>운영사 {MEDIA.operator}</p>
         <p className="mt-2 text-[11px]">
-          © 2026 해룡신문. All rights reserved.
+          © 2026 {MEDIA.name}. All rights reserved.
         </p>
       </div>
     </footer>

@@ -67,6 +67,10 @@ export async function saveArticle(formData: FormData): Promise<void> {
     thumbnail_url: thumbnailUrl || null,
     author_id: user.id,
     status,
+    ai_text: formData.get("ai_text") === "on",
+    ai_image: formData.get("ai_image") === "on",
+    source_name: String(formData.get("source_name") ?? "").trim() || null,
+    source_url: String(formData.get("source_url") ?? "").trim() || null,
     published_at: status === "published" ? new Date().toISOString() : null,
   };
   const { error } = await supabase

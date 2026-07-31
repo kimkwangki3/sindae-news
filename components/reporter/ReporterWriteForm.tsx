@@ -5,6 +5,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { saveReporterArticle, type WriteState } from "@/lib/reporter-actions";
 import { CATEGORY_NAME } from "@/lib/mock/articles-meta";
 import ImageUpload from "@/components/ImageUpload";
+import ArticleAiFields from "@/components/ArticleAiFields";
 
 const INITIAL: WriteState = {};
 const INPUT =
@@ -91,6 +92,8 @@ export default function ReporterWriteForm({
         label="대표 이미지(선택)"
         hint="목록·상세 상단에 표시됩니다. 6MB 이하 권장."
       />
+
+      <ArticleAiFields />
 
       {/* 책임 서약 */}
       <label className="flex items-start gap-2.5 rounded-card border border-rose bg-rose-soft p-4 text-[13px] leading-relaxed">

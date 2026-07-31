@@ -6,6 +6,7 @@ import ReactionBar from "@/components/article/ReactionBar";
 import Comments from "@/components/article/Comments";
 import ReadTracker from "@/components/article/ReadTracker";
 import ReportSheet from "@/components/ReportSheet";
+import ArticleAiNotice from "@/components/ArticleAiNotice";
 import {
   CATEGORY_NAME,
   getArticleBySlug,
@@ -65,6 +66,13 @@ export default async function ArticleDetailPage({
           <p key={i}>{p}</p>
         ))}
       </div>
+
+      <ArticleAiNotice
+        aiText={article.aiText}
+        aiImage={article.aiImage}
+        sourceName={article.sourceName}
+        sourceUrl={article.sourceUrl}
+      />
 
       <AdSlot slot="article-mid" />
 

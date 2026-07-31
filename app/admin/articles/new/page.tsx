@@ -2,6 +2,7 @@ import Link from "next/link";
 import { saveArticle } from "@/lib/admin-actions";
 import { PageHead } from "@/components/admin/ui";
 import ImageUpload from "@/components/ImageUpload";
+import ArticleAiFields from "@/components/ArticleAiFields";
 import { CATEGORY_NAME, type CategorySlug } from "@/lib/mock/articles";
 
 export const metadata = { title: "기사 작성 · 관리자" };
@@ -94,6 +95,8 @@ export default function NewArticlePage({
           label="대표 이미지"
           hint="목록·상세 상단 썸네일. 6MB 이하 권장."
         />
+
+        <ArticleAiFields />
 
         {/* 발행 / 임시저장 — 같은 폼, status 값만 다름 */}
         <div className="mt-2 flex gap-3">

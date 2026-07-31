@@ -2,6 +2,8 @@
 // ⚠️ 발행인·편집인·발행소·명칭·홈페이지 주소가 바뀌면 변경등록 신고가 먼저다(미신고 발행 과태료).
 // 후속: 관리자 '법적 페이지' 관리에서 DB로 편집 가능하게 전환(db/legal-migration.sql 실행 필요).
 
+import { MEDIA } from "./media";
+
 export interface LegalSection {
   heading?: string;
   body: string[];
@@ -29,28 +31,28 @@ const DOCS: LegalDoc[] = [
         // 법 제21조 나열 순서 그대로 — 점검 시 대조가 쉽도록 순서를 지킨다.
         heading: "필요적 게재사항",
         body: [
-          "명칭: 해룡신문",
-          "등록번호: 전남광주,아00766",
+          `명칭: ${MEDIA.name}`,
+          `등록번호: ${MEDIA.regNo}`,
           // 등록증상 전화번호(010-3535-1221)는 유지되며, 대외 연락은 이메일로 받는다.
-          "발행소 연락처: ghkdtk85@gmail.com",
-          "등록연월일: 2026년 7월 27일",
-          "제호: 해룡신문",
-          "간별: 인터넷신문",
-          "발행인: 김광기",
-          "편집인: 김광기",
+          `발행소 연락처: ${MEDIA.email}`,
+          `등록연월일: ${MEDIA.regDate}`,
+          `제호: ${MEDIA.name}`,
+          `간별: ${MEDIA.kind}`,
+          `발행인: ${MEDIA.publisher}`,
+          `편집인: ${MEDIA.editor}`,
           // 등록증 주소 중 도로명까지만 노출(자택이라 동·호수는 생략). 등록증 원본은 변동 없음.
-          "발행소: (우)57998 전남광주통합특별시 순천시 오천4길 39",
+          `발행소: ${MEDIA.address}`,
           "발행연월일: 기사별 게재일자로 갈음 (각 기사 상단 표시)",
         ],
       },
       {
         heading: "매체 정보",
         body: [
-          "청소년보호책임자: 김광기",
-          "이메일: ghkdtk85@gmail.com",
-          "홈페이지: sdtime.net",
-          "보급지역: 전국 · 보급대상: 일반 · 무가",
-          "운영사: DSBH",
+          `청소년보호책임자: ${MEDIA.youthOfficer}`,
+          `이메일: ${MEDIA.email}`,
+          `홈페이지: ${MEDIA.homepage}`,
+          `보급지역: ${MEDIA.circulation} · 보급대상: ${MEDIA.audience} · ${MEDIA.price}`,
+          `운영사: ${MEDIA.operator}`,
         ],
       },
       {
@@ -69,7 +71,7 @@ const DOCS: LegalDoc[] = [
     sections: [
       {
         body: [
-          "해룡신문은 청소년이 유해 정보에 노출되지 않도록 「청소년 보호법」에 따라 청소년보호정책을 수립·시행합니다.",
+          `${MEDIA.name}은 청소년이 유해 정보에 노출되지 않도록 「청소년 보호법」에 따라 청소년보호정책을 수립·시행합니다.`,
         ],
       },
       {
@@ -87,8 +89,8 @@ const DOCS: LegalDoc[] = [
       {
         heading: "3. 청소년보호책임자",
         body: [
-          "청소년보호책임자: 김광기 (발행인 겸 편집인)",
-          "연락처: ghkdtk85@gmail.com",
+          `청소년보호책임자: ${MEDIA.youthOfficer} (발행인 겸 편집인)`,
+          `연락처: ${MEDIA.email}`,
         ],
       },
     ],
@@ -100,7 +102,7 @@ const DOCS: LegalDoc[] = [
     sections: [
       {
         body: [
-          "해룡신문과 소속·시민기자는 다음의 윤리강령을 준수하여 공정하고 책임 있는 보도를 실천합니다.",
+          `${MEDIA.name}과 소속·시민기자는 다음의 윤리강령을 준수하여 공정하고 책임 있는 보도를 실천합니다.`,
         ],
       },
       {
@@ -139,9 +141,9 @@ const DOCS: LegalDoc[] = [
         heading: "청구 방법",
         body: [
           "해당 보도가 있음을 안 날부터 3개월 이내(게재 후 6개월 이내)에 서면 또는 이메일로 청구할 수 있습니다.",
-          "청구 접수: ghkdtk85@gmail.com",
-          "담당: 편집인 김광기",
-          "접수 주소: (우)57998 전남광주통합특별시 순천시 오천4길 39",
+          `청구 접수: ${MEDIA.email}`,
+          `담당: 편집인 ${MEDIA.editor}`,
+          `접수 주소: ${MEDIA.address}`,
         ],
       },
       {
@@ -161,7 +163,7 @@ const DOCS: LegalDoc[] = [
     sections: [
       {
         body: [
-          "해룡신문(운영사 DSBH, 이하 ‘회사’)은 「개인정보 보호법」에 따라 이용자의 개인정보를 보호하고 관련 권익을 보장합니다.",
+          `${MEDIA.name}(운영사 ${MEDIA.operator}, 이하 ‘회사’)은 「개인정보 보호법」에 따라 이용자의 개인정보를 보호하고 관련 권익을 보장합니다.`,
         ],
       },
       {
@@ -187,8 +189,8 @@ const DOCS: LegalDoc[] = [
       {
         heading: "4. 개인정보 보호책임자",
         body: [
-          "개인정보 보호책임자: 김광기",
-          "연락처: ghkdtk85@gmail.com",
+          `개인정보 보호책임자: ${MEDIA.privacyOfficer}`,
+          `연락처: ${MEDIA.email}`,
         ],
       },
     ],
