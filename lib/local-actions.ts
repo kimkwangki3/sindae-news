@@ -203,7 +203,7 @@ export async function writeOrgPost(
       org_id: orgId,
       author_id: user.id,
       title,
-      category: String(formData.get("category") ?? "") || "동네소식",
+      category: String(formData.get("category") ?? "") || "local",
       body: String(formData.get("body") ?? "").trim() || null,
     })
     .select("id")

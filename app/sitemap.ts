@@ -4,6 +4,7 @@ import { getMarketPosts, getBoardPosts } from "@/lib/mock/community";
 import { getBusinesses } from "@/lib/mock/district";
 import { getOrgs } from "@/lib/mock/orgs";
 import { LEGAL_LINKS } from "@/lib/legal";
+import { FEATURES } from "@/lib/features";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -20,7 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/hot",
     "/district",
     "/orgs",
-    "/market",
+    ...(FEATURES.market ? ["/market"] : []),
     "/board",
     "/tips",
     "/recruit",
@@ -37,7 +38,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const articles = (articleRows ?? []).map((a) =>
     u(`/article/${(a as { slug: string }).slug}`),
   );
-  const market = (await getMarketPosts("all")).map((p) => u(`/market/${p.id}`));
+  // 내려둔 섹션은 색인되지 않게 사이트맵에서도 뺀다.
+  const market = FEATURES.market
+    ? (await getMarketPosts("all")).map((p) => u(`/market/${p.id}`))
+    : [];
   const board = (await getBoardPosts("all")).map((p) => u(`/board/${p.id}`));
   const district = (await getBusinesses("all")).map((b) =>
     u(`/district/${b.id}`),

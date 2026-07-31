@@ -9,7 +9,13 @@ import { getOrg } from "@/lib/mock/orgs";
 
 export const metadata = { title: "단체 소식 글쓰기 · 지역단체" };
 
-const POST_CATS = ["모집", "공지", "활동후기"];
+// 단체 소식은 게시판(board_posts)에 저장되므로 게시판 분류 코드를 그대로 쓴다.
+// 한글 라벨을 값으로 넣으면 게시판에서 분류 배지가 빈칸으로 나온다.
+const POST_CATS: { value: string; label: string }[] = [
+  { value: "local", label: "동네소식" },
+  { value: "notice", label: "공지" },
+  { value: "daily", label: "일상" },
+];
 
 export default async function OrgPostWritePage({
   params,
@@ -70,17 +76,17 @@ export default async function OrgPostWritePage({
           <div className="flex gap-2">
             {POST_CATS.map((c, idx) => (
               <label
-                key={c}
+                key={c.value}
                 className="min-h-[40px] flex-1 cursor-pointer rounded-element border border-line bg-white text-center text-sm leading-[40px] has-[:checked]:border-rose has-[:checked]:bg-rose has-[:checked]:text-white"
               >
                 <input
                   type="radio"
                   name="category"
-                  value={c}
+                  value={c.value}
                   defaultChecked={idx === 0}
                   className="sr-only"
                 />
-                {c}
+                {c.label}
               </label>
             ))}
           </div>

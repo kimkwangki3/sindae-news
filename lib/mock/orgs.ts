@@ -11,15 +11,6 @@ export const ORG_CAT_NAME: Record<OrgCategory, string> = {
   culture: "종교·문화",
 };
 
-export interface OrgPost {
-  id: string;
-  category: string;
-  title: string;
-  body: string;
-  createdAt: string;
-  photoUrls: string[];
-}
-
 export interface PendingMember {
   id: string;
   name: string;
@@ -48,7 +39,6 @@ export interface Organization {
   intro: string;
   photoCount: number;
   photos: string[];
-  posts: OrgPost[];
   pending: PendingMember[];
   members: OrgMember[];
 }
@@ -85,7 +75,6 @@ function toOrgSummary(r: Record<string, unknown>): Organization {
     intro: (r.intro as string) ?? "",
     photoCount: photos.length,
     photos,
-    posts: [],
     pending: [],
     members: [],
   };
@@ -118,44 +107,12 @@ export async function getOrg(id: string): Promise<Organization | null> {
 
   const base = toOrgSummary(data as Record<string, unknown>);
 
-  const [{ data: posts }, { data: mem }, { data: photos }] = await Promise.all([
-    supabase
-      .from("org_posts")
-      .select("id, title, category, body, created_at, photo_urls")
-      .eq("org_id", id)
-      .eq("visibility", "visible")
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("org_members")
-      .select("id, role, status, apply_name, neighborhood, motivation")
-      .eq("org_id", id),
-    supabase
-      .from("org_photos")
-      .select("url, sort")
-      .eq("org_id", id)
-      .order("sort", { ascending: true }),
-  ]);
-
-  base.photos = (photos ?? []).map((p) => (p as { url: string }).url);
-
-  base.posts = (posts ?? []).map((p) => {
-    const row = p as {
-      id: string;
-      title: string;
-      category: string | null;
-      body: string | null;
-      created_at: string;
-      photo_urls: string[] | null;
-    };
-    return {
-      id: row.id,
-      category: row.category ?? "공지",
-      title: row.title,
-      body: row.body ?? "",
-      createdAt: row.created_at.slice(0, 10).replace(/-/g, "."),
-      photoUrls: row.photo_urls ?? [],
-    };
-  });
+  // 사진은 LIST_COLS 임베드로 이미 채워져 있다.
+  // 단체 소식은 board_posts로 옮겨졌으므로 org_posts는 더 이상 읽지 않는다.
+  const { data: mem } = await supabase
+    .from("org_members")
+    .select("id, role, status, apply_name, neighborhood, motivation")
+    .eq("org_id", id);
 
   const members = (mem ?? []) as {
     id: number;

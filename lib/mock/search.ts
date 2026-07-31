@@ -5,6 +5,7 @@ import { getArticlesPage } from "@/lib/mock/articles";
 import { getMarketPosts, getBoardPosts } from "@/lib/mock/community";
 import { getBusinesses, BIZ_CAT_NAME } from "@/lib/mock/district";
 import { getOrgs, ORG_CAT_NAME } from "@/lib/mock/orgs";
+import { FEATURES } from "@/lib/features";
 
 export interface SearchHit {
   title: string;
@@ -28,7 +29,8 @@ export async function searchAll(query: string): Promise<SearchGroup[]> {
     .filter((a) => has(a.title))
     .map((a) => ({ title: a.title, sub: a.meta, href: `/article/${a.slug}` }));
 
-  const market = (await getMarketPosts("all"))
+  // 내려둔 섹션은 검색 결과로도 새어 나오지 않게 한다.
+  const market = (FEATURES.market ? await getMarketPosts("all") : [])
     .filter((p) => has(p.title) || has(p.body))
     .map((p) => ({
       title: p.title,

@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { logout } from "@/lib/auth-actions";
 import { canWriteArticle, REPORTER_LEVEL_LABEL } from "@/lib/permissions";
 import type { UserRole } from "@/lib/types";
+import { FEATURES } from "@/lib/features";
 
 export const metadata = { title: "마이페이지 · 해룡신문" };
 
@@ -137,8 +138,9 @@ export default async function MePage() {
         {writeAllowed && (
           <MeLink href="/reporter" label="기자 공간" icon="✍️" />
         )}
-        {/* 나눔마켓을 다시 열 때 아래 한 줄을 되살리면 된다(하단 탭도 lib/nav.ts에서 함께).
-        <MeLink href="/market" label="내 나눔글" icon="🤝" /> */}
+        {FEATURES.market && (
+          <MeLink href="/market" label="내 나눔글" icon="🤝" />
+        )}
         <MeLink href="/board" label="내 게시글" icon="💬" />
         {!user.business && (
           <MeLink href="/district" label="업체 등록" icon="🏪" />
