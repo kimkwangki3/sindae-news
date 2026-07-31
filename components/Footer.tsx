@@ -23,20 +23,14 @@ export default function Footer() {
         </Link>
       </nav>
 
-      {/* 신문법 제21조 필요적 게재사항 — 값은 lib/media.ts 한 곳에서만 바꾼다 */}
+      {/* 발행소·연락처·발행인·운영사는 발행인 판단으로 푸터에서 제외(2026-07-31).
+          필요적 게재사항 전체는 /legal/publisher에, 청소년보호책임자는 홈 하단에
+          그대로 게재돼 있다. 값은 lib/media.ts 한 곳에서만 바꾼다. */}
       <div className="mt-4 flex flex-col gap-0.5 leading-relaxed">
         <p className="font-bold text-ink">{MEDIA.name}</p>
         <p>
           등록번호 {MEDIA.regNo} · {MEDIA.regDateShort} 등록 · {MEDIA.kind}
         </p>
-        <p>
-          발행소 {MEDIA.addressShort} · 문의 {MEDIA.email}
-        </p>
-        <p>
-          발행인·편집인 {MEDIA.publisher} · 청소년보호책임자{" "}
-          {MEDIA.youthOfficer}
-        </p>
-        <p>운영사 {MEDIA.operator}</p>
         <p className="mt-2 text-[11px]">
           © 2026 {MEDIA.name}. All rights reserved.
         </p>
