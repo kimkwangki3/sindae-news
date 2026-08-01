@@ -30,9 +30,3 @@ export interface ArticlesPage {
   nextCursor: number | null;
 }
 
-export type HotPeriod = "day" | "week" | "month";
-
-export interface HotItem extends ArticleSummary {
-  rank: number;
-  views: number;
-}
