@@ -1,0 +1,13 @@
+{
+  "name": "haeryong-automation",
+  "private": true,
+  "type": "module",
+  "description": "해룡신문 기사 초안 자동 생성 — GitHub Actions에서 실행. 웹앱과 의존성을 분리해 Vercel 빌드에 영향을 주지 않는다.",
+  "scripts": {
+    "draft": "node draft.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
+    "@supabase/supabase-js": "^2.45.4"
+  }
+}

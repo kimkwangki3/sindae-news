@@ -1,0 +1,40 @@
+name: 기사 초안 자동 생성
+
+# 매일 한국시각 06:00(= UTC 21:00 전날)에 초안을 만들어 텔레그램으로 보낸다.
+# 발행인이 승인 버튼을 눌러야 기사가 게재되므로, 이 작업만으로는 아무것도 공개되지 않는다.
+# GitHub Actions에서 돌기 때문에 개인 컴퓨터가 꺼져 있어도 실행된다.
+on:
+  schedule:
+    - cron: "0 21 * * *"
+  workflow_dispatch: # 수동 실행(테스트용)
+
+# 같은 시각에 두 번 돌아 초안이 중복되는 일을 막는다.
+concurrency:
+  group: daily-drafts
+  cancel-in-progress: false
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 의존성 설치
+        working-directory: automation
+        run: npm install --no-audit --no-fund
+
+      - name: 초안 생성
+        working-directory: automation
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DRAFT_COUNT: "3"
+        run: node draft.mjs

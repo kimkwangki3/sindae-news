@@ -1,5 +1,5 @@
-# dependencies
-/node_modules
+# dependencies (automation/ 등 하위 폴더도 포함)
+node_modules/
 /.pnp
 .pnp.js
 
