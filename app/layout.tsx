@@ -23,6 +23,16 @@ const TITLE = "해룡신문 — 순천시 해룡면 지역 인터넷신문";
 const DESCRIPTION =
   "순천시 해룡면 신대·선월·복성지구 소식을 전하는 지역 인터넷신문. 지역 행정, 생활, 문화, 경제 소식을 가장 빠르게 전합니다.";
 
+// 카카오톡·페이스북 등에 링크를 붙였을 때 뜨는 미리보기 그림.
+// 1200x630 은 각 서비스가 가로형 큰 카드로 잡아주는 표준 규격이다.
+// 개별 기사에 대표 이미지가 없으면 이 그림이 대신 쓰인다.
+const OG_IMAGE = {
+  url: "/og-image.png",
+  width: 1200,
+  height: 630,
+  alt: "해룡신문 — 순천시 해룡면 지역 인터넷신문",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -43,8 +53,16 @@ export const metadata: Metadata = {
     url: SITE_URL,
     title: TITLE,
     description: DESCRIPTION,
+    images: [OG_IMAGE],
   },
-  twitter: { card: "summary", title: TITLE, description: DESCRIPTION },
+  // summary_large_image 로 올린다. 카카오톡·트위터에서 작은 정사각 썸네일이
+  // 아니라 가로로 넓은 카드로 보인다 — 1200x630 은 그 규격이다.
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [OG_IMAGE.url],
+  },
   robots: { index: true, follow: true },
   // 검색엔진 소유 확인용 메타 태그. 확인이 끝나도 지우면 안 된다
   // (네이버·구글이 주기적으로 재확인하며, 사라지면 소유권이 해제된다).

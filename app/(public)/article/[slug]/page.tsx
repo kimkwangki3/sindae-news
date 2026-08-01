@@ -39,11 +39,24 @@ export async function generateMetadata({
   // 부제가 있으면 검색·카톡 공유 미리보기 설명으로 쓴다(없으면 본문 첫 문단).
   const description = a.subtitle ?? a.body[0]?.slice(0, 150) ?? undefined;
   const title = `${a.title} · ${MEDIA.name}`;
+
+  // 페이지가 openGraph를 정의하면 상위(layout)의 것을 통째로 대체한다.
+  // 그래서 여기서 이미지를 직접 넣지 않으면 기사를 공유했을 때 그림이 빠진다.
+  // 대표 이미지가 있으면 그걸, 없으면 신문 기본 이미지를 쓴다.
+  const image = a.thumbnailUrl ?? "/og-image.png";
+
   return {
     title,
     description,
-    openGraph: { title, description, type: "article" },
-    twitter: { card: "summary", title, description },
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      images: [image],
+      publishedTime: a.publishedAtIso ?? undefined,
+      modifiedTime: a.updatedAtIso ?? undefined,
+    },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
   };
 }
 
