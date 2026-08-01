@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Thumb from "@/components/Thumb";
+import AdSlot from "@/components/AdSlot";
 import { getOrgs, ORG_CAT_NAME, type OrgCategory } from "@/lib/mock/orgs";
 
 export const metadata = { title: "지역단체 · 해룡신문" };
@@ -43,6 +44,10 @@ export default async function OrgsPage({
             </Link>
           );
         })}
+      </div>
+
+      <div className="px-[18px]">
+        <AdSlot slot="orgs-top" />
       </div>
 
       <div className="flex items-center justify-between px-[18px]">

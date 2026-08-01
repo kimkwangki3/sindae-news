@@ -142,7 +142,7 @@ export default async function ArticleDetailPage({
         sourceUrl={article.sourceUrl}
       />
 
-      <AdSlot slot="article-mid" />
+      <AdSlot slot="article-mid" placeholder />
 
       <ReactionBar
         slug={article.slug}
@@ -181,6 +181,7 @@ export default async function ArticleDetailPage({
           ))}
         </section>
       )}
+      <AdSlot slot="article-bottom" />
     </article>
   );
 }

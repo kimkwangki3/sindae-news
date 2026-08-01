@@ -60,7 +60,7 @@ export default async function DistrictPage({
       </div>
 
       <div className="px-[18px] pb-6 pt-3">
-        <AdSlot slot="district-top" />
+        <AdSlot slot="district-top" placeholder />
 
         <ul className="flex flex-col gap-3">
           {stores.map((s) => (

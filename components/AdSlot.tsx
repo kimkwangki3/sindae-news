@@ -1,26 +1,33 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getAd, SLOT_LABEL, type AdSlotKey } from "@/lib/mock/ads";
+import { getAd, type AdSlotKey } from "@/lib/mock/ads";
 
-// 광고 슬롯: 활성 배너가 있으면 배너 렌더, 없으면 '광고 문의' 자리표시.
-// variant="infeed"는 나눔마켓 목록 사이에 끼우는 가로형 카드.
+// 광고 슬롯: 활성 배너가 있으면 배너를 그리고, 없으면 아무것도 그리지 않는다.
+//
+// placeholder를 켠 자리에서만 '광고 문의' 점선 박스를 보여준다. 자리를 열 개
+// 두고 전부 자리표시를 띄우면 빈 박스만 가득한 사이트가 된다 — 광고가 팔리기
+// 전까지는 오히려 신뢰를 깎는다. 문의 유도는 눈에 잘 띄는 몇 곳이면 충분하다.
+//
+// variant="infeed"는 목록 사이에 끼우는 가로형 카드.
 export default async function AdSlot({
   slot,
   variant = "banner",
+  placeholder = false,
 }: {
   slot: AdSlotKey;
   variant?: "banner" | "infeed";
+  placeholder?: boolean;
 }) {
   const ad = await getAd(slot);
 
   if (!ad) {
-    // 미판매 슬롯 — 광고 신청 유도 자리표시
+    if (!placeholder) return null;
     return (
       <Link
         href="/ads/apply"
         className="my-5 flex h-[90px] items-center justify-center rounded-card border border-dashed border-rose bg-ivory-2 text-xs text-muted"
       >
-        {SLOT_LABEL[slot]} · 광고 문의 ›
+        이 자리에 우리 가게를 · 광고 문의 ›
       </Link>
     );
   }

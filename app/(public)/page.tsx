@@ -60,23 +60,27 @@ export default async function HomePage() {
           </section>
         )}
 
-        <AdSlot slot="home-top" />
+        <AdSlot slot="home-top" placeholder />
 
-        {/* 지역소식 */}
+        {/* 해룡소식 */}
         <section>
-          <SectionTitle title="지역소식" href="/articles/local" />
+          <SectionTitle title="해룡소식" href="/articles/local" />
           {localNews.map((a) => (
             <ArticleListItem key={a.slug} article={a} />
           ))}
         </section>
 
-        {/* 인물 */}
+        <AdSlot slot="home-mid" />
+
+        {/* 해룡인물 */}
         <section>
-          <SectionTitle title="인물" href="/articles/people" />
+          <SectionTitle title="해룡인물" href="/articles/people" />
           {people.map((a) => (
             <ArticleListItem key={a.slug} article={a} />
           ))}
         </section>
+
+        <AdSlot slot="home-bottom" />
 
         {/* 신문법 제21조 단서 — 청소년보호 정책·책임자는 첫 화면에 노출해야 한다 */}
         <Link

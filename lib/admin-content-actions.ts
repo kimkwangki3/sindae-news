@@ -281,12 +281,18 @@ export async function saveInfoPage(formData: FormData): Promise<void> {
     throw new Error("내용을 채운 뒤에 공개할 수 있습니다.");
   }
 
+  // 이미지를 새로 올리지 않았으면 기존 것을 유지한다. 빈 값으로 덮으면
+  // 글자만 고치려던 사람이 이미지를 날리게 된다.
+  const uploaded = String(formData.get("image_url") ?? "").trim();
+  const image = uploaded ? { image_url: uploaded } : {};
+
   await createServiceClient()
     .from("info_pages")
     .update({
       title: String(formData.get("title") ?? "").trim(),
       summary: String(formData.get("summary") ?? "").trim() || null,
       body,
+      ...image,
       source_name: String(formData.get("source_name") ?? "").trim() || null,
       source_url: String(formData.get("source_url") ?? "").trim() || null,
       is_published: published,

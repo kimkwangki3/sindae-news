@@ -1,10 +1,19 @@
 // Phase 6 광고 슬롯(목). 후속: ad_slots/ads 테이블로 교체(슬롯별 활성 배너 1건 조회).
 // 자동 광고(애드핏/애드센스)는 별도 스크립트 영역, 여기선 수동 배너 슬롯만 모델링.
 
+// 광고를 넣을 수 있는 자리. DB ad_slots.key 와 짝이며 하이픈↔언더스코어만 다르다.
+// 자리를 늘려도 팔린 것만 보인다 — 빈 자리는 아무것도 그리지 않는다.
 export type AdSlotKey =
   | "home-top"
+  | "home-mid"
+  | "home-bottom"
+  | "articles-top"
   | "article-mid"
+  | "article-bottom"
+  | "board-top"
   | "district-top"
+  | "orgs-top"
+  | "info-bottom"
   | "market-infeed";
 
 export interface Ad {
@@ -13,13 +22,6 @@ export interface Ad {
   href: string;
   imageUrl: string | null;
 }
-
-export const SLOT_LABEL: Record<AdSlotKey, string> = {
-  "home-top": "홈 상단 배너",
-  "article-mid": "기사 중간 배너",
-  "district-top": "상권 상단 배너",
-  "market-infeed": "나눔마켓 인피드",
-};
 
 import { createClient } from "@/lib/supabase/server";
 

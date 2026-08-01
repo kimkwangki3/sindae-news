@@ -1,6 +1,7 @@
 import { getAllInfoPages, fmtUpdated } from "@/lib/info";
 import { saveInfoPage } from "@/lib/admin-content-actions";
 import { PageHead } from "@/components/admin/ui";
+import ImageUpload from "@/components/ImageUpload";
 
 export const metadata = { title: "생활정보 · 관리자" };
 
@@ -56,6 +57,22 @@ export default async function AdminInfoPage() {
               placeholder={`${p.title} 내용을 입력하세요. 빈 줄로 문단을 나눕니다.`}
               className="w-full resize-y rounded-element border border-line p-3 text-sm leading-relaxed outline-none focus:border-rose"
             />
+
+            {/* 요일표 같은 정리 이미지는 단톡방에서 계속 돌아다닌다.
+                본문 맨 위에 표시되며 잘리지 않는다. */}
+            <div className="mt-3">
+              <ImageUpload
+                name="image_url"
+                bucket="board"
+                label="대표 이미지 (선택)"
+                hint="요일표처럼 한 장으로 정리된 그림을 넣으면 공유하기 좋습니다."
+              />
+              {p.imageUrl && (
+                <p className="mt-1 text-[11px] text-muted">
+                  현재 이미지가 등록돼 있습니다. 새로 올리면 교체됩니다.
+                </p>
+              )}
+            </div>
 
             <div className="mt-2 flex flex-col gap-2 sm:flex-row">
               <input

@@ -1,7 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getInfoPage, fmtUpdated } from "@/lib/info";
 import ShareButton from "@/components/ShareButton";
+import AdSlot from "@/components/AdSlot";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +50,22 @@ export default async function InfoDetailPage({
         </p>
       )}
 
+      {/* 요일표처럼 한 장으로 정리된 그림은 글보다 훨씬 잘 퍼진다.
+          본문보다 먼저 보이게 맨 위에 둔다.
+          object-contain 인 이유: 표를 잘라내면 안 된다. 공용 Thumb 은
+          object-cover 라 가장자리가 잘려 여기에는 쓸 수 없다. */}
+      {page.imageUrl && (
+        <div className="relative mt-4 aspect-[4/3] overflow-hidden rounded-card border border-line bg-ivory-2">
+          <Image
+            src={page.imageUrl}
+            alt={`${page.title} 안내 이미지`}
+            fill
+            sizes="(max-width: 768px) 100vw, 768px"
+            className="object-contain"
+          />
+        </div>
+      )}
+
       <div className="mt-5 flex flex-col gap-3">
         {paras.map((p, i) => (
           <p
@@ -92,6 +110,8 @@ export default async function InfoDetailPage({
           로 알려주시면 바로잡겠습니다.
         </p>
       </div>
+
+      <AdSlot slot="info-bottom" />
 
       <div className="mt-4">
         <ShareButton title={page.title} text={page.summary ?? undefined} label="공유하기" />

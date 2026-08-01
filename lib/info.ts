@@ -11,6 +11,7 @@ export interface InfoPage {
   summary: string | null;
   icon: string | null;
   body: string | null;
+  imageUrl: string | null;
   sourceName: string | null;
   sourceUrl: string | null;
   autoUpdated: boolean;
@@ -18,8 +19,11 @@ export interface InfoPage {
   updatedAt: string;
 }
 
-const COLS =
-  "slug, title, summary, icon, body, source_name, source_url, auto_updated, is_published, updated_at";
+// 컬럼을 하나씩 적지 않고 * 를 쓴다. 컬럼을 새로 추가할 때 마이그레이션과
+// 배포 순서가 어긋나면(코드가 먼저 나가면) 없는 컬럼을 골라 조회가 통째로
+// 실패하고 생활정보가 사이트에서 사라진다. 공개 테이블이라 * 로 받아도
+// 민감한 값이 새지 않는다.
+const COLS = "*";
 
 interface Row {
   slug: string;
@@ -27,6 +31,7 @@ interface Row {
   summary: string | null;
   icon: string | null;
   body: string | null;
+  image_url?: string | null;
   source_name: string | null;
   source_url: string | null;
   auto_updated: boolean;
@@ -41,6 +46,7 @@ function toPage(r: Row): InfoPage {
     summary: r.summary,
     icon: r.icon,
     body: r.body,
+    imageUrl: r.image_url ?? null,
     sourceName: r.source_name,
     sourceUrl: r.source_url,
     autoUpdated: r.auto_updated,
