@@ -20,9 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node 20에는 전역 WebSocket이 없어 supabase-js가 클라이언트를 만들 때
+      # 실시간 기능 초기화에서 죽는다(우리는 실시간을 안 쓰지만 초기화는 일어난다).
+      # 22부터 표준으로 들어왔다.
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: 의존성 설치
         working-directory: automation
