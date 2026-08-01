@@ -1,4 +1,5 @@
 import Link from "next/link";
+import InfoBoardCard from "@/components/InfoBoardCard";
 import {
   getBoardPosts,
   BOARD_CAT_NAME,
@@ -38,6 +39,10 @@ export default async function BoardPage({
 
   return (
     <div>
+      {/* 생활정보는 게시판 맨 위에 고정으로 노출한다(발행인 요청).
+          공개된 항목이 없으면 아무것도 그리지 않는다. */}
+      <InfoBoardCard />
+
       <div className="no-scrollbar flex gap-2 overflow-x-auto px-[18px] py-3">
         {CHIPS.map((c) => {
           const active = c.key === cat;

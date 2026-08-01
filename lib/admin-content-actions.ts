@@ -268,3 +268,35 @@ export async function saveLegalPage(formData: FormData): Promise<void> {
   revalidatePath("/admin/legal");
   revalidatePath(`/legal/${slug}`);
 }
+
+// 생활정보 저장. 내용을 채운 뒤 '공개'를 켜야 독자에게 보인다 —
+// 빈 페이지가 노출되지 않게 하려는 것이다.
+export async function saveInfoPage(formData: FormData): Promise<void> {
+  await assertAdmin();
+  const slug = String(formData.get("slug") ?? "").trim();
+  if (!slug) throw new Error("slug 누락");
+  const body = String(formData.get("body") ?? "");
+  const published = formData.get("is_published") === "on";
+  if (published && body.trim().length < 10) {
+    throw new Error("내용을 채운 뒤에 공개할 수 있습니다.");
+  }
+
+  await createServiceClient()
+    .from("info_pages")
+    .update({
+      title: String(formData.get("title") ?? "").trim(),
+      summary: String(formData.get("summary") ?? "").trim() || null,
+      body,
+      source_name: String(formData.get("source_name") ?? "").trim() || null,
+      source_url: String(formData.get("source_url") ?? "").trim() || null,
+      is_published: published,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("slug", slug);
+
+  await logAdmin("save_info_page", { targetType: "info", targetId: slug });
+  revalidatePath("/admin/info");
+  revalidatePath("/info");
+  revalidatePath(`/info/${slug}`);
+  revalidatePath("/board");
+}

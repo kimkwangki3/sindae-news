@@ -6,6 +6,7 @@ import { getOrgs } from "@/lib/mock/orgs";
 import { LEGAL_LINKS } from "@/lib/legal";
 import { FEATURES } from "@/lib/features";
 import { STAFF } from "@/lib/staff";
+import { getInfoPages } from "@/lib/info";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -23,12 +24,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/orgs",
     ...(FEATURES.market ? ["/market"] : []),
     "/board",
+    "/info",
     "/tips",
     "/recruit",
     "/search",
     "/reporters",
     "/ads/apply",
   ];
+
+  const info = (await getInfoPages()).map((p) => u(`/info/${p.slug}`));
 
   const { data: articleRows } = await createAnonClient()
     .from("articles")
@@ -60,5 +64,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...district,
     ...orgs,
     ...legal,
+    ...info,
   ].map((url) => ({ url }));
 }
