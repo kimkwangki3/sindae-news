@@ -12,7 +12,8 @@ export const runtime = "edge";
 export const preferredRegion = ["icn1"];
 export const dynamic = "force-dynamic";
 
-const ALLOWED_HOST = "www.suncheon.go.kr";
+// 순천시청 도메인만. www 와 m 두 호스트를 쓴다(게시판에 따라 다르다).
+const ALLOWED_HOSTS = ["www.suncheon.go.kr", "m.suncheon.go.kr"];
 
 // 엣지 함수는 25초 안에 응답을 시작해야 한다. 그보다 앞서 끊는다.
 const UPSTREAM_TIMEOUT_MS = 20000;
@@ -43,7 +44,7 @@ export async function GET(req: Request): Promise<Response> {
   } catch {
     return fail("url 형식이 올바르지 않습니다", 400);
   }
-  if (parsed.hostname !== ALLOWED_HOST) {
+  if (!ALLOWED_HOSTS.includes(parsed.hostname)) {
     return fail(`중계할 수 없는 도메인입니다: ${parsed.hostname}`, 403);
   }
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {

@@ -12,17 +12,14 @@ const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
   "(KHTML, like Gecko) Chrome/131.0 Safari/537.36 (haeryongnews-bot; +https://www.sdtime.net)";
 
+// m. 호스트를 쓴다. www 쪽 보도자료(0006)는 https로 요청해도 http로 302를 주는데
+// 그 http 응답이 간헐적으로 끊긴다(시청 서버 문제). m. 은 같은 내용을 https로
+// 리다이렉트 없이 내려준다. 내용·HTML 구조는 www와 동일하다.
+const HOST = "https://m.suncheon.go.kr";
+
 export const SOURCES = [
-  {
-    key: "press",
-    name: "순천시청 보도자료",
-    list: "https://www.suncheon.go.kr/kr/news/0006/0001/",
-  },
-  {
-    key: "notice",
-    name: "순천시청 새소식",
-    list: "https://www.suncheon.go.kr/kr/news/0001/0001/",
-  },
+  { key: "press", name: "순천시청 보도자료", list: `${HOST}/kr/news/0006/0001/` },
+  { key: "notice", name: "순천시청 새소식", list: `${HOST}/kr/news/0001/0001/` },
 ];
 
 // 보도 대상 지역. 앞쪽일수록 우선순위가 높다(운영매뉴얼 4절).
