@@ -174,6 +174,16 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
+  // 카카오톡 채널 '소식'은 API가 없어 손으로 올려야 한다(카카오 공식 답변).
+  // 그래서 붙여넣기만 하면 되게 문구를 미리 만들어 둔다. 텔레그램의 <pre>는
+  // 폰에서 눌러 한 번에 복사된다.
+  const post = [...(d.subtitle ? [d.title, d.subtitle] : [d.title]), "", url];
+  parts.push(
+    "",
+    "🗨 <b>카카오톡 채널 소식용</b> — 눌러서 복사",
+    `<pre>${esc(post.join("\n"))}</pre>`,
+  );
+
   await answerCallback(cq.id, "게재했습니다.");
   if (messageId) {
     await settleDraftMessage(messageId, parts.join("\n"));
