@@ -1,0 +1,47 @@
+name: 보안 점검
+
+# 매일 한국시각 07:00(= UTC 22:00 전날). 초안이 오는 시각 직후라
+# 텔레그램을 볼 때 함께 확인하게 된다.
+#
+# 이상이 없으면 조용하고, 문제가 있으면 텔레그램으로 바로 알린다.
+# 월요일에는 이상이 없어도 한 번 보내 점검이 살아 있음을 알린다
+# (조용한 점검은 멈춰 있어도 알아차리지 못한다).
+on:
+  schedule:
+    - cron: "0 22 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: security-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: 의존성 설치
+        working-directory: automation
+        run: npm install --no-audit --no-fund
+
+      - name: 월요일 여부 확인
+        id: day
+        run: |
+          if [ "$(date -u +%u)" = "1" ]; then echo "loud=--loud" >> "$GITHUB_OUTPUT";
+          else echo "loud=" >> "$GITHUB_OUTPUT"; fi
+
+      - name: 점검 실행
+        working-directory: automation
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node security-audit.mjs ${{ steps.day.outputs.loud }}
