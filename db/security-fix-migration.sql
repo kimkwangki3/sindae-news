@@ -18,8 +18,13 @@
 
 -- service_role(서버 전용 키)로 들어오는 요청은 관리자 작업이므로 통과시킨다.
 -- 관리자 화면·텔레그램 발행·시드 스크립트가 전부 이 경로다.
+--
+-- current_user 로 판별하므로 이 함수를 부르는 트리거에 security definer 를
+-- 붙이면 안 된다(그 안에서는 소유자 이름으로 바뀐다). JWT 클레임도 함께 보아
+-- 키 형식이 달라져도 판별이 되게 한다.
 create or replace function is_service_role() returns boolean as $$
-  select current_user = 'service_role';
+  select current_user = 'service_role'
+      or coalesce(current_setting('request.jwt.claim.role', true), '') = 'service_role';
 $$ language sql stable;
 
 -- 로그인한 사람의 기자 등급. profiles는 컬럼 단위로 권한이 잠겨 있어
@@ -61,7 +66,10 @@ begin
 
   return new;
 end;
-$$ language plpgsql security definer;
+-- ⚠️ security definer 를 붙이면 안 된다. 그 안에서는 current_user 가 호출자가
+--    아니라 함수 소유자(postgres)로 바뀌어 is_service_role() 이 항상 거짓이 되고,
+--    관리자 작업까지 막힌다. 권한이 필요한 조회는 아래 두 함수가 대신한다.
+$$ language plpgsql;
 
 drop trigger if exists trg_guard_article_write on articles;
 create trigger trg_guard_article_write
@@ -86,7 +94,10 @@ begin
 
   return new;
 end;
-$$ language plpgsql security definer;
+-- ⚠️ security definer 를 붙이면 안 된다. 그 안에서는 current_user 가 호출자가
+--    아니라 함수 소유자(postgres)로 바뀌어 is_service_role() 이 항상 거짓이 되고,
+--    관리자 작업까지 막힌다. 권한이 필요한 조회는 아래 두 함수가 대신한다.
+$$ language plpgsql;
 
 drop trigger if exists trg_guard_business_status on businesses;
 create trigger trg_guard_business_status
