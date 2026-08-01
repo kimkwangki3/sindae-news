@@ -29,22 +29,22 @@ const config: Config = {
         serif: ["var(--font-gowun-batang)", "serif"], // 헤드라인
         sans: ["var(--font-gowun-dodum)", "var(--font-gowun-batang)", "sans-serif"], // 본문
       },
-      // 글자가 작다는 피드백 — Tailwind 기본 스케일을 단계별로 약 2px(0.125rem)씩
+      // 글자가 작다는 피드백 — Tailwind 기본 스케일을 단계별로 약 3px(0.1875rem)씩
       // 키웠다. 여백(spacing)은 그대로 두고 text-* 크기만 올려 레이아웃은 유지한다.
       fontSize: {
-        xs: ["0.875rem", { lineHeight: "1.125rem" }], // 12 → 14px
-        sm: ["1rem", { lineHeight: "1.375rem" }], // 14 → 16px
-        base: ["1.125rem", { lineHeight: "1.625rem" }], // 16 → 18px
-        lg: ["1.25rem", { lineHeight: "1.875rem" }], // 18 → 20px
-        xl: ["1.375rem", { lineHeight: "1.875rem" }], // 20 → 22px
-        "2xl": ["1.625rem", { lineHeight: "2.125rem" }], // 24 → 26px
-        "3xl": ["2rem", { lineHeight: "2.375rem" }], // 30 → 32px
-        "4xl": ["2.375rem", { lineHeight: "2.625rem" }], // 36 → 38px
-        "5xl": ["3.125rem", { lineHeight: "1" }], // 48 → 50px
-        "6xl": ["3.875rem", { lineHeight: "1" }], // 60 → 62px
-        "7xl": ["4.625rem", { lineHeight: "1" }], // 72 → 74px
-        "8xl": ["6.125rem", { lineHeight: "1" }], // 96 → 98px
-        "9xl": ["8.125rem", { lineHeight: "1" }], // 128 → 130px
+        xs: ["0.9375rem", { lineHeight: "1.1875rem" }], // 12 → 15px
+        sm: ["1.0625rem", { lineHeight: "1.4375rem" }], // 14 → 17px
+        base: ["1.1875rem", { lineHeight: "1.6875rem" }], // 16 → 19px
+        lg: ["1.3125rem", { lineHeight: "1.9375rem" }], // 18 → 21px
+        xl: ["1.4375rem", { lineHeight: "1.9375rem" }], // 20 → 23px
+        "2xl": ["1.6875rem", { lineHeight: "2.1875rem" }], // 24 → 27px
+        "3xl": ["2.0625rem", { lineHeight: "2.4375rem" }], // 30 → 33px
+        "4xl": ["2.4375rem", { lineHeight: "2.6875rem" }], // 36 → 39px
+        "5xl": ["3.1875rem", { lineHeight: "1" }], // 48 → 51px
+        "6xl": ["3.9375rem", { lineHeight: "1" }], // 60 → 63px
+        "7xl": ["4.6875rem", { lineHeight: "1" }], // 72 → 75px
+        "8xl": ["6.1875rem", { lineHeight: "1" }], // 96 → 99px
+        "9xl": ["8.1875rem", { lineHeight: "1" }], // 128 → 131px
       },
       borderRadius: {
         card: "18px", // 카드/큰 요소
