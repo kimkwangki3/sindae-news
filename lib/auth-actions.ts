@@ -89,5 +89,7 @@ export async function setNickname(
     return { error: "저장 중 문제가 발생했어요. 다시 시도해 주세요." };
   }
 
-  redirect("/me");
+  // 가입이 막 끝난 이 순간이 카카오톡 채널 추가를 권하기 가장 좋은 자리다.
+  // /welcome 에서 안내한 뒤 /me 로 보낸다.
+  redirect("/welcome");
 }
