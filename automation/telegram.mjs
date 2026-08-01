@@ -39,10 +39,11 @@ async function call(method, body) {
   }
 }
 
+// lib/mock/articles-meta.ts 의 CATEGORY_NAME 과 같은 값을 유지한다.
 const CATEGORY_NAME = {
-  local: "지역소식",
+  local: "해룡소식",
   admin: "행정",
-  people: "인물",
+  people: "해룡인물",
   life: "생활",
 };
 

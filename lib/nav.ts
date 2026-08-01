@@ -25,12 +25,13 @@ export interface CategoryLink {
   label: string;
 }
 
-// 상단 카테고리 바 (홈 + 핫소식 + 기사 카테고리). 지역단체는 하단 탭으로 분리됨.
+// 상단 카테고리 바 (홈 + 기사 카테고리). 지역단체는 하단 탭으로 분리됨.
+// 핫소식은 발행인 판단으로 상단에서 내렸다(2026-08-01). /hot 페이지 자체는
+// 남아 있어 기존 링크는 그대로 열린다.
 export const CATEGORY_LINKS: CategoryLink[] = [
   { href: "/", label: "홈" },
-  { href: "/hot", label: "🔥핫소식" },
-  { href: "/articles/local", label: "지역소식" },
+  { href: "/articles/local", label: "해룡소식" },
+  { href: "/articles/people", label: "해룡인물" },
   { href: "/articles/admin", label: "행정" },
-  { href: "/articles/people", label: "인물" },
   { href: "/articles/life", label: "생활" },
 ];

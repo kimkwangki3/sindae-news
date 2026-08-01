@@ -3,7 +3,9 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./auth";
-import { createClient } from "./supabase/server";
+import { createClient, createServiceClient } from "./supabase/server";
+import { getIpHash } from "./ip";
+import { TIP_DAILY_LIMIT } from "./tips";
 import { parsePhotoUrls } from "./photos";
 import { notify } from "./telegram";
 import { type PostComment } from "./mock/community";
@@ -11,6 +13,15 @@ import { type PostComment } from "./mock/community";
 // timestamptz → "06.28 14:20"
 function fmtShort(ts: string): string {
   return `${ts.slice(5, 10).replace("-", ".")} ${ts.slice(11, 16)}`;
+}
+
+// '오늘'은 한국 자정 기준. 서버는 UTC라 그냥 24시간 전으로 잡으면
+// 밤에 보낸 제보가 다음 날까지 발목을 잡는다.
+function startOfTodayKst(): string {
+  const now = new Date();
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  kst.setUTCHours(0, 0, 0, 0);
+  return new Date(kst.getTime() - 9 * 60 * 60 * 1000).toISOString();
 }
 
 // 사진 테이블(market_photos/board_photos)에 URL 행 삽입(정렬순).
@@ -334,23 +345,48 @@ export async function submitTip(
   _prev: TipState,
   formData: FormData,
 ): Promise<TipState> {
+  // 카카오 로그인을 한 사람만 제보할 수 있다. 발행인이 제보자에게 사실관계를
+  // 되물을 수 있어야 하고, 익명 제보는 남용을 막을 방법이 없다.
+  const user = await getCurrentUser();
+  if (!user) return { error: "제보하려면 카카오 로그인이 필요합니다." };
+  if (user.is_suspended) return { error: "정지된 계정은 제보할 수 없습니다." };
+
   const title = String(formData.get("title") ?? "").trim();
   const category = String(formData.get("category") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
   const contact = String(formData.get("contact") ?? "").trim();
   if (title.length < 2) return { error: "제목을 입력해 주세요." };
   if (body.length < 5) return { error: "내용을 조금 더 자세히 적어주세요." };
+  if (contact.length < 5)
+    return { error: "연락받으실 전화번호나 이메일을 적어주세요. 확인 연락에 씁니다." };
 
-  const user = await getCurrentUser();
+  // 하루 제출 제한. 제보 목록은 관리자만 읽을 수 있으므로 세는 일은
+  // service_role로 한다(회원이 직접 세어볼 수는 없어야 한다).
+  const ipHash = getIpHash();
+  const since = startOfTodayKst();
+  const admin = createServiceClient();
+  const [byIp, byUser] = await Promise.all([
+    admin.from("tips").select("id", { count: "exact", head: true })
+      .eq("ip_hash", ipHash).gte("created_at", since),
+    admin.from("tips").select("id", { count: "exact", head: true })
+      .eq("reporter_id", user.id).gte("created_at", since),
+  ]);
+  if ((byUser.count ?? 0) >= TIP_DAILY_LIMIT || (byIp.count ?? 0) >= TIP_DAILY_LIMIT) {
+    return {
+      error: `제보는 하루 ${TIP_DAILY_LIMIT}건까지 보내실 수 있습니다. 내일 다시 시도해 주세요.`,
+    };
+  }
+
   const photoUrls = parsePhotoUrls(formData.get("photo_urls"), 3);
   const supabase = createClient();
   const { error } = await supabase.from("tips").insert({
     title,
     category: category || null,
     body,
-    contact: contact || null,
+    contact,
     photo_urls: photoUrls.length ? photoUrls : null,
-    reporter_id: user?.id ?? null,
+    reporter_id: user.id,
+    ip_hash: ipHash,
   });
   if (error) return { error: "전송에 실패했습니다. 잠시 후 다시 시도해 주세요." };
 
@@ -360,7 +396,7 @@ export async function submitTip(
     category,
     body,
     contact,
-    byMember: Boolean(user),
+    byMember: true,
   });
   return { ok: true };
 }

@@ -2,6 +2,7 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import { submitTip, type TipState } from "@/lib/community-actions";
+import { TIP_DAILY_LIMIT } from "@/lib/tips";
 import ImageUpload from "@/components/ImageUpload";
 
 const INITIAL: TipState = {};
@@ -79,9 +80,12 @@ export default function TipForm() {
         max={3}
       />
 
-      <Field label="연락처 (선택)">
+      {/* 사실관계를 되물으려면 연락이 닿아야 한다. 확인 못 한 제보는 기사가
+          되지 못하므로 필수로 받는다. */}
+      <Field label="연락처">
         <input
           name="contact"
+          required
           placeholder="회신받을 휴대폰 또는 이메일"
           className="min-h-[48px] w-full rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose"
         />
@@ -93,7 +97,8 @@ export default function TipForm() {
       {/* 제보 내용을 기사에 쓸 수 있다는 사실은 약관에만 묻어두지 않고
           보내는 자리에서 알린다. */}
       <p className="text-center text-[11px] leading-relaxed text-muted">
-        제보는 로그인 없이도 보낼 수 있어요.
+        확인을 위해 편집국에서 연락드릴 수 있습니다. 제보는 하루 {TIP_DAILY_LIMIT}
+        건까지 보내실 수 있어요.
         <br />
         보내주신 내용과 사진은 기사에 쓰일 수 있습니다. 이름을 밝히길 원하지
         않으시면 내용에 적어 주세요.

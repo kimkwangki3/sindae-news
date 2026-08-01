@@ -68,7 +68,8 @@ const SCHEMA = {
       type: "string",
       enum: ["local", "admin", "people", "life"],
       description:
-        "local=지역소식, admin=시·면 행정, people=인물, life=생활정보(모집·행사·복지)",
+        "local=해룡소식(동네 사건·사업·변화), admin=행정(시·면의 정책과 집행), " +
+        "people=해룡인물(사람 이야기), life=생활(모집·행사·복지 등 생활정보)",
     },
     scope: {
       type: "string",

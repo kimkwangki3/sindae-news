@@ -5,9 +5,9 @@ import type { ArticleSummary } from "@/components/ArticleListItem";
 export type CategorySlug = "local" | "admin" | "people" | "life";
 
 export const CATEGORY_NAME: Record<CategorySlug, string> = {
-  local: "지역소식",
+  local: "해룡소식",
   admin: "행정",
-  people: "인물",
+  people: "해룡인물",
   life: "생활",
 };
 
