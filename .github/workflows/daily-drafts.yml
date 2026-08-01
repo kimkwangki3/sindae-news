@@ -39,5 +39,9 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # 순천시청은 해외 IP에 응답하지 않는다. 서울 리전에서 도는
+          # 우리 사이트의 중계 경로를 거쳐 읽는다.
+          RELAY_URL: https://www.sdtime.net/api/relay
+          RELAY_SECRET: ${{ secrets.TELEGRAM_WEBHOOK_SECRET }}
           DRAFT_COUNT: "3"
         run: node draft.mjs

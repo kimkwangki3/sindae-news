@@ -96,10 +96,28 @@ function request(url, { timeout = 20000, hops = 5 } = {}) {
   });
 }
 
+// 해외에서 실행될 때(GitHub Actions)는 시청 서버가 응답하지 않는다.
+// 그럴 땐 서울에서 도는 우리 사이트의 /api/relay 를 거쳐 읽는다.
+const RELAY_URL = process.env.RELAY_URL;
+const RELAY_SECRET = process.env.RELAY_SECRET;
+
+async function viaRelay(url) {
+  const res = await fetch(`${RELAY_URL}?url=${encodeURIComponent(url)}`, {
+    headers: { "x-relay-secret": RELAY_SECRET },
+    signal: AbortSignal.timeout(60000),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(`중계 ${res.status} ${detail.slice(0, 120)}`);
+  }
+  return res.text();
+}
+
 async function get(url, { retries = 1 } = {}) {
+  const fetchOnce = RELAY_URL && RELAY_SECRET ? viaRelay : request;
   for (let attempt = 0; ; attempt++) {
     try {
-      return await request(url);
+      return await fetchOnce(url);
     } catch (e) {
       if (attempt >= retries) throw new Error(`${e.message} — ${url}`);
       await new Promise((r) => setTimeout(r, 2000));
