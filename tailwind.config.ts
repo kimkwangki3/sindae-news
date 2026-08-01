@@ -29,6 +29,23 @@ const config: Config = {
         serif: ["var(--font-gowun-batang)", "serif"], // 헤드라인
         sans: ["var(--font-gowun-dodum)", "var(--font-gowun-batang)", "sans-serif"], // 본문
       },
+      // 글자가 작다는 피드백 — Tailwind 기본 스케일을 단계별로 약 2px(0.125rem)씩
+      // 키웠다. 여백(spacing)은 그대로 두고 text-* 크기만 올려 레이아웃은 유지한다.
+      fontSize: {
+        xs: ["0.875rem", { lineHeight: "1.125rem" }], // 12 → 14px
+        sm: ["1rem", { lineHeight: "1.375rem" }], // 14 → 16px
+        base: ["1.125rem", { lineHeight: "1.625rem" }], // 16 → 18px
+        lg: ["1.25rem", { lineHeight: "1.875rem" }], // 18 → 20px
+        xl: ["1.375rem", { lineHeight: "1.875rem" }], // 20 → 22px
+        "2xl": ["1.625rem", { lineHeight: "2.125rem" }], // 24 → 26px
+        "3xl": ["2rem", { lineHeight: "2.375rem" }], // 30 → 32px
+        "4xl": ["2.375rem", { lineHeight: "2.625rem" }], // 36 → 38px
+        "5xl": ["3.125rem", { lineHeight: "1" }], // 48 → 50px
+        "6xl": ["3.875rem", { lineHeight: "1" }], // 60 → 62px
+        "7xl": ["4.625rem", { lineHeight: "1" }], // 72 → 74px
+        "8xl": ["6.125rem", { lineHeight: "1" }], // 96 → 98px
+        "9xl": ["8.125rem", { lineHeight: "1" }], // 128 → 130px
+      },
       borderRadius: {
         card: "18px", // 카드/큰 요소
         element: "12px", // 작은 요소
