@@ -16,7 +16,7 @@ export default async function AdminLegalPage() {
         title="법적 페이지"
         sub="발행인·연락처 등 사실 정보를 입력·수정하세요"
       />
-      <p className="mb-4 rounded-card border border-line bg-white p-3 text-[15px] leading-relaxed text-muted">
+      <p className="mb-4 rounded-card border border-line bg-white p-3 text-[17px] leading-relaxed text-muted">
         본문은 빈 줄로 문단을 구분합니다. 저장하면 공개 페이지(/legal/…)에 즉시
         반영됩니다. (legal_pages 마이그레이션 실행 필요)
       </p>
@@ -34,7 +34,7 @@ export default async function AdminLegalPage() {
               <div className="mb-2 flex items-center justify-between">
                 <h2 className="text-sm font-bold text-rose-deep">{p.title}</h2>
                 {cur?.updatedAt && (
-                  <span className="text-[14px] text-muted">
+                  <span className="text-[16px] text-muted">
                     수정 {cur.updatedAt}
                   </span>
                 )}

@@ -66,16 +66,16 @@ export default function BusinessReviews({
   return (
     <section className="mt-6">
       <div className="flex items-baseline gap-2">
-        <h2 className="text-[19px] font-bold">리뷰</h2>
+        <h2 className="text-[21px] font-bold">리뷰</h2>
         {count > 0 && (
-          <span className="text-[16px] text-muted">
+          <span className="text-[18px] text-muted">
             <Stars value={average} /> {average.toFixed(1)} · {count}개
           </span>
         )}
       </div>
 
       {!loggedIn && (
-        <div className="mt-3 rounded-card border border-line bg-white p-4 text-center text-[16px] text-muted">
+        <div className="mt-3 rounded-card border border-line bg-white p-4 text-center text-[18px] text-muted">
           <Link href="/login" className="font-bold text-rose-deep underline">
             로그인
           </Link>
@@ -88,7 +88,7 @@ export default function BusinessReviews({
           action={formAction}
           className="mt-3 rounded-card border border-line bg-white p-4"
         >
-          <p className="text-[16px] font-bold">
+          <p className="text-[18px] font-bold">
             {mine ? "리뷰 수정" : "이 가게 어떠셨나요?"}
           </p>
 
@@ -141,14 +141,14 @@ export default function BusinessReviews({
         {reviews.map((r) => (
           <li key={r.id} className="rounded-card border border-line bg-white p-4">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[16px] font-bold">{r.author}</span>
-              <span className="text-[14px] text-muted">{r.createdAt}</span>
+              <span className="text-[18px] font-bold">{r.author}</span>
+              <span className="text-[16px] text-muted">{r.createdAt}</span>
             </div>
-            <p className="mt-1 text-[16px]">
+            <p className="mt-1 text-[18px]">
               <Stars value={r.rating} /> {r.rating}
             </p>
             {r.body && (
-              <p className="mt-1.5 whitespace-pre-line text-[17px] leading-relaxed">
+              <p className="mt-1.5 whitespace-pre-line text-[19px] leading-relaxed">
                 {r.body}
               </p>
             )}
@@ -176,7 +176,7 @@ export default function BusinessReviews({
           </li>
         ))}
         {count === 0 && (
-          <li className="py-6 text-center text-[16px] text-muted">
+          <li className="py-6 text-center text-[18px] text-muted">
             아직 리뷰가 없습니다. 첫 리뷰를 남겨보세요.
           </li>
         )}

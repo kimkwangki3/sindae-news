@@ -60,32 +60,32 @@ export default async function MarketDetailPage({
       )}
 
       <div className="mt-3 flex items-center gap-1.5">
-        <span className="rounded-full bg-tag-org-bg px-2 py-0.5 text-[14px] font-bold text-tag-org-fg">
+        <span className="rounded-full bg-tag-org-bg px-2 py-0.5 text-[16px] font-bold text-tag-org-fg">
           {MARKET_CAT_NAME[post.category]}
         </span>
         {post.pinned && (
-          <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[14px] font-bold text-rose">
+          <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[16px] font-bold text-rose">
             📌 고정
           </span>
         )}
       </div>
 
-      <h1 className="mt-2 text-[24px] font-extrabold leading-snug">
+      <h1 className="mt-2 text-[26px] font-extrabold leading-snug">
         {post.title}
       </h1>
 
       <div className="mt-3 flex items-center gap-2.5 border-b border-line pb-4">
         <div className="h-9 w-9 flex-shrink-0 rounded-full bg-rose" />
-        <div className="text-[16px]">
+        <div className="text-[18px]">
           <p className="font-bold">{post.author}</p>
-          <p className="text-[14px] text-muted">
+          <p className="text-[16px] text-muted">
             {post.neighborhood} · {post.createdAt}
           </p>
         </div>
-        <span className="ml-auto text-[16px] text-muted">🤍 {post.likeCount}</span>
+        <span className="ml-auto text-[18px] text-muted">🤍 {post.likeCount}</span>
       </div>
 
-      <p className="mt-4 whitespace-pre-line text-[18px] leading-[1.85]">
+      <p className="mt-4 whitespace-pre-line text-[20px] leading-[1.85]">
         {post.body}
       </p>
 

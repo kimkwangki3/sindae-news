@@ -61,7 +61,7 @@ export default function ShareButton({
       aria-live="polite"
       className={
         className ||
-        "flex min-h-[44px] items-center gap-1.5 rounded-element border border-line bg-white px-4 text-[16px] font-bold text-ink"
+        "flex min-h-[44px] items-center gap-1.5 rounded-element border border-line bg-white px-4 text-[18px] font-bold text-ink"
       }
     >
       {copied ? "🔗 링크 복사됨" : failed ? "복사 실패" : `🔗 ${label}`}

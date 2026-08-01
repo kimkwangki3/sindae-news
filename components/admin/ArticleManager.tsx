@@ -135,12 +135,12 @@ export default function ArticleManager({
           >
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold">{a.title}</p>
-              <p className="mt-0.5 text-[14px] text-muted">
+              <p className="mt-0.5 text-[16px] text-muted">
                 {a.category} · {a.date ?? "임시저장"}
                 {a.views !== null && ` · 조회 ${a.views.toLocaleString()}`}
               </p>
               {a.status === "pending" && (
-                <p className="mt-0.5 text-[14px] text-muted">
+                <p className="mt-0.5 text-[16px] text-muted">
                   기자 {a.author}
                   {a.reporterLevel && ` (${LEVEL_LABEL[a.reporterLevel]})`} ·{" "}
                   {a.pledged ? "✅ 서약" : "⚠️ 서약없음"}

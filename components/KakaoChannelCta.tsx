@@ -11,7 +11,7 @@ export default function KakaoChannelCta() {
   return (
     <section className="mt-8 rounded-card border border-line bg-ivory-2 p-4">
       <p className="text-sm font-bold text-ink">카카오톡 채널</p>
-      <p className="mt-1 text-[16px] leading-relaxed text-muted">
+      <p className="mt-1 text-[18px] leading-relaxed text-muted">
         채널을 추가하시면 {MEDIA.name} 소식을 카카오톡에서 보실 수 있습니다.
       </p>
       <a

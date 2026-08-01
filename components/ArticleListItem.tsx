@@ -17,13 +17,13 @@ export default function ArticleListItem({ article }: { article: ArticleSummary }
       className="flex gap-3.5 border-t border-line py-3.5"
     >
       <div className="min-w-0 flex-1">
-        <span className="text-[14px] font-bold text-rose">
+        <span className="text-[16px] font-bold text-rose">
           {article.category}
         </span>
         <h4 className="mt-1 line-clamp-2 text-base font-bold leading-snug">
           {article.title}
         </h4>
-        <p className="mt-2 text-[14px] text-muted">{article.meta}</p>
+        <p className="mt-2 text-[16px] text-muted">{article.meta}</p>
       </div>
       <Thumb
         src={article.thumbnailUrl}

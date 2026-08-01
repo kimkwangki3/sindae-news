@@ -61,12 +61,12 @@ export default async function OrgDetailPage({
       )}
 
       <div className="mt-3">
-        <span className="rounded-full bg-tag-org-bg px-2.5 py-1 text-[14px] font-bold text-tag-org-fg">
+        <span className="rounded-full bg-tag-org-bg px-2.5 py-1 text-[16px] font-bold text-tag-org-fg">
           {ORG_CAT_NAME[org.category]}
         </span>
       </div>
-      <h1 className="mt-2 text-[25px] font-extrabold">{org.name}</h1>
-      <p className="mt-1 text-[16px] text-muted">
+      <h1 className="mt-2 text-[27px] font-extrabold">{org.name}</h1>
+      <p className="mt-1 text-[18px] text-muted">
         회원 {org.memberCount}명 · {org.neighborhood} · {org.since}~
       </p>
 
@@ -97,7 +97,7 @@ export default async function OrgDetailPage({
 
       <section className="mt-6">
         <h2 className="mb-2 text-base text-rose-deep">단체 소개</h2>
-        <p className="whitespace-pre-line text-[18px] leading-[1.85]">
+        <p className="whitespace-pre-line text-[20px] leading-[1.85]">
           {org.intro}
         </p>
       </section>
@@ -107,12 +107,12 @@ export default async function OrgDetailPage({
         <div className="mb-2 flex items-baseline justify-between">
           <h2 className="text-base text-rose-deep">단체 소식</h2>
           {news.total > 0 && (
-            <span className="text-[14px] text-muted">전체 {news.total}건</span>
+            <span className="text-[16px] text-muted">전체 {news.total}건</span>
           )}
         </div>
 
         {news.items.length === 0 ? (
-          <p className="rounded-card border border-line bg-white p-5 text-center text-[16px] text-muted">
+          <p className="rounded-card border border-line bg-white p-5 text-center text-[18px] text-muted">
             아직 올라온 소식이 없습니다
           </p>
         ) : (
@@ -123,15 +123,15 @@ export default async function OrgDetailPage({
                   href={`/board/${n.id}`}
                   className="flex min-h-[52px] items-center gap-2 px-4 py-3"
                 >
-                  <span className="min-w-0 flex-1 truncate text-[17px]">
+                  <span className="min-w-0 flex-1 truncate text-[19px]">
                     {n.title}
                   </span>
                   {n.commentCount > 0 && (
-                    <span className="text-[14px] text-rose">
+                    <span className="text-[16px] text-rose">
                       💬 {n.commentCount}
                     </span>
                   )}
-                  <span className="text-[14px] text-muted">{n.createdAt}</span>
+                  <span className="text-[16px] text-muted">{n.createdAt}</span>
                 </Link>
               </li>
             ))}

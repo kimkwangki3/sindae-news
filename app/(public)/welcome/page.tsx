@@ -18,8 +18,8 @@ export default async function WelcomePage() {
 
   return (
     <main className="px-[18px] py-10">
-      <p className="text-[16px] font-bold text-rose">가입을 마쳤습니다</p>
-      <h1 className="mt-2 font-serif text-[29px] leading-snug text-ink">
+      <p className="text-[18px] font-bold text-rose">가입을 마쳤습니다</p>
+      <h1 className="mt-2 font-serif text-[31px] leading-snug text-ink">
         {user.nickname ?? "이웃"}님, 반갑습니다
       </h1>
       <p className="mt-3 text-sm leading-relaxed text-muted">
@@ -27,10 +27,10 @@ export default async function WelcomePage() {
       </p>
 
       <section className="mt-8 rounded-card border border-line bg-ivory-2 p-5">
-        <p className="text-[18px] font-bold text-ink">
+        <p className="text-[20px] font-bold text-ink">
           카카오톡 채널도 추가해 두세요
         </p>
-        <p className="mt-2 text-[16px] leading-relaxed text-muted">
+        <p className="mt-2 text-[18px] leading-relaxed text-muted">
           {MEDIA.name} 소식을 카카오톡에서도 보실 수 있습니다. 한 번만
           누르시면 됩니다.
         </p>
@@ -38,7 +38,7 @@ export default async function WelcomePage() {
           href={MEDIA.kakaoChannelAdd}
           target="_blank"
           rel="noreferrer"
-          className="mt-4 flex min-h-[52px] items-center justify-center rounded-element bg-[#FEE500] text-[18px] font-bold text-[#191600]"
+          className="mt-4 flex min-h-[52px] items-center justify-center rounded-element bg-[#FEE500] text-[20px] font-bold text-[#191600]"
         >
           카카오톡 채널 추가하기
         </a>

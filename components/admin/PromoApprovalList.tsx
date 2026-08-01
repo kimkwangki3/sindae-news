@@ -34,7 +34,7 @@ export default function PromoApprovalList({
           >
             <div className="min-w-0">
               <p className="truncate text-sm font-bold">{r.title}</p>
-              <p className="mt-0.5 text-[14px] text-muted">
+              <p className="mt-0.5 text-[16px] text-muted">
                 {r.business} · {r.createdAt}
               </p>
             </div>

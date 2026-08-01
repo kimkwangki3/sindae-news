@@ -42,7 +42,7 @@ export default function TipManager({ initial }: { initial: AdminTipRow[] }) {
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-1.5">
                 {t.category && (
-                  <span className="text-[14px] text-muted">{t.category}</span>
+                  <span className="text-[16px] text-muted">{t.category}</span>
                 )}
                 <span className="text-sm font-bold">{t.title}</span>
               </div>
@@ -58,10 +58,10 @@ export default function TipManager({ initial }: { initial: AdminTipRow[] }) {
                 {STATUS_LABEL[t.status]}
               </Pill>
             </div>
-            <p className="mt-1.5 whitespace-pre-line text-[16px] leading-relaxed text-ink">
+            <p className="mt-1.5 whitespace-pre-line text-[18px] leading-relaxed text-ink">
               {t.body}
             </p>
-            <p className="mt-1.5 text-[14px] text-muted">
+            <p className="mt-1.5 text-[16px] text-muted">
               제보자 {t.reporter} · 연락처 {t.contact} · {t.createdAt}
             </p>
 

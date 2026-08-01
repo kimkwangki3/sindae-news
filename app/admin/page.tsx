@@ -52,7 +52,7 @@ export default async function AdminDashboard() {
                 className="flex items-center gap-1.5 rounded-element border border-line px-3 py-2 text-sm"
               >
                 {q.label}
-                <span className="rounded-full bg-rose px-1.5 text-[13px] font-bold text-white">
+                <span className="rounded-full bg-rose px-1.5 text-[15px] font-bold text-white">
                   {counts[q.key]}
                 </span>
               </Link>
@@ -129,7 +129,7 @@ function Popular({
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold">{r.title}</p>
-              <p className="text-[14px] text-muted">{r.sub}</p>
+              <p className="text-[16px] text-muted">{r.sub}</p>
             </div>
           </li>
         ))}

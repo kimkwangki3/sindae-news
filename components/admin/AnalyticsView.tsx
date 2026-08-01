@@ -24,7 +24,7 @@ function downloadCsv(filename: string, rows: ContentStatRow[]) {
 function StatTable({ rows }: { rows: ContentStatRow[] }) {
   return (
     <ul className="overflow-hidden rounded-card border border-line bg-white">
-      <li className="flex gap-2 border-b border-line bg-ivory-2 px-3 py-2 text-[14px] font-bold text-muted">
+      <li className="flex gap-2 border-b border-line bg-ivory-2 px-3 py-2 text-[16px] font-bold text-muted">
         <span className="flex-1">제목</span>
         <span className="w-12 text-right">조회</span>
         <span className="w-10 text-right">댓글</span>
@@ -36,7 +36,7 @@ function StatTable({ rows }: { rows: ContentStatRow[] }) {
           className="flex items-center gap-2 border-t border-line px-3 py-2.5 text-sm first:border-t-0"
         >
           <span className="min-w-0 flex-1 truncate">
-            <span className="mr-1 text-[13px] text-muted">{r.category}</span>
+            <span className="mr-1 text-[15px] text-muted">{r.category}</span>
             {r.title}
           </span>
           <span className="w-12 text-right font-bold">{r.views}</span>
@@ -92,7 +92,7 @@ export default function AnalyticsView({
             className="rounded-card border border-line bg-white p-3"
           >
             <p className="text-sm font-bold">{c.category}</p>
-            <p className="mt-0.5 text-[14px] text-muted">
+            <p className="mt-0.5 text-[16px] text-muted">
               {c.count}건 · 조회 {c.views.toLocaleString()}
             </p>
           </div>

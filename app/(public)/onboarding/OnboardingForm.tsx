@@ -12,7 +12,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="mt-6 min-h-[52px] w-full rounded-element bg-rose-deep text-[18px] font-bold text-white disabled:opacity-50"
+      className="mt-6 min-h-[52px] w-full rounded-element bg-rose-deep text-[20px] font-bold text-white disabled:opacity-50"
     >
       {pending ? "저장 중…" : "시작하기"}
     </button>
@@ -28,7 +28,7 @@ export default function OnboardingForm({
 
   return (
     <form action={action} className="mt-7 flex flex-col">
-      <label htmlFor="nickname" className="text-[16px] font-bold text-ink">
+      <label htmlFor="nickname" className="text-[18px] font-bold text-ink">
         닉네임 <span className="text-rose">*</span>
       </label>
       <input
@@ -46,10 +46,10 @@ export default function OnboardingForm({
       {/* 거주 지역은 필수 — 보급 대상 지역 파악과 동네 소식 전달의 기준이다.
           자유 입력이면 표기가 제각각이라 집계가 안 돼 선택지로 받는다. */}
       <fieldset className="mt-6">
-        <legend className="text-[16px] font-bold text-ink">
+        <legend className="text-[18px] font-bold text-ink">
           어디에 사시나요? <span className="text-rose">*</span>
         </legend>
-        <p className="mt-1 text-[15px] leading-relaxed text-muted">
+        <p className="mt-1 text-[17px] leading-relaxed text-muted">
           우리 동네 소식을 골라 전해드리는 데 씁니다. 다른 이웃에게는 공개되지
           않습니다.
         </p>

@@ -40,7 +40,7 @@ export default async function BoardWritePage({
 
       <form action={action} className="flex flex-col gap-4">
         <fieldset>
-          <legend className="mb-2 text-[16px] font-bold">분류</legend>
+          <legend className="mb-2 text-[18px] font-bold">분류</legend>
           <div className="flex gap-2">
             {BOARD_WRITE_CATS.map((c, idx) => (
               <label
@@ -61,7 +61,7 @@ export default async function BoardWritePage({
         </fieldset>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="title" className="text-[16px] font-bold">
+          <label htmlFor="title" className="text-[18px] font-bold">
             제목
           </label>
           <input
@@ -75,7 +75,7 @@ export default async function BoardWritePage({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="body" className="text-[16px] font-bold">
+          <label htmlFor="body" className="text-[18px] font-bold">
             내용
           </label>
           <textarea

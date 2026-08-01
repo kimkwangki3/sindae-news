@@ -76,20 +76,20 @@ export default async function DistrictPage({
                 />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <span className="rounded-full bg-ivory-2 px-2 py-0.5 text-[13px] font-bold text-muted">
+                    <span className="rounded-full bg-ivory-2 px-2 py-0.5 text-[15px] font-bold text-muted">
                       {BIZ_CAT_NAME[s.category]}
                     </span>
                     {s.isPromoted && (
-                      <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[13px] font-bold text-rose">
+                      <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[15px] font-bold text-rose">
                         홍보
                       </span>
                     )}
                   </div>
-                  <h4 className="mt-1 line-clamp-1 text-[18px] font-bold">
+                  <h4 className="mt-1 line-clamp-1 text-[20px] font-bold">
                     {s.name}
                   </h4>
                   {/* 리뷰가 없으면 ★0 대신 안내 문구 — 0점으로 오해되지 않게 */}
-                  <div className="mt-1.5 flex gap-2 text-[14px] text-muted">
+                  <div className="mt-1.5 flex gap-2 text-[16px] text-muted">
                     {s.reviewCount > 0 ? (
                       <>
                         <span className="font-bold text-rose">

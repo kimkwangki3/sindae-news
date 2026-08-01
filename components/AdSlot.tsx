@@ -49,20 +49,20 @@ export default async function AdSlot({
             />
           </div>
         ) : (
-          <div className="flex h-[56px] w-[56px] flex-shrink-0 items-center justify-center rounded-thumb bg-gradient-to-br from-[#EFD9DE] to-[#D69AA8] text-[13px] text-white/70">
+          <div className="flex h-[56px] w-[56px] flex-shrink-0 items-center justify-center rounded-thumb bg-gradient-to-br from-[#EFD9DE] to-[#D69AA8] text-[15px] text-white/70">
             AD
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <span className="rounded-full bg-rose-soft px-1.5 py-0.5 text-[12px] font-bold text-rose">
+          <span className="rounded-full bg-rose-soft px-1.5 py-0.5 text-[14px] font-bold text-rose">
             광고
           </span>
           <p className="mt-1 line-clamp-1 text-sm font-bold">
             {ad.advertiser}
           </p>
-          <p className="line-clamp-1 text-[14px] text-muted">{ad.text}</p>
+          <p className="line-clamp-1 text-[16px] text-muted">{ad.text}</p>
         </div>
-        <span className="flex-shrink-0 text-[13px] text-muted">스폰서</span>
+        <span className="flex-shrink-0 text-[15px] text-muted">스폰서</span>
       </Link>
     );
   }
@@ -82,7 +82,7 @@ export default async function AdSlot({
           sizes="(max-width: 480px) 100vw, 480px"
           className="h-auto w-full object-cover"
         />
-        <span className="absolute left-2 top-2 rounded-full bg-black/45 px-2 py-0.5 text-[13px] font-bold text-white">
+        <span className="absolute left-2 top-2 rounded-full bg-black/45 px-2 py-0.5 text-[15px] font-bold text-white">
           광고
         </span>
       </Link>
@@ -95,7 +95,7 @@ export default async function AdSlot({
       href={ad.href}
       className="my-5 flex items-center gap-3 rounded-card bg-gradient-to-r from-rose-soft to-ivory-2 px-4 py-4"
     >
-      <span className="rounded-full bg-white/70 px-2 py-0.5 text-[13px] font-bold text-rose">
+      <span className="rounded-full bg-white/70 px-2 py-0.5 text-[15px] font-bold text-rose">
         광고
       </span>
       <div className="min-w-0 flex-1">

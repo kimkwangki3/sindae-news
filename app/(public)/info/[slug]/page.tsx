@@ -36,7 +36,7 @@ export default async function InfoDetailPage({
 
   return (
     <div className="px-[18px] py-6">
-      <Link href="/info" className="text-[15px] text-muted">
+      <Link href="/info" className="text-[17px] text-muted">
         ← 생활정보
       </Link>
 
@@ -45,7 +45,7 @@ export default async function InfoDetailPage({
         {page.title}
       </h1>
       {page.summary && (
-        <p className="mt-1.5 text-[16px] leading-relaxed text-muted">
+        <p className="mt-1.5 text-[18px] leading-relaxed text-muted">
           {page.summary}
         </p>
       )}
@@ -70,7 +70,7 @@ export default async function InfoDetailPage({
         {paras.map((p, i) => (
           <p
             key={i}
-            className="whitespace-pre-line text-[17px] leading-[1.85] text-ink"
+            className="whitespace-pre-line text-[19px] leading-[1.85] text-ink"
           >
             {p}
           </p>
@@ -79,7 +79,7 @@ export default async function InfoDetailPage({
 
       {/* 언제 기준인지, 어디서 온 자료인지, 그리고 최종 확인은 어떻게 하는지.
           신문사가 낸 정보라 틀렸을 때의 책임이 크다. 셋을 늘 함께 둔다. */}
-      <div className="mt-8 rounded-card border border-line bg-ivory-2 p-4 text-[15px] leading-relaxed text-muted">
+      <div className="mt-8 rounded-card border border-line bg-ivory-2 p-4 text-[17px] leading-relaxed text-muted">
         <p>
           <b className="text-ink">{fmtUpdated(page.updatedAt)}</b> 기준 정보입니다.
           {page.autoUpdated && " 자동으로 갱신됩니다."}

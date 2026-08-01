@@ -92,14 +92,14 @@ export default async function ArticleDetailPage({
         siteUrl={SITE_URL}
       />
       <div className="pt-4">
-        <span className="inline-block rounded-full bg-rose-soft px-2.5 py-1 text-[14px] font-bold text-rose">
+        <span className="inline-block rounded-full bg-rose-soft px-2.5 py-1 text-[16px] font-bold text-rose">
           {CATEGORY_NAME[article.category]}
         </span>
-        <h1 className="mt-3 text-[25px] font-extrabold leading-snug">
+        <h1 className="mt-3 text-[27px] font-extrabold leading-snug">
           {article.title}
         </h1>
         {article.subtitle && (
-          <p className="mt-2 border-l-[3px] border-rose-soft pl-3 text-[18px] leading-relaxed text-ink/80">
+          <p className="mt-2 border-l-[3px] border-rose-soft pl-3 text-[20px] leading-relaxed text-ink/80">
             {article.subtitle}
           </p>
         )}
@@ -136,13 +136,13 @@ export default async function ArticleDetailPage({
           alt={`${article.title} 관련 이미지`}
         />
         {article.thumbnailUrl && article.aiImage && (
-          <figcaption className="mt-1.5 text-[14px] text-muted">
+          <figcaption className="mt-1.5 text-[16px] text-muted">
             이미지: AI 생성 · 실제 현장 사진이 아닙니다
           </figcaption>
         )}
       </figure>
 
-      <div className="mt-5 flex flex-col gap-4 text-[18px] leading-[1.85]">
+      <div className="mt-5 flex flex-col gap-4 text-[20px] leading-[1.85]">
         {article.body.map((p, i) => (
           <p key={i}>{p}</p>
         ))}

@@ -18,8 +18,8 @@ export default function ArticleAiFields({
   return (
     <div className="flex flex-col gap-4">
       <fieldset className="rounded-card border border-line bg-ivory-2 p-4">
-        <legend className="px-1 text-[16px] font-bold">📎 출처 (선택)</legend>
-        <p className="mt-1 text-[15px] leading-relaxed text-muted">
+        <legend className="px-1 text-[18px] font-bold">📎 출처 (선택)</legend>
+        <p className="mt-1 text-[17px] leading-relaxed text-muted">
           보도자료·공공자료를 재구성한 기사는 출처를 밝혀야 합니다. 자체 취재
           기사는 비워 두세요.
         </p>
@@ -41,8 +41,8 @@ export default function ArticleAiFields({
       </fieldset>
 
       <fieldset className="rounded-card border border-line bg-ivory-2 p-4">
-        <legend className="px-1 text-[16px] font-bold">🤖 AI 생성 고지</legend>
-        <p className="mt-1 text-[15px] leading-relaxed text-muted">
+        <legend className="px-1 text-[18px] font-bold">🤖 AI 생성 고지</legend>
+        <p className="mt-1 text-[17px] leading-relaxed text-muted">
           해당하는 항목을 체크하면 기사 하단에 고지 문구가 표시됩니다. 생성형
           AI를 쓰고도 밝히지 않으면 독자 신뢰를 잃고 포털 제휴 심사에서도
           불리합니다.
@@ -70,7 +70,7 @@ function Check({
   children: React.ReactNode;
 }) {
   return (
-    <label className="flex min-h-[44px] cursor-pointer items-center gap-2.5 text-[16px]">
+    <label className="flex min-h-[44px] cursor-pointer items-center gap-2.5 text-[18px]">
       <input
         type="checkbox"
         name={name}

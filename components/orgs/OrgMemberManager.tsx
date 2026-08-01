@@ -71,7 +71,7 @@ export default function OrgMemberManager({
                   <p className="text-sm font-bold">
                     {p.name} · {p.neighborhood}
                   </p>
-                  <p className="mt-0.5 text-[15px] text-muted">
+                  <p className="mt-0.5 text-[17px] text-muted">
                     동기: {p.motivation}
                   </p>
                 </div>
@@ -110,7 +110,7 @@ export default function OrgMemberManager({
               <div className="h-9 w-9 flex-shrink-0 rounded-full bg-rose" />
               <div className="flex-1">
                 <p className="text-sm font-bold">{m.name}</p>
-                <p className="text-[14px] text-muted">{ROLE_LABEL[m.role]}</p>
+                <p className="text-[16px] text-muted">{ROLE_LABEL[m.role]}</p>
               </div>
               {m.role !== "owner" && (
                 <button

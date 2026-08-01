@@ -13,7 +13,7 @@ import {
 function SectionTitle({ title, href }: { title: string; href: string }) {
   return (
     <div className="mb-3 mt-6 flex items-center justify-between">
-      <h3 className="text-[20px] text-rose-deep">{title}</h3>
+      <h3 className="text-[22px] text-rose-deep">{title}</h3>
       <Link href={href} className="text-xs text-rose">
         더보기 ›
       </Link>
@@ -38,7 +38,7 @@ export default async function HomePage() {
         {/* 오늘의 헤드라인 */}
         {lead && (
           <section className="pt-[18px]">
-            <span className="inline-block rounded-full bg-rose-soft px-2.5 py-1 text-[14px] font-bold tracking-wide text-rose">
+            <span className="inline-block rounded-full bg-rose-soft px-2.5 py-1 text-[16px] font-bold tracking-wide text-rose">
               오늘의 헤드라인
             </span>
             <Link href={`/article/${lead.slug}`} className="mt-3.5 block">
@@ -49,7 +49,7 @@ export default async function HomePage() {
                 rounded="rounded-card"
                 alt={lead.title}
               />
-              <h2 className="mt-3.5 text-[26px] font-extrabold leading-snug">
+              <h2 className="mt-3.5 text-[28px] font-extrabold leading-snug">
                 {lead.title}
               </h2>
               <p className="mt-2 text-xs text-muted">
@@ -85,7 +85,7 @@ export default async function HomePage() {
         {/* 신문법 제21조 단서 — 청소년보호 정책·책임자는 첫 화면에 노출해야 한다 */}
         <Link
           href="/legal/youth"
-          className="flex min-h-[44px] items-center justify-between rounded-card border border-line bg-ivory-2 px-4 py-3 text-[15px] text-muted"
+          className="flex min-h-[44px] items-center justify-between rounded-card border border-line bg-ivory-2 px-4 py-3 text-[17px] text-muted"
         >
           <span>청소년보호정책 · 청소년보호책임자 {MEDIA.youthOfficer}</span>
           <span aria-hidden>›</span>

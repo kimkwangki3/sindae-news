@@ -102,16 +102,16 @@ export default function AdminPostManager({
                 <div className="flex items-center gap-1.5">
                   {r.pinned && <Pill tone="warn">고정</Pill>}
                   {r.visibility === "hidden" && <Pill tone="muted">숨김</Pill>}
-                  <span className="text-[14px] text-muted">{r.category}</span>
+                  <span className="text-[16px] text-muted">{r.category}</span>
                 </div>
                 <p className="mt-1 truncate text-sm font-bold">{r.title}</p>
-                <p className="mt-0.5 text-[14px] text-muted">
+                <p className="mt-0.5 text-[16px] text-muted">
                   {r.author} · {r.extra} · 💬{r.comments} · {r.createdAt}
                 </p>
               </div>
               <Link
                 href={`${VIEW_BASE[kind]}/${r.id}`}
-                className="flex-shrink-0 text-[14px] text-rose"
+                className="flex-shrink-0 text-[16px] text-rose"
               >
                 보기 ›
               </Link>

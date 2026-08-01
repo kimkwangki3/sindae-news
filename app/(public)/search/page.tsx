@@ -61,7 +61,7 @@ export default async function SearchPage({
                       <span className="line-clamp-1 text-sm font-bold">
                         {h.title}
                       </span>
-                      <span className="text-[14px] text-muted">{h.sub}</span>
+                      <span className="text-[16px] text-muted">{h.sub}</span>
                     </Link>
                   </li>
                 ))}

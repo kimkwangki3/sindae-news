@@ -76,17 +76,17 @@ export default async function StoreDetailPage({
       </div>
 
       <div className="mt-3 flex items-center gap-1.5">
-        <span className="rounded-full bg-ivory-2 px-2 py-0.5 text-[14px] font-bold text-muted">
+        <span className="rounded-full bg-ivory-2 px-2 py-0.5 text-[16px] font-bold text-muted">
           {BIZ_CAT_NAME[store.category]}
         </span>
         {store.isPromoted && (
-          <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[14px] font-bold text-rose">
+          <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[16px] font-bold text-rose">
             홍보 등록업체
           </span>
         )}
       </div>
-      <h1 className="mt-2 text-[25px] font-extrabold">{store.name}</h1>
-      <p className="mt-1 text-[16px] text-muted">
+      <h1 className="mt-2 text-[27px] font-extrabold">{store.name}</h1>
+      <p className="mt-1 text-[18px] text-muted">
         {store.reviewCount > 0 ? (
           <>
             <span className="font-bold text-rose">
@@ -121,7 +121,7 @@ export default async function StoreDetailPage({
                 <span className="flex-1 text-sm font-bold">
                   {m.name}
                   {m.popular && (
-                    <span className="ml-1.5 text-[14px] font-normal text-rose">
+                    <span className="ml-1.5 text-[16px] font-normal text-rose">
                       가장 인기
                     </span>
                   )}
@@ -142,11 +142,11 @@ export default async function StoreDetailPage({
               key={p.id}
               className="mb-2 rounded-card border border-line bg-white p-4"
             >
-              <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[13px] font-bold text-rose">
+              <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[15px] font-bold text-rose">
                 {p.category}
               </span>
               <h5 className="mt-1.5 text-sm font-bold">{p.title}</h5>
-              <p className="mt-1 text-[16px] text-muted">{p.body}</p>
+              <p className="mt-1 text-[18px] text-muted">{p.body}</p>
               {p.photoUrls.length > 0 && (
                 <div className="mt-2 flex gap-2 overflow-x-auto">
                   {p.photoUrls.map((u) => (

@@ -5,7 +5,7 @@ import { MEDIA } from "@/lib/media";
 // 공개 영역 공통 푸터: 매체 정보 + 법적 페이지 링크 + 광고 문의.
 export default function Footer() {
   return (
-    <footer className="mt-6 border-t border-line bg-ivory-2 px-[18px] py-6 text-[15px] text-muted">
+    <footer className="mt-6 border-t border-line bg-ivory-2 px-[18px] py-6 text-[17px] text-muted">
       <nav className="flex flex-wrap gap-x-3 gap-y-2">
         {LEGAL_LINKS.map((l) => (
           <Link
@@ -42,7 +42,7 @@ export default function Footer() {
         <p>
           등록번호 {MEDIA.regNo} · {MEDIA.regDateShort} 등록 · {MEDIA.kind}
         </p>
-        <p className="mt-2 text-[14px]">
+        <p className="mt-2 text-[16px]">
           © 2026 {MEDIA.name}. All rights reserved.
         </p>
       </div>

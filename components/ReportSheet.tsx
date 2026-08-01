@@ -97,18 +97,18 @@ export default function ReportSheet({
               </div>
             ) : (
               <>
-                <p className="mb-1 text-[16px]">
+                <p className="mb-1 text-[18px]">
                   신고 대상: <b>{typeName}</b>
                   {targetLabel && (
                     <span className="text-muted"> · “{targetLabel}”</span>
                   )}
                 </p>
-                <p className="mb-4 text-[14px] text-muted">
+                <p className="mb-4 text-[16px] text-muted">
                   기사·댓글·나눔글·게시글 모두 같은 방식으로 신고합니다.
                 </p>
 
                 <fieldset className="flex flex-col gap-1">
-                  <legend className="mb-1 text-[16px] font-bold">
+                  <legend className="mb-1 text-[18px] font-bold">
                     신고 사유
                   </legend>
                   {REPORT_REASONS.map((r) => (
@@ -136,7 +136,7 @@ export default function ReportSheet({
 
                 <label
                   htmlFor="report-detail"
-                  className="mt-4 block text-[16px] font-bold"
+                  className="mt-4 block text-[18px] font-bold"
                 >
                   상세 내용 <span className="font-normal text-muted">(선택)</span>
                 </label>
@@ -159,7 +159,7 @@ export default function ReportSheet({
                 >
                   {pending ? "접수 중…" : "신고 접수"}
                 </button>
-                <p className="mt-2 text-center text-[14px] text-muted">
+                <p className="mt-2 text-center text-[16px] text-muted">
                   허위·반복 신고 시 이용이 제한될 수 있습니다.
                 </p>
               </>

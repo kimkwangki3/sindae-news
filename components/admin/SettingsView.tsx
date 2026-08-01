@@ -34,11 +34,11 @@ export default function SettingsView({
             className="rounded-full border border-line bg-white px-3 py-1.5 text-sm"
           >
             {c.name}{" "}
-            <span className="text-[14px] text-muted">/{c.slug}</span>
+            <span className="text-[16px] text-muted">/{c.slug}</span>
           </span>
         ))}
       </div>
-      <p className="mb-6 text-[14px] text-muted">
+      <p className="mb-6 text-[16px] text-muted">
         ※ 카테고리는 기사 데이터와 연결돼 있어 코드로 관리합니다(추가·변경은
         개발 작업).
       </p>
@@ -58,7 +58,7 @@ export default function SettingsView({
                   {s.isActive ? "사용" : "중지"}
                 </Pill>
               </div>
-              <p className="mt-0.5 text-[14px] text-muted">/{s.key}</p>
+              <p className="mt-0.5 text-[16px] text-muted">/{s.key}</p>
             </div>
             <button
               type="button"

@@ -73,15 +73,15 @@ export default function AdManager({
                 <Pill tone="muted">보류</Pill>
               )}
             </div>
-            <p className="mt-1.5 text-[15px] text-muted">
+            <p className="mt-1.5 text-[17px] text-muted">
               {r.slotLabel} · 기간 {r.duration} · 연락처 {r.contact}
             </p>
             {r.linkUrl && (
-              <p className="mt-0.5 truncate text-[14px] text-muted">
+              <p className="mt-0.5 truncate text-[16px] text-muted">
                 링크: {r.linkUrl}
               </p>
             )}
-            <p className="mt-0.5 text-[14px] text-muted">{r.createdAt}</p>
+            <p className="mt-0.5 text-[16px] text-muted">{r.createdAt}</p>
             {r.status === "pending" && (
               <div className="mt-2 flex justify-end gap-2">
                 <button
@@ -171,7 +171,7 @@ export default function AdManager({
                   <Pill tone="muted">중지</Pill>
                 )}
               </div>
-              <p className="mt-1 text-[14px] text-muted">
+              <p className="mt-1 text-[16px] text-muted">
                 {a.slotLabel} · {a.createdAt}
               </p>
             </div>

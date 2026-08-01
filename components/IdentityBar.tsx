@@ -11,7 +11,7 @@ export default function IdentityBar({ user }: { user: CurrentUser | null }) {
   if (!user) {
     return (
       <div className="flex items-center justify-between border-b border-line bg-white px-[18px] py-2.5">
-        <span className="text-[16px] text-muted">
+        <span className="text-[18px] text-muted">
           해룡면 이웃들의 소식 · 해룡신문
         </span>
         <Link href="/login" className="text-xs font-bold text-rose-deep">
@@ -56,7 +56,7 @@ export default function IdentityBar({ user }: { user: CurrentUser | null }) {
           />
         ) : null}
       </div>
-      <span className="flex-shrink-0 text-[16px] font-bold">
+      <span className="flex-shrink-0 text-[18px] font-bold">
         {user.nickname} 님
       </span>
 
@@ -69,7 +69,7 @@ export default function IdentityBar({ user }: { user: CurrentUser | null }) {
                 key={b.key}
                 href={b.href}
                 title={b.pending ? `${b.name} · 승인 대기` : b.name}
-                className={`flex min-h-[24px] max-w-[140px] flex-shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 text-[13px] font-bold ${
+                className={`flex min-h-[24px] max-w-[140px] flex-shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 text-[15px] font-bold ${
                   b.pending ? "bg-line text-muted" : b.tone
                 }`}
               >

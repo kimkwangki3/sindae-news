@@ -23,17 +23,17 @@ export default async function TipsPage() {
         <TipForm />
       ) : (
         <div className="mt-6 rounded-card border border-line bg-ivory-2 p-5">
-          <p className="text-[18px] font-bold text-ink">
+          <p className="text-[20px] font-bold text-ink">
             카카오 로그인 후 제보하실 수 있습니다
           </p>
-          <p className="mt-2 text-[16px] leading-relaxed text-muted">
+          <p className="mt-2 text-[18px] leading-relaxed text-muted">
             제보 내용을 확인하려면 편집국에서 연락을 드려야 합니다. 그래서
             누구신지 확인되는 분께만 제보를 받고 있습니다. 제보는 하루{" "}
             {TIP_DAILY_LIMIT}건까지 보내실 수 있습니다.
           </p>
           <Link
             href="/login"
-            className="mt-4 flex min-h-[52px] items-center justify-center rounded-element bg-rose-deep text-[18px] font-bold text-white"
+            className="mt-4 flex min-h-[52px] items-center justify-center rounded-element bg-rose-deep text-[20px] font-bold text-white"
           >
             카카오로 로그인
           </Link>

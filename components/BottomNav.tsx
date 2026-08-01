@@ -82,7 +82,7 @@ export default function BottomNav() {
               {ICONS[tab.href]}
             </svg>
             <span
-              className={`text-[15px] tracking-tight ${
+              className={`text-[17px] tracking-tight ${
                 active ? "font-bold" : "font-medium"
               }`}
             >

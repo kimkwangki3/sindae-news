@@ -20,7 +20,7 @@ function Stat({
         {typeof value === "number" ? value.toLocaleString() : value}
         {unit && <span className="text-sm font-bold"> {unit}</span>}
       </p>
-      <p className="mt-1 text-[14px] text-muted">{label}</p>
+      <p className="mt-1 text-[16px] text-muted">{label}</p>
     </div>
   );
 }
@@ -46,7 +46,7 @@ export default async function ArticleStatsPage({
       </div>
 
       <div className="mb-4 rounded-card border border-line bg-white p-4">
-        <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[14px] font-bold text-rose">
+        <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[16px] font-bold text-rose">
           {ARTICLE_STATUS_LABEL[s.status]}
         </span>
         <p className="mt-2 text-base font-bold leading-snug">{s.title}</p>
@@ -73,7 +73,7 @@ export default async function ArticleStatsPage({
         <Stat label="댓글" value={s.comments} />
       </div>
 
-      <p className="mt-4 text-center text-[14px] leading-relaxed text-muted">
+      <p className="mt-4 text-center text-[16px] leading-relaxed text-muted">
         읽음률·체류시간은 독자의 스크롤·머문 시간을 익명 집계한 값입니다.
       </p>
     </div>

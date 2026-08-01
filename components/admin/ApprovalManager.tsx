@@ -90,9 +90,9 @@ export default function ApprovalManager({
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="text-sm font-bold">{r.name}</span>
-                  <span className="text-[14px] text-muted">{r.category}</span>
+                  <span className="text-[16px] text-muted">{r.category}</span>
                 </div>
-                <p className="mt-0.5 text-[14px] text-muted">
+                <p className="mt-0.5 text-[16px] text-muted">
                   {r.sub} · {r.createdAt}
                 </p>
               </div>

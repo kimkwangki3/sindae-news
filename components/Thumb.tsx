@@ -32,7 +32,7 @@ export default function Thumb({
   }
   return (
     <div
-      className={`flex items-center justify-center bg-gradient-to-br from-[#EFD9DE] to-[#D69AA8] text-[16px] text-white/60 ${rounded} ${className}`}
+      className={`flex items-center justify-center bg-gradient-to-br from-[#EFD9DE] to-[#D69AA8] text-[18px] text-white/60 ${rounded} ${className}`}
       aria-hidden
     >
       사진

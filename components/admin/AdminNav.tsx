@@ -91,7 +91,7 @@ export default function AdminNav({ counts }: { counts: AdminQueueCounts }) {
     <nav className="no-scrollbar flex gap-1 overflow-x-auto px-3 pb-2 lg:flex-col lg:gap-0.5 lg:px-2 lg:pb-4">
       {GROUPS.map((g) => (
         <Fragment key={g.title}>
-          <p className="hidden w-full px-3.5 pb-1 pt-3 text-[13px] font-bold uppercase tracking-wide text-muted lg:block">
+          <p className="hidden w-full px-3.5 pb-1 pt-3 text-[15px] font-bold uppercase tracking-wide text-muted lg:block">
             {g.title}
           </p>
           {g.items.map((it) => {
@@ -113,7 +113,7 @@ export default function AdminNav({ counts }: { counts: AdminQueueCounts }) {
               >
                 {it.label}
                 {count > 0 && (
-                  <span className="rounded-full bg-rose px-1.5 text-[13px] font-bold text-white">
+                  <span className="rounded-full bg-rose px-1.5 text-[15px] font-bold text-white">
                     {count}
                   </span>
                 )}

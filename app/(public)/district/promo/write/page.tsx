@@ -41,20 +41,20 @@ export default async function PromoWritePage() {
         </Link>
       </div>
 
-      <div className="mb-4 rounded-element border border-tag-biz-bg bg-tag-biz-bg/40 p-3 text-[16px] text-tag-biz-fg">
+      <div className="mb-4 rounded-element border border-tag-biz-bg bg-tag-biz-bg/40 p-3 text-[18px] text-tag-biz-fg">
         ⚠ 홍보 글은 게시 전 <b>관리자 승인</b>이 필요합니다.
       </div>
 
       <form action={writePromo} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <span className="text-[16px] font-bold">업체</span>
+          <span className="text-[18px] font-bold">업체</span>
           <div className="min-h-[48px] rounded-element border border-line bg-ivory-2 px-3.5 text-sm leading-[48px]">
             🏪 {user.business?.name}
           </div>
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="title" className="text-[16px] font-bold">
+          <label htmlFor="title" className="text-[18px] font-bold">
             제목
           </label>
           <input
@@ -67,7 +67,7 @@ export default async function PromoWritePage() {
         </div>
 
         <fieldset>
-          <legend className="mb-2 text-[16px] font-bold">분류</legend>
+          <legend className="mb-2 text-[18px] font-bold">분류</legend>
           <div className="flex gap-2">
             {PROMO_CATS.map((c, idx) => (
               <label
@@ -88,7 +88,7 @@ export default async function PromoWritePage() {
         </fieldset>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="body" className="text-[16px] font-bold">
+          <label htmlFor="body" className="text-[18px] font-bold">
             내용
           </label>
           <textarea
