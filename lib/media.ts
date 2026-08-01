@@ -22,6 +22,10 @@ export const MEDIA = {
   address: "(우)57998 전남광주통합특별시 순천시 오천4길 39",
   addressShort: "순천시 오천4길 39",
   homepage: "sdtime.net",
+  // 카카오톡 채널. /friend 는 '채널 추가' 화면으로 바로 간다.
+  // 검색용 아이디는 '해룡신문'이며 변경할 수 없다.
+  kakaoChannel: "https://pf.kakao.com/_xmxhZBX",
+  kakaoChannelAdd: "https://pf.kakao.com/_xmxhZBX/friend",
   operator: "DSBH",
   circulation: "전국",
   audience: "일반",

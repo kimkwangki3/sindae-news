@@ -24,6 +24,14 @@ export default function Footer() {
         <Link href="/ads/apply" className="min-h-[24px]">
           광고 문의
         </Link>
+        <a
+          href={MEDIA.kakaoChannel}
+          target="_blank"
+          rel="noreferrer"
+          className="min-h-[24px]"
+        >
+          카카오톡 채널
+        </a>
       </nav>
 
       {/* 발행소·연락처·발행인·운영사는 발행인 판단으로 푸터에서 제외(2026-07-31).

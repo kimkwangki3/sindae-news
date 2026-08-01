@@ -8,6 +8,7 @@ import Comments from "@/components/article/Comments";
 import ReadTracker from "@/components/article/ReadTracker";
 import ReportSheet from "@/components/ReportSheet";
 import ArticleAiNotice from "@/components/ArticleAiNotice";
+import KakaoChannelCta from "@/components/KakaoChannelCta";
 import NewsArticleJsonLd from "@/components/article/NewsArticleJsonLd";
 import { MEDIA } from "@/lib/media";
 import { findStaffByName } from "@/lib/staff";
@@ -163,6 +164,8 @@ export default async function ArticleDetailPage({
           triggerLabel="기사 신고"
         />
       </div>
+
+      <KakaoChannelCta />
 
       <Comments
         slug={article.slug}
