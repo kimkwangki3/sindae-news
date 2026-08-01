@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { CATEGORY_ID, type CategorySlug } from "@/lib/mock/articles-meta";
-import { normalizeSlug } from "@/lib/slug";
+import { nextArticleSlug } from "@/lib/slug";
 import { answerCallback, settleDraftMessage } from "@/lib/telegram-drafts";
 import { revalidatePublic } from "@/lib/revalidate";
 import { MEDIA } from "@/lib/media";
@@ -101,32 +101,36 @@ export async function POST(req: Request): Promise<Response> {
   if (action !== "pub") return NextResponse.json({ ok: true });
 
   // --- 발행 ---
-  const slug = normalizeSlug(d.title);
   const now = new Date().toISOString();
 
-  const { error } = await supabase.from("articles").insert({
-    slug,
-    title: d.title,
-    subtitle: d.subtitle,
-    body: d.body,
-    category_id: CATEGORY_ID[d.category_slug as CategorySlug] ?? CATEGORY_ID.local,
-    status: "published",
-    published_at: now,
-    updated_at: now,
-    // 자동 생성 초안이므로 본문은 AI 작성으로 고지한다. 대표 이미지는 수동이라 false.
-    ai_text: true,
-    ai_image: false,
-    source_name: d.source_name,
-    source_url: d.source_url,
-  });
+  // 슬러그는 날짜+순번이라, 같은 순간에 두 건을 발행하면 번호가 겹칠 수 있다.
+  // 겹치면 다시 번호를 받아 한 번 더 시도한다.
+  let slug = "";
+  let error = null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    slug = await nextArticleSlug();
+    ({ error } = await supabase.from("articles").insert({
+      slug,
+      title: d.title,
+      subtitle: d.subtitle,
+      body: d.body,
+      category_id: CATEGORY_ID[d.category_slug as CategorySlug] ?? CATEGORY_ID.local,
+      status: "published",
+      published_at: now,
+      updated_at: now,
+      // 자동 생성 초안이므로 본문은 AI 작성으로 고지한다. 대표 이미지는 수동이라 false.
+      ai_text: true,
+      ai_image: false,
+      source_name: d.source_name,
+      source_url: d.source_url,
+    }));
+    if (!error || error.code !== "23505") break;
+  }
 
   if (error) {
     // eslint-disable-next-line no-console
     console.error("[draft] 발행 실패:", error.message);
-    await answerCallback(
-      cq.id,
-      error.code === "23505" ? "같은 주소의 기사가 이미 있습니다." : "발행에 실패했습니다.",
-    );
+    await answerCallback(cq.id, "발행에 실패했습니다.");
     return NextResponse.json({ ok: true });
   }
 

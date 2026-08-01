@@ -7,7 +7,7 @@ import { getCurrentUser } from "./auth";
 import { createServiceClient } from "./supabase/server";
 import { logAdmin } from "./audit";
 import { CATEGORY_ID } from "./mock/articles-meta";
-import { normalizeSlug } from "./slug";
+import { normalizeSlug, nextArticleSlug } from "./slug";
 import type {
   ArticleStatus,
   CommentStatus,
@@ -52,18 +52,21 @@ export async function deleteArticle(slug: string): Promise<void> {
 export async function saveArticle(formData: FormData): Promise<void> {
   const user = await assertAdmin();
   const title = String(formData.get("title") ?? "").trim();
-  const slug = normalizeSlug(String(formData.get("slug") ?? ""));
   const categorySlug = String(formData.get("category") ?? "local");
   const body = String(formData.get("body") ?? "").trim();
   const thumbnailUrl = String(formData.get("thumbnail_url") ?? "").trim();
   const status = String(formData.get("status") ?? "draft") as ArticleStatus;
-  // 슬러그는 위에서 항상 유효한 값으로 보정되므로 제목만 확인한다.
   if (title.length < 2) throw new Error("제목을 입력해 주세요.");
 
   const supabase = createServiceClient();
 
   // 편집이면 대상 글을 원래 슬러그로 찾는다(슬러그를 바꿔도 새 글이 생기지 않게).
   const originalSlug = String(formData.get("original_slug") ?? "").trim();
+
+  // 슬러그를 비워두거나 쓸 수 없는 값을 넣으면 자동 생성한다. 단 편집 중이라면
+  // 기존 주소를 지킨다 — 수정할 때마다 URL이 바뀌면 나눠둔 링크가 죽는다.
+  const typed = normalizeSlug(String(formData.get("slug") ?? ""));
+  const slug = typed || originalSlug || (await nextArticleSlug());
   const target = originalSlug || slug;
 
   // 이미 발행된 글은 게재일자를 유지한다. 매번 now로 덮으면 수정할 때마다

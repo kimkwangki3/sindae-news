@@ -8,6 +8,7 @@ import { canWriteArticle, articleStatusOnSubmit } from "./permissions";
 import { createClient } from "./supabase/server";
 import { notify } from "./telegram";
 import { CATEGORY_ID } from "./mock/articles-meta";
+import { normalizeSlug, nextArticleSlug } from "./slug";
 
 export interface WriteState {
   ok?: boolean;
@@ -27,20 +28,22 @@ export async function saveReporterArticle(
 
   const intent = String(formData.get("intent") ?? "draft"); // draft | submit
   const title = String(formData.get("title") ?? "").trim();
-  const slug = String(formData.get("slug") ?? "").trim();
   const categorySlug = String(formData.get("category") ?? "local");
   const body = String(formData.get("body") ?? "").trim();
   const thumbnailUrl = String(formData.get("thumbnail_url") ?? "").trim();
   const pledge = formData.get("pledge_ack") === "on";
 
   if (title.length < 2) return { error: "제목을 입력해 주세요." };
-  if (!/^[a-z0-9-]{2,}$/.test(slug))
-    return { error: "슬러그는 영문 소문자·숫자·하이픈(-) 2자 이상이어야 해요." };
 
   // 제출(발행/승인요청)에는 책임 서약 필수
   if (intent === "submit" && !pledge) {
     return { error: "기사 책임 서약에 동의해야 제출할 수 있습니다." };
   }
+
+  // 주소는 비워두면 날짜+순번으로 자동 생성한다. 기자에게 영문 주소를
+  // 지어내게 하지 않는다(관리자 에디터와 같은 규칙).
+  const slug =
+    normalizeSlug(String(formData.get("slug") ?? "")) || (await nextArticleSlug());
 
   const status =
     intent === "submit" ? articleStatusOnSubmit(user) : "draft";

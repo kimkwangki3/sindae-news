@@ -76,11 +76,10 @@ export default function ReporterWriteForm({
         </select>
       </Field>
 
-      <Field label="슬러그(주소)">
+      <Field label="주소(비우면 자동)">
         <input
           name="slug"
-          required
-          placeholder="예: haeryong-festival-2026 (영문/숫자/-)"
+          placeholder="비워두면 20260801-1 처럼 자동으로 정해집니다"
           className={INPUT}
         />
       </Field>
