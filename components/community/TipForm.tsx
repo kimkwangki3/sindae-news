@@ -90,8 +90,13 @@ export default function TipForm() {
       {state.error && <p className="text-xs text-rose">{state.error}</p>}
 
       <SubmitButton />
-      <p className="text-center text-[11px] text-muted">
+      {/* 제보 내용을 기사에 쓸 수 있다는 사실은 약관에만 묻어두지 않고
+          보내는 자리에서 알린다. */}
+      <p className="text-center text-[11px] leading-relaxed text-muted">
         제보는 로그인 없이도 보낼 수 있어요.
+        <br />
+        보내주신 내용과 사진은 기사에 쓰일 수 있습니다. 이름을 밝히길 원하지
+        않으시면 내용에 적어 주세요.
       </p>
     </form>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { demoLogin } from "@/lib/auth-actions";
 import { DEMO_PERSONA_KEYS, DEMO_PERSONAS } from "@/lib/mock/auth";
@@ -73,8 +74,18 @@ export default function LoginPanel({ demo }: { demo: boolean }) {
         )}
       </div>
 
+      {/* 동의를 구하는 문서는 눌러서 읽을 수 있어야 한다. 링크 없이 문구만
+          두면 무엇에 동의하는지 확인할 방법이 없다. */}
       <p className="mt-8 max-w-[300px] text-[11px] leading-relaxed text-muted">
-        로그인 시 서비스 이용약관 및 개인정보처리방침에 동의하게 됩니다.
+        로그인 시{" "}
+        <Link href="/legal/terms" className="underline">
+          서비스 이용약관
+        </Link>{" "}
+        및{" "}
+        <Link href="/legal/privacy" className="underline">
+          개인정보처리방침
+        </Link>
+        에 동의하게 됩니다.
       </p>
     </div>
   );
