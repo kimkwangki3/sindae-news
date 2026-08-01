@@ -103,7 +103,7 @@ export default function PostComments({
                   targetType={commentReportType}
                   targetId={c.id}
                   targetLabel={c.body.slice(0, 20)}
-                  triggerClassName="text-[11px] text-muted"
+                  triggerClassName="text-[14px] text-muted"
                   triggerLabel="🚩"
                 />
               ) : undefined

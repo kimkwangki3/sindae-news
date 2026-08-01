@@ -100,7 +100,7 @@ export default function MemberManager({
                       </span>
                     )}
                   </p>
-                  <p className="mt-0.5 text-[11px] text-muted">
+                  <p className="mt-0.5 text-[14px] text-muted">
                     {m.neighborhood ? `📍 ${m.neighborhood} · ` : ""}
                     가입 {m.joinedAt}
                   </p>
@@ -150,7 +150,7 @@ export default function MemberManager({
               {/* 시민기자일 때만 등급 지정(기자신청자/준기자/정기자) */}
               {m.role === "reporter" && (
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="text-[11px] font-bold text-muted">
+                  <span className="text-[14px] font-bold text-muted">
                     기자 등급
                   </span>
                   <select

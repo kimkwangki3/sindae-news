@@ -75,15 +75,15 @@ export default async function MyArticlesPage({
           >
             <div className="flex items-center gap-1.5">
               <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${STATUS_TONE[a.status]}`}
+                className={`rounded-full px-2 py-0.5 text-[13px] font-bold ${STATUS_TONE[a.status]}`}
               >
                 {ARTICLE_STATUS_LABEL[a.status]}
               </span>
-              <span className="text-[11px] text-muted">{a.category}</span>
-              <span className="ml-auto text-[11px] text-muted">{a.date}</span>
+              <span className="text-[14px] text-muted">{a.category}</span>
+              <span className="ml-auto text-[14px] text-muted">{a.date}</span>
             </div>
             <p className="mt-1.5 line-clamp-1 text-sm font-bold">{a.title}</p>
-            <div className="mt-1.5 flex items-center gap-3 text-[11px] text-muted">
+            <div className="mt-1.5 flex items-center gap-3 text-[14px] text-muted">
               <span>👁 {a.views}</span>
               <span>👍 {a.reactions}</span>
               <span>💬 {a.comments}</span>

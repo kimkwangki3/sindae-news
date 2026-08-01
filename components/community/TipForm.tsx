@@ -96,7 +96,7 @@ export default function TipForm() {
       <SubmitButton />
       {/* 제보 내용을 기사에 쓸 수 있다는 사실은 약관에만 묻어두지 않고
           보내는 자리에서 알린다. */}
-      <p className="text-center text-[11px] leading-relaxed text-muted">
+      <p className="text-center text-[14px] leading-relaxed text-muted">
         확인을 위해 편집국에서 연락드릴 수 있습니다. 제보는 하루 {TIP_DAILY_LIMIT}
         건까지 보내실 수 있어요.
         <br />
@@ -116,7 +116,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[13px] font-bold">{label}</label>
+      <label className="text-[16px] font-bold">{label}</label>
       {children}
     </div>
   );

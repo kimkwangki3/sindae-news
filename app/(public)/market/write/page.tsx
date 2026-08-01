@@ -43,7 +43,7 @@ export default async function MarketWritePage({
 
       <form action={action} className="flex flex-col gap-4">
         <fieldset>
-          <legend className="mb-2 text-[13px] font-bold">분류</legend>
+          <legend className="mb-2 text-[16px] font-bold">분류</legend>
           <div className="flex gap-2">
             {[
               { v: "share", l: "나눔" },
@@ -129,7 +129,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[13px] font-bold">{label}</label>
+      <label className="text-[16px] font-bold">{label}</label>
       {children}
     </div>
   );

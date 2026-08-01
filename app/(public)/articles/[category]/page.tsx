@@ -39,7 +39,7 @@ export default async function CategoryPage({
     <>
       <CategoryChips />
       <div className="px-[18px] pb-6">
-        <h1 className="py-2 text-[17px] text-rose-deep">
+        <h1 className="py-2 text-[20px] text-rose-deep">
           {CATEGORY_NAME[category]}
         </h1>
         <ArticleList

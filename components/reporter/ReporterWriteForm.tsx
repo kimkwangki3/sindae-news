@@ -103,7 +103,7 @@ export default function ReporterWriteForm({
       <ArticleAiFields />
 
       {/* 책임 서약 */}
-      <label className="flex items-start gap-2.5 rounded-card border border-rose bg-rose-soft p-4 text-[13px] leading-relaxed">
+      <label className="flex items-start gap-2.5 rounded-card border border-rose bg-rose-soft p-4 text-[16px] leading-relaxed">
         <input
           type="checkbox"
           name="pledge_ack"
@@ -121,7 +121,7 @@ export default function ReporterWriteForm({
       {state.error && <p className="text-xs text-rose-deep">{state.error}</p>}
 
       <Buttons pledged={pledged} publishLabel={publishLabel} />
-      <p className="text-center text-[11px] text-muted">
+      <p className="text-center text-[14px] text-muted">
         ‘임시저장’은 서약 없이 보관됩니다. 발행/승인요청은 서약 동의가 필요합니다.
       </p>
     </form>
@@ -137,7 +137,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[13px] font-bold">{label}</label>
+      <label className="text-[16px] font-bold">{label}</label>
       {children}
     </div>
   );

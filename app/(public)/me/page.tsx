@@ -43,21 +43,21 @@ export default async function MePage() {
         <div className="min-w-0">
           <p className="text-lg font-bold">{user.nickname} 님</p>
           <div className="mt-1 flex flex-wrap items-center gap-1.5">
-            <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[11px] font-bold text-rose">
+            <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[14px] font-bold text-rose">
               {ROLE_LABEL[user.role]}
             </span>
             {user.role === "reporter" && user.reporter_level && (
-              <span className="rounded-full bg-line px-2 py-0.5 text-[11px] font-bold text-muted">
+              <span className="rounded-full bg-line px-2 py-0.5 text-[14px] font-bold text-muted">
                 {REPORTER_LEVEL_LABEL[user.reporter_level]}
               </span>
             )}
             {user.neighborhood && (
-              <span className="text-[11px] text-muted">
+              <span className="text-[14px] text-muted">
                 📍 {user.neighborhood}
               </span>
             )}
             {user.is_suspended && (
-              <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-bold text-white">
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[14px] font-bold text-white">
                 정지됨
               </span>
             )}
@@ -68,7 +68,7 @@ export default async function MePage() {
       {/* 소속(업체·단체) — 승인 대기분도 보여준다. 여러 개일 수 있어 목록으로. */}
       {(user.businesses.length > 0 || myOrgs.length > 0) && (
         <section className="mt-4">
-          <h2 className="mb-2 text-[13px] font-bold text-muted">내 소속</h2>
+          <h2 className="mb-2 text-[16px] font-bold text-muted">내 소속</h2>
           <ul className="flex flex-col gap-2">
             {user.businesses.map((b) => (
               <li key={b.id}>
@@ -76,16 +76,16 @@ export default async function MePage() {
                   href={b.status === "approved" ? `/district/${b.id}` : "/me"}
                   className="flex min-h-[48px] items-center gap-2 rounded-card border border-line bg-white px-4"
                 >
-                  <span className="rounded-full bg-tag-biz-bg px-2.5 py-1 text-[11px] font-bold text-tag-biz-fg">
+                  <span className="rounded-full bg-tag-biz-bg px-2.5 py-1 text-[14px] font-bold text-tag-biz-fg">
                     🏪 업체
                   </span>
                   <span className="min-w-0 flex-1 truncate text-sm font-bold">
                     {b.name}
                   </span>
                   {b.status === "approved" ? (
-                    <span className="text-[11px] text-muted">보기 ›</span>
+                    <span className="text-[14px] text-muted">보기 ›</span>
                   ) : (
-                    <span className="text-[11px] text-muted">승인 대기</span>
+                    <span className="text-[14px] text-muted">승인 대기</span>
                   )}
                 </Link>
               </li>
@@ -96,21 +96,21 @@ export default async function MePage() {
                   href={o.status === "approved" ? `/orgs/${o.org_id}` : "/me"}
                   className="flex min-h-[48px] items-center gap-2 rounded-card border border-line bg-white px-4"
                 >
-                  <span className="rounded-full bg-tag-org-bg px-2.5 py-1 text-[11px] font-bold text-tag-org-fg">
+                  <span className="rounded-full bg-tag-org-bg px-2.5 py-1 text-[14px] font-bold text-tag-org-fg">
                     🏛 단체
                   </span>
                   <span className="min-w-0 flex-1 truncate text-sm font-bold">
                     {o.name}
                     {o.role !== "member" && (
-                      <span className="ml-1 text-[11px] font-normal text-muted">
+                      <span className="ml-1 text-[14px] font-normal text-muted">
                         · 운영진
                       </span>
                     )}
                   </span>
                   {o.status === "approved" ? (
-                    <span className="text-[11px] text-muted">보기 ›</span>
+                    <span className="text-[14px] text-muted">보기 ›</span>
                   ) : (
-                    <span className="text-[11px] text-muted">승인 대기</span>
+                    <span className="text-[14px] text-muted">승인 대기</span>
                   )}
                 </Link>
               </li>

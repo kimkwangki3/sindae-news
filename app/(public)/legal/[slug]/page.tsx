@@ -37,12 +37,12 @@ export default async function LegalPage({
     return (
       <div className="px-[18px] py-6">
         <h1 className="text-xl text-rose-deep">{db.title}</h1>
-        <p className="mt-1 text-[11px] text-muted">
+        <p className="mt-1 text-[14px] text-muted">
           최종 개정 {db.updated_at.slice(0, 10).replace(/-/g, ".")}
         </p>
         <div className="mt-5 flex flex-col gap-3">
           {paras.map((p, i) => (
-            <p key={i} className="whitespace-pre-line text-[14px] leading-[1.8] text-ink">
+            <p key={i} className="whitespace-pre-line text-[17px] leading-[1.8] text-ink">
               {p}
             </p>
           ))}
@@ -55,17 +55,17 @@ export default async function LegalPage({
   return (
     <div className="px-[18px] py-6">
       <h1 className="text-xl text-rose-deep">{doc.title}</h1>
-      <p className="mt-1 text-[11px] text-muted">최종 개정 {doc.updated}</p>
+      <p className="mt-1 text-[14px] text-muted">최종 개정 {doc.updated}</p>
 
       <div className="mt-5 flex flex-col gap-5">
         {doc.sections.map((s, i) => (
           <section key={i}>
             {s.heading && (
-              <h2 className="mb-1.5 text-[15px] font-bold">{s.heading}</h2>
+              <h2 className="mb-1.5 text-[18px] font-bold">{s.heading}</h2>
             )}
             <div className="flex flex-col gap-1.5">
               {s.body.map((line, j) => (
-                <p key={j} className="text-[14px] leading-[1.8] text-ink">
+                <p key={j} className="text-[17px] leading-[1.8] text-ink">
                   {line}
                 </p>
               ))}

@@ -25,7 +25,7 @@ export default function StaffManager({
     <div className="px-[18px] py-5">
       <PageHead title="관리자·권한" sub={`운영진 ${rows.length}명`} />
 
-      <p className="mb-3 rounded-card border border-line bg-white p-3 text-[12px] leading-relaxed text-muted">
+      <p className="mb-3 rounded-card border border-line bg-white p-3 text-[15px] leading-relaxed text-muted">
         새 관리자 임명은 <b className="text-rose-deep">회원 관리</b>에서 해당
         회원의 등급을 ‘관리자’로 변경하세요. 여기서는 현재 운영진 확인·해제만
         합니다.
@@ -44,7 +44,7 @@ export default function StaffManager({
                   {m.role === "superadmin" ? "최고관리자" : "관리자"}
                 </Pill>
               </div>
-              <p className="mt-0.5 text-[11px] text-muted">가입 {m.joinedAt}</p>
+              <p className="mt-0.5 text-[14px] text-muted">가입 {m.joinedAt}</p>
             </div>
             {m.role !== "superadmin" && (
               <button

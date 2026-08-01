@@ -49,7 +49,7 @@ export default async function NewArticlePage({
         )}
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="title" className="text-[13px] font-bold">
+          <label htmlFor="title" className="text-[16px] font-bold">
             제목
           </label>
           <input
@@ -63,7 +63,7 @@ export default async function NewArticlePage({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="subtitle" className="text-[13px] font-bold">
+          <label htmlFor="subtitle" className="text-[16px] font-bold">
             부제 (선택)
           </label>
           <input
@@ -77,7 +77,7 @@ export default async function NewArticlePage({
 
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="category" className="text-[13px] font-bold">
+            <label htmlFor="category" className="text-[16px] font-bold">
               분류
             </label>
             <select
@@ -94,7 +94,7 @@ export default async function NewArticlePage({
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="slug" className="text-[13px] font-bold">
+            <label htmlFor="slug" className="text-[16px] font-bold">
               슬러그(URL){" "}
               <span className="font-normal text-muted">— 비우면 자동 생성</span>
             </label>
@@ -109,7 +109,7 @@ export default async function NewArticlePage({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="body" className="text-[13px] font-bold">
+          <label htmlFor="body" className="text-[16px] font-bold">
             본문
           </label>
           <textarea

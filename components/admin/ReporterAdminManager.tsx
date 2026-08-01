@@ -80,14 +80,14 @@ export default function ReporterAdminManager({
                     : "반려"}
               </Pill>
             </div>
-            <p className="mt-1 text-[11px] text-muted">
+            <p className="mt-1 text-[14px] text-muted">
               {a.neighborhood} · {a.phone} · {a.email}
             </p>
             {a.interests && (
-              <p className="mt-0.5 text-[11px] text-muted">관심: {a.interests}</p>
+              <p className="mt-0.5 text-[14px] text-muted">관심: {a.interests}</p>
             )}
-            <p className="mt-1.5 text-[13px] leading-relaxed">{a.motivation}</p>
-            <p className="mt-1 text-[11px] text-muted">
+            <p className="mt-1.5 text-[16px] leading-relaxed">{a.motivation}</p>
+            <p className="mt-1 text-[14px] text-muted">
               {a.pledged ? "✅ 책임서약 동의" : "⚠️ 서약 미동의"} · {a.createdAt}
             </p>
             {a.status === "pending" && (
@@ -116,7 +116,7 @@ export default function ReporterAdminManager({
               </div>
             )}
             {a.status === "approved" && !a.userId && (
-              <p className="mt-2 text-[11px] text-rose-deep">
+              <p className="mt-2 text-[14px] text-rose-deep">
                 ⚠️ 연결된 회원 계정이 없어 자동 등급 지정이 안 됐어요. 회원
                 관리에서 수동 지정 필요.
               </p>
@@ -140,7 +140,7 @@ export default function ReporterAdminManager({
           >
             <div className="min-w-0">
               <p className="text-sm font-bold">{r.nickname}</p>
-              <p className="mt-0.5 text-[11px] text-muted">
+              <p className="mt-0.5 text-[14px] text-muted">
                 기사 {r.articles}건 · 가입 {r.joinedAt}
               </p>
             </div>

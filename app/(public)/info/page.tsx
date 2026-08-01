@@ -22,7 +22,7 @@ export default async function InfoPage() {
       </p>
 
       {pages.length === 0 ? (
-        <p className="mt-8 rounded-card border border-line bg-ivory-2 p-5 text-center text-[13px] leading-relaxed text-muted">
+        <p className="mt-8 rounded-card border border-line bg-ivory-2 p-5 text-center text-[16px] leading-relaxed text-muted">
           준비 중입니다.
           <br />
           버스 시간표·야간 약국·재활용 배출 요일부터 차례로 올립니다.
@@ -39,13 +39,13 @@ export default async function InfoPage() {
                   {p.icon ?? "📄"}
                 </span>
                 <span className="flex flex-col gap-0.5">
-                  <span className="text-[15px] font-bold text-ink">{p.title}</span>
+                  <span className="text-[18px] font-bold text-ink">{p.title}</span>
                   {p.summary && (
-                    <span className="text-[12px] leading-relaxed text-muted">
+                    <span className="text-[15px] leading-relaxed text-muted">
                       {p.summary}
                     </span>
                   )}
-                  <span className="text-[11px] text-muted">
+                  <span className="text-[14px] text-muted">
                     {fmtUpdated(p.updatedAt)} 기준
                   </span>
                 </span>

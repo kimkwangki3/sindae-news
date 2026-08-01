@@ -54,9 +54,9 @@ export default function CommentItem({
   return (
     <li className="border-t border-line pt-4 first:border-t-0">
       <div className="flex items-center justify-between">
-        <span className="text-[13px] font-bold">{comment.author}</span>
+        <span className="text-[16px] font-bold">{comment.author}</span>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-muted">{comment.createdAt}</span>
+          <span className="text-[14px] text-muted">{comment.createdAt}</span>
           {reportNode}
         </div>
       </div>
@@ -102,7 +102,7 @@ export default function CommentItem({
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="text-[11px] text-muted underline"
+            className="text-[14px] text-muted underline"
           >
             수정
           </button>
@@ -110,7 +110,7 @@ export default function CommentItem({
             type="button"
             onClick={remove}
             disabled={pending}
-            className="text-[11px] text-muted underline disabled:opacity-50"
+            className="text-[14px] text-muted underline disabled:opacity-50"
           >
             삭제
           </button>

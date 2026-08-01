@@ -12,7 +12,7 @@ export default function ReportersPage() {
   return (
     <div className="px-[18px] py-5">
       <h1 className="text-xl text-rose-deep">필자 소개</h1>
-      <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
+      <p className="mt-1.5 text-[16px] leading-relaxed text-muted">
         해룡신문 기사를 쓰는 사람들입니다. 취재 요청이나 정정 요청은 담당 필자
         이메일로 바로 보내주셔도 됩니다.
       </p>
@@ -25,13 +25,13 @@ export default function ReportersPage() {
               className="flex min-h-[72px] items-center gap-3 rounded-card border border-line bg-white p-4"
             >
               <div className="min-w-0 flex-1">
-                <p className="text-[15px] font-bold">
+                <p className="text-[18px] font-bold">
                   {s.name}
-                  <span className="ml-1.5 text-[12px] font-normal text-muted">
+                  <span className="ml-1.5 text-[15px] font-normal text-muted">
                     {s.title}
                   </span>
                 </p>
-                <p className="mt-1 truncate text-[12px] text-muted">
+                <p className="mt-1 truncate text-[15px] text-muted">
                   {s.areas.join(" · ")}
                 </p>
               </div>

@@ -67,7 +67,7 @@ export default function RecruitForm() {
       </Field>
 
       <fieldset>
-        <legend className="mb-2 text-[13px] font-bold">관심 분야</legend>
+        <legend className="mb-2 text-[16px] font-bold">관심 분야</legend>
         <div className="flex flex-wrap gap-2">
           {INTERESTS.map((it) => (
             <label
@@ -97,10 +97,10 @@ export default function RecruitForm() {
 
       {/* 책임 서약 (법적 증빙) */}
       <div className="rounded-card border border-rose-soft bg-rose-soft/50 p-4">
-        <h4 className="text-[13px] font-bold text-rose-deep">
+        <h4 className="text-[16px] font-bold text-rose-deep">
           ⚖ 기자 책임 서약 (필수)
         </h4>
-        <div className="mt-2 flex flex-col gap-2 text-[12px] leading-relaxed text-ink">
+        <div className="mt-2 flex flex-col gap-2 text-[15px] leading-relaxed text-ink">
           <p>
             본인은 작성·게재하는 모든 기사에 대해{" "}
             <b>법적·윤리적 책임이 작성 기자 본인에게 있음</b>을 인지합니다.
@@ -112,7 +112,7 @@ export default function RecruitForm() {
           </p>
           <p>취재·보도 시 언론윤리강령과 관련 법령을 준수할 것을 서약합니다.</p>
         </div>
-        <label className="mt-3 flex items-start gap-2 text-[13px] font-bold">
+        <label className="mt-3 flex items-start gap-2 text-[16px] font-bold">
           <input
             type="checkbox"
             name="pledge"
@@ -134,7 +134,7 @@ export default function RecruitForm() {
       {state.error && <p className="text-xs text-rose">{state.error}</p>}
 
       <SubmitButton />
-      <p className="text-center text-[11px] text-muted">
+      <p className="text-center text-[14px] text-muted">
         관리자 승인 후 기사 작성 권한이 부여됩니다.
       </p>
     </form>
@@ -150,7 +150,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[13px] font-bold">{label}</label>
+      <label className="text-[16px] font-bold">{label}</label>
       {children}
     </div>
   );

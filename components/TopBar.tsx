@@ -18,13 +18,13 @@ export default function TopBar() {
         </Link>
         <Link
           href="/recruit"
-          className="rounded-full border border-[#EAD2D8] bg-rose-soft px-2.5 py-1 text-[11px] font-bold text-rose-deep"
+          className="rounded-full border border-[#EAD2D8] bg-rose-soft px-2.5 py-1 text-[14px] font-bold text-rose-deep"
         >
           기자모집
         </Link>
         <Link
           href="/tips"
-          className="rounded-full border border-[#EAD2D8] bg-rose-soft px-2.5 py-1 text-[11px] font-bold text-rose-deep"
+          className="rounded-full border border-[#EAD2D8] bg-rose-soft px-2.5 py-1 text-[14px] font-bold text-rose-deep"
         >
           기사제보
         </Link>

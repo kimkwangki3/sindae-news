@@ -74,10 +74,10 @@ export default function ReportManager({
                 <Pill tone="ok">처리됨</Pill>
               )}
             </div>
-            <p className="mt-2 truncate text-[13px] text-ink">
+            <p className="mt-2 truncate text-[16px] text-ink">
               {r.targetLabel}
             </p>
-            <p className="mt-1 text-[11px] text-muted">
+            <p className="mt-1 text-[14px] text-muted">
               신고자 {r.reporter} · {r.createdAt}
             </p>
 

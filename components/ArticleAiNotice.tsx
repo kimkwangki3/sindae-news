@@ -21,7 +21,7 @@ export default function ArticleAiNotice({
   return (
     <div className="mt-6 flex flex-col gap-3">
       {hasSource && (
-        <aside className="rounded-card border border-line bg-ivory-2 p-4 text-[12px] leading-relaxed">
+        <aside className="rounded-card border border-line bg-ivory-2 p-4 text-[15px] leading-relaxed">
           <p className="font-bold text-ink">📎 출처</p>
           <p className="mt-1.5 text-muted">
             {sourceName ?? "원문 자료"}
@@ -43,7 +43,7 @@ export default function ArticleAiNotice({
       )}
 
       {(aiText || aiImage) && (
-        <aside className="rounded-card border border-line bg-ivory-2 p-4 text-[12px] leading-relaxed text-muted">
+        <aside className="rounded-card border border-line bg-ivory-2 p-4 text-[15px] leading-relaxed text-muted">
           <p className="font-bold text-ink">🤖 AI 생성 고지</p>
           {aiText && (
             <p className="mt-1.5">
@@ -61,7 +61,7 @@ export default function ArticleAiNotice({
       )}
 
       {/* 항상 노출 — 저작권 + 정정보도 청구 창구(언론중재법) + 제보 */}
-      <aside className="rounded-card border border-line bg-ivory-2 p-4 text-[11px] leading-relaxed text-muted">
+      <aside className="rounded-card border border-line bg-ivory-2 p-4 text-[14px] leading-relaxed text-muted">
         <p>
           ⓒ {MEDIA.name}({MEDIA.regNo}) · 무단전재 및 재배포 금지
         </p>

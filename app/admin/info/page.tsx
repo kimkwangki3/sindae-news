@@ -18,7 +18,7 @@ export default async function AdminInfoPage() {
         title="생활정보"
         sub="계속 갱신되는 상시 정보. 내용을 채우고 공개를 켜세요"
       />
-      <p className="mb-4 rounded-card border border-line bg-white p-3 text-[12px] leading-relaxed text-muted">
+      <p className="mb-4 rounded-card border border-line bg-white p-3 text-[15px] leading-relaxed text-muted">
         본문은 빈 줄로 문단을 구분합니다. <b>공개</b>를 켜야 독자에게 보이고
         게시판 상단에도 뜹니다. 자동 갱신 표시가 붙은 항목은 나중에 자동으로
         내용이 채워지므로, 직접 쓰신 내용은 덮어쓰일 수 있습니다.
@@ -37,7 +37,7 @@ export default async function AdminInfoPage() {
               <h2 className="text-sm font-bold text-rose-deep">
                 {p.icon} {p.title}
               </h2>
-              <span className="shrink-0 text-[11px] text-muted">
+              <span className="shrink-0 text-[14px] text-muted">
                 {p.autoUpdated && "자동 갱신 · "}
                 {fmtUpdated(p.updatedAt)}
               </span>
@@ -68,7 +68,7 @@ export default async function AdminInfoPage() {
                 hint="요일표처럼 한 장으로 정리된 그림을 넣으면 공유하기 좋습니다."
               />
               {p.imageUrl && (
-                <p className="mt-1 text-[11px] text-muted">
+                <p className="mt-1 text-[14px] text-muted">
                   현재 이미지가 등록돼 있습니다. 새로 올리면 교체됩니다.
                 </p>
               )}
@@ -90,7 +90,7 @@ export default async function AdminInfoPage() {
             </div>
 
             <div className="mt-3 flex items-center justify-between">
-              <label className="flex min-h-[44px] cursor-pointer items-center gap-2 text-[13px]">
+              <label className="flex min-h-[44px] cursor-pointer items-center gap-2 text-[16px]">
                 <input
                   type="checkbox"
                   name="is_published"

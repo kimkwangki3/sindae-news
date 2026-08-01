@@ -34,7 +34,7 @@ export default function LoginPanel({ demo }: { demo: boolean }) {
           type="button"
           onClick={kakao}
           disabled={demo}
-          className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-element bg-[#FEE500] text-[15px] font-bold text-[#3C1E1E] disabled:opacity-50"
+          className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-element bg-[#FEE500] text-[18px] font-bold text-[#3C1E1E] disabled:opacity-50"
         >
           <span aria-hidden>💬</span> 카카오로 시작하기
         </button>
@@ -44,10 +44,10 @@ export default function LoginPanel({ demo }: { demo: boolean }) {
 
         {demo && (
           <div className="mt-7 rounded-card border border-line bg-white p-4 text-left">
-            <p className="text-[13px] font-bold text-rose-deep">
+            <p className="text-[16px] font-bold text-rose-deep">
               데모 로그인
             </p>
-            <p className="mt-1 text-[11px] leading-relaxed text-muted">
+            <p className="mt-1 text-[14px] leading-relaxed text-muted">
               아직 Supabase·카카오가 연결되지 않았어요. 화면 미리보기를 위해
               아래 가상 계정으로 로그인할 수 있어요.
             </p>
@@ -62,10 +62,10 @@ export default function LoginPanel({ demo }: { demo: boolean }) {
                     onClick={() => startTransition(() => demoLogin(key))}
                     className="flex min-h-[56px] flex-col items-start justify-center rounded-element border border-line bg-ivory px-3 py-2 text-left disabled:opacity-50"
                   >
-                    <span className="text-[13px] font-bold text-ink">
+                    <span className="text-[16px] font-bold text-ink">
                       {p.label}
                     </span>
-                    <span className="text-[10px] text-muted">{p.desc}</span>
+                    <span className="text-[13px] text-muted">{p.desc}</span>
                   </button>
                 );
               })}
@@ -76,7 +76,7 @@ export default function LoginPanel({ demo }: { demo: boolean }) {
 
       {/* 동의를 구하는 문서는 눌러서 읽을 수 있어야 한다. 링크 없이 문구만
           두면 무엇에 동의하는지 확인할 방법이 없다. */}
-      <p className="mt-8 max-w-[300px] text-[11px] leading-relaxed text-muted">
+      <p className="mt-8 max-w-[300px] text-[14px] leading-relaxed text-muted">
         로그인 시{" "}
         <Link href="/legal/terms" className="underline">
           서비스 이용약관

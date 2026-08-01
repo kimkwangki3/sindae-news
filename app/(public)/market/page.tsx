@@ -84,20 +84,20 @@ export default async function MarketPage({
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-1.5">
                   {p.pinned && (
-                    <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[10px] font-bold text-rose">
+                    <span className="rounded-full bg-rose-soft px-2 py-0.5 text-[13px] font-bold text-rose">
                       📌 고정
                     </span>
                   )}
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${TAG_TONE[p.category]}`}
+                    className={`rounded-full px-2 py-0.5 text-[13px] font-bold ${TAG_TONE[p.category]}`}
                   >
                     {MARKET_CAT_NAME[p.category]}
                   </span>
                 </div>
-                <h4 className="mt-1 line-clamp-2 text-[15px] font-bold leading-snug">
+                <h4 className="mt-1 line-clamp-2 text-[18px] font-bold leading-snug">
                   {p.title}
                 </h4>
-                <div className="mt-1.5 flex gap-2 text-[11px] text-muted">
+                <div className="mt-1.5 flex gap-2 text-[14px] text-muted">
                   <span>{p.neighborhood}</span>
                   <span>💬 {p.commentCount}</span>
                   <span>{p.createdAt}</span>

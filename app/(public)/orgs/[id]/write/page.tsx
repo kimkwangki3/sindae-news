@@ -50,7 +50,7 @@ export default async function OrgPostWritePage({
         </Link>
       </div>
 
-      <div className="mb-4 rounded-element border border-tag-org-bg bg-tag-org-bg/40 p-3 text-[13px] text-tag-org-fg">
+      <div className="mb-4 rounded-element border border-tag-org-bg bg-tag-org-bg/40 p-3 text-[16px] text-tag-org-fg">
         ℹ <b>{org.name}</b> 운영진으로 소식을 작성합니다.
       </div>
 
@@ -59,7 +59,7 @@ export default async function OrgPostWritePage({
         className="flex flex-col gap-4"
       >
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="title" className="text-[13px] font-bold">
+          <label htmlFor="title" className="text-[16px] font-bold">
             제목
           </label>
           <input
@@ -72,7 +72,7 @@ export default async function OrgPostWritePage({
         </div>
 
         <fieldset>
-          <legend className="mb-2 text-[13px] font-bold">분류</legend>
+          <legend className="mb-2 text-[16px] font-bold">분류</legend>
           <div className="flex gap-2">
             {POST_CATS.map((c, idx) => (
               <label
@@ -93,7 +93,7 @@ export default async function OrgPostWritePage({
         </fieldset>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="body" className="text-[13px] font-bold">
+          <label htmlFor="body" className="text-[16px] font-bold">
             내용
           </label>
           <textarea

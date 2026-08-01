@@ -89,8 +89,8 @@ export default async function ReporterProfilePage({
         </Link>
       </div>
 
-      <h1 className="mt-2 text-[22px] font-extrabold">{staff.name}</h1>
-      <p className="mt-1 text-[13px] text-muted">
+      <h1 className="mt-2 text-[25px] font-extrabold">{staff.name}</h1>
+      <p className="mt-1 text-[16px] text-muted">
         {MEDIA.name} {staff.title}
       </p>
 
@@ -109,7 +109,7 @@ export default async function ReporterProfilePage({
         </div>
       </dl>
 
-      <p className="mt-4 whitespace-pre-line text-[15px] leading-[1.85]">
+      <p className="mt-4 whitespace-pre-line text-[18px] leading-[1.85]">
         {staff.bio}
       </p>
 
@@ -117,13 +117,13 @@ export default async function ReporterProfilePage({
         <h2 className="mb-1 text-base text-rose-deep">
           {staff.name} 기자의 기사
           {mine.length > 0 && (
-            <span className="ml-1.5 text-[12px] font-normal text-muted">
+            <span className="ml-1.5 text-[15px] font-normal text-muted">
               {mine.length}건
             </span>
           )}
         </h2>
         {mine.length === 0 ? (
-          <p className="mt-2 rounded-card border border-line bg-white p-5 text-center text-[13px] text-muted">
+          <p className="mt-2 rounded-card border border-line bg-white p-5 text-center text-[16px] text-muted">
             아직 등록된 기사가 없습니다
           </p>
         ) : (

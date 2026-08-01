@@ -51,7 +51,7 @@ export default async function OrgsPage({
       </div>
 
       <div className="flex items-center justify-between px-[18px]">
-        <p className="text-[13px] text-muted">우리 동네 단체를 만나고 함께해요</p>
+        <p className="text-[16px] text-muted">우리 동네 단체를 만나고 함께해요</p>
         <Link
           href="/orgs/register"
           className="flex min-h-[40px] items-center rounded-element bg-rose-deep px-3.5 text-sm font-bold text-white"
@@ -73,13 +73,13 @@ export default async function OrgsPage({
                   className="h-[76px] w-[76px] flex-shrink-0"
                 />
               <div className="min-w-0 flex-1">
-                <span className="rounded-full bg-tag-org-bg px-2 py-0.5 text-[10px] font-bold text-tag-org-fg">
+                <span className="rounded-full bg-tag-org-bg px-2 py-0.5 text-[13px] font-bold text-tag-org-fg">
                   {ORG_CAT_NAME[o.category]}
                 </span>
-                <h4 className="mt-1 line-clamp-1 text-[15px] font-bold">
+                <h4 className="mt-1 line-clamp-1 text-[18px] font-bold">
                   {o.name}
                 </h4>
-                <div className="mt-1.5 flex gap-2 text-[11px] text-muted">
+                <div className="mt-1.5 flex gap-2 text-[14px] text-muted">
                   <span>회원 {o.memberCount}명</span>
                   <span>{o.neighborhood}</span>
                 </div>

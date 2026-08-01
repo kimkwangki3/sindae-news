@@ -51,12 +51,12 @@ export default function CorrectionManager({
               </Pill>
             </div>
             {r.reason && (
-              <p className="mt-1 text-[12px] text-muted">사유: {r.reason}</p>
+              <p className="mt-1 text-[15px] text-muted">사유: {r.reason}</p>
             )}
-            <p className="mt-1 whitespace-pre-line text-[13px] leading-relaxed">
+            <p className="mt-1 whitespace-pre-line text-[16px] leading-relaxed">
               {r.body}
             </p>
-            <p className="mt-1 text-[11px] text-muted">{r.createdAt}</p>
+            <p className="mt-1 text-[14px] text-muted">{r.createdAt}</p>
             {r.status === "pending" && (
               <div className="mt-2 flex justify-end gap-1.5">
                 <button

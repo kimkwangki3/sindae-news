@@ -75,7 +75,7 @@ export default function CommentManager({
             className="rounded-card border border-line bg-white p-4"
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[13px] font-bold">{c.author}</span>
+              <span className="text-[16px] font-bold">{c.author}</span>
               <div className="flex items-center gap-1.5">
                 {c.status === "reported" && (
                   <Pill tone="warn">신고 {c.reportCount}</Pill>
@@ -91,7 +91,7 @@ export default function CommentManager({
             >
               {c.body}
             </p>
-            <p className="mt-1.5 text-[11px] text-muted">
+            <p className="mt-1.5 text-[14px] text-muted">
               {c.articleTitle} · {c.createdAt}
             </p>
 

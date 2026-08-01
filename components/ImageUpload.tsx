@@ -83,7 +83,7 @@ export default function ImageUpload({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-[13px] font-bold">{label}</span>
+      <span className="text-[16px] font-bold">{label}</span>
       <input type="hidden" name={name} value={urls.join("\n")} />
 
       {urls.length > 0 && (
@@ -136,8 +136,8 @@ export default function ImageUpload({
         onChange={onPick}
         className="hidden"
       />
-      {hint && !error && <p className="text-[11px] text-muted">{hint}</p>}
-      {error && <p className="text-[11px] text-rose-deep">{error}</p>}
+      {hint && !error && <p className="text-[14px] text-muted">{hint}</p>}
+      {error && <p className="text-[14px] text-rose-deep">{error}</p>}
     </div>
   );
 }

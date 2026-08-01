@@ -86,7 +86,7 @@ export default async function BoardPage({
             >
               <div className="flex items-center gap-1.5">
                 <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                  className={`rounded-full px-2 py-0.5 text-[13px] font-bold ${
                     TAG_TONE[p.category] ?? "bg-line text-muted"
                   }`}
                 >
@@ -95,15 +95,15 @@ export default async function BoardPage({
                 </span>
                 {/* 단체 명의 글이면 어느 단체인지 바로 보이게 */}
                 {p.orgName && (
-                  <span className="max-w-[45%] truncate rounded-full bg-tag-org-bg px-2 py-0.5 text-[10px] font-bold text-tag-org-fg">
+                  <span className="max-w-[45%] truncate rounded-full bg-tag-org-bg px-2 py-0.5 text-[13px] font-bold text-tag-org-fg">
                     🏛 {p.orgName}
                   </span>
                 )}
-                <h4 className="line-clamp-1 flex-1 text-[15px] font-bold">
+                <h4 className="line-clamp-1 flex-1 text-[18px] font-bold">
                   {p.title}
                 </h4>
               </div>
-              <div className="flex gap-2.5 text-[11px] text-muted">
+              <div className="flex gap-2.5 text-[14px] text-muted">
                 <span>{p.author}</span>
                 <span>👍 {p.likeCount}</span>
                 <span>💬 {p.commentCount}</span>

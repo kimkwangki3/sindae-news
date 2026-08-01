@@ -5,10 +5,10 @@ export const metadata = { title: "기자 모집 · 해룡신문" };
 export default function RecruitPage() {
   return (
     <div className="px-[18px] py-6">
-      <span className="inline-block rounded-full bg-rose-soft px-2.5 py-1 text-[11px] font-bold tracking-wide text-rose">
+      <span className="inline-block rounded-full bg-rose-soft px-2.5 py-1 text-[14px] font-bold tracking-wide text-rose">
         함께할 시민기자를 찾습니다
       </span>
-      <h1 className="mt-3 text-[22px] font-extrabold leading-snug">
+      <h1 className="mt-3 text-[25px] font-extrabold leading-snug">
         해룡면 소식, 직접 전해보세요
       </h1>
       <p className="mt-2 text-sm leading-relaxed text-muted">

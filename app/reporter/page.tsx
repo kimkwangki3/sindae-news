@@ -19,7 +19,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
       <p className="text-xl font-extrabold text-rose-deep">
         {value.toLocaleString()}
       </p>
-      <p className="mt-0.5 text-[11px] text-muted">{label}</p>
+      <p className="mt-0.5 text-[14px] text-muted">{label}</p>
     </div>
   );
 }
@@ -97,14 +97,14 @@ export default async function ReporterDashboard() {
           >
             <div className="min-w-0">
               <p className="truncate text-sm font-bold">{a.title}</p>
-              <p className="mt-0.5 text-[11px] text-muted">
+              <p className="mt-0.5 text-[14px] text-muted">
                 {ARTICLE_STATUS_LABEL[a.status]} · 조회 {a.views} · 댓글{" "}
                 {a.comments}
               </p>
             </div>
             <Link
               href={`/reporter/articles/${a.id}/stats`}
-              className="flex-shrink-0 text-[11px] text-rose"
+              className="flex-shrink-0 text-[14px] text-rose"
             >
               통계 ›
             </Link>

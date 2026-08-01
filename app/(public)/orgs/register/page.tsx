@@ -57,7 +57,7 @@ export default async function OrgRegisterPage() {
           />
         </Field>
         <Field label="가입 신청 받기">
-          <label className="flex items-center gap-2 text-[13px] text-muted">
+          <label className="flex items-center gap-2 text-[16px] text-muted">
             <input
               type="checkbox"
               name="accept_join"
@@ -102,7 +102,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[13px] font-bold">{label}</label>
+      <label className="text-[16px] font-bold">{label}</label>
       {children}
     </div>
   );

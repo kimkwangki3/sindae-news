@@ -50,7 +50,7 @@ export default function OrgJoinForm({
 
   return (
     <form action={action} className="mt-6 flex flex-col gap-4">
-      <div className="rounded-element border border-tag-org-bg bg-tag-org-bg/40 p-3 text-[13px] text-tag-org-fg">
+      <div className="rounded-element border border-tag-org-bg bg-tag-org-bg/40 p-3 text-[16px] text-tag-org-fg">
         <b>{orgName}</b> 가입을 신청합니다.
         <br />
         단체 운영진 승인 후 회원이 됩니다.
@@ -80,7 +80,7 @@ export default function OrgJoinForm({
         />
       </Field>
 
-      <label className="flex items-center gap-2 text-[13px] text-muted">
+      <label className="flex items-center gap-2 text-[16px] text-muted">
         <input type="checkbox" name="agree" className="h-auto w-auto" />
         개인정보를 단체 운영진에게 제공하는 데 동의합니다
       </label>
@@ -101,7 +101,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[13px] font-bold">{label}</label>
+      <label className="text-[16px] font-bold">{label}</label>
       {children}
     </div>
   );

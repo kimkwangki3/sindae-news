@@ -18,9 +18,9 @@ export default async function AdminLogsPage() {
           >
             <div className="flex items-center justify-between gap-2">
               <span className="font-bold">{l.actor}</span>
-              <span className="text-[11px] text-muted">{l.createdAt}</span>
+              <span className="text-[14px] text-muted">{l.createdAt}</span>
             </div>
-            <p className="mt-0.5 text-[12px] text-muted">
+            <p className="mt-0.5 text-[15px] text-muted">
               <span className="font-bold text-ink">{l.action}</span>
               {l.targetType && ` · ${l.targetType}`}
               {l.memo && ` · ${l.memo}`}
