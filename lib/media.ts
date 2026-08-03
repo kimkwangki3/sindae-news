@@ -26,6 +26,10 @@ export const MEDIA = {
   // 검색용 아이디는 '해룡신문'이며 변경할 수 없다.
   kakaoChannel: "https://pf.kakao.com/_xmxhZBX",
   kakaoChannelAdd: "https://pf.kakao.com/_xmxhZBX/friend",
+  // 발행인이 직접 운영하는 블로그(2026-08-03 확인).
+  // 홈 구조화 데이터의 sameAs로 나가 구글이 "같은 매체의 다른 계정"으로 묶는다.
+  // 주소가 바뀌면 없는 페이지를 가리키게 되므로 옮길 때 여기도 같이 고칠 것.
+  naverBlog: "https://blog.naver.com/sdtime0801",
   operator: "DSBH",
   circulation: "전국",
   audience: "일반",

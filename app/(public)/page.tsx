@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CategoryNav from "@/components/CategoryNav";
+import SiteJsonLd from "@/components/SiteJsonLd";
 import AdSlot from "@/components/AdSlot";
 import Thumb from "@/components/Thumb";
 import ArticleListItem from "@/components/ArticleListItem";
@@ -32,6 +33,9 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* 검색 결과에 'sdtime.net' 대신 '해룡신문'이 뜨게 하는 구조화 데이터.
+          구글은 홈페이지에서만 사이트 이름을 읽는다. */}
+      <SiteJsonLd />
       <CategoryNav />
 
       <div className="px-[18px] pb-6">
