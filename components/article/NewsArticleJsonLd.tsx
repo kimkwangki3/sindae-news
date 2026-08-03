@@ -17,6 +17,7 @@ export default function NewsArticleJsonLd({
   author,
   section,
   siteUrl,
+  tags = [],
 }: {
   slug: string;
   headline: string;
@@ -27,6 +28,7 @@ export default function NewsArticleJsonLd({
   author: string;
   section: string;
   siteUrl: string;
+  tags?: string[];
 }) {
   const url = `${siteUrl}/article/${slug}`;
 
@@ -59,6 +61,8 @@ export default function NewsArticleJsonLd({
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     articleSection: section,
+    // 태그 = schema.org keywords. 쉼표로 잇는 게 표준 표기다.
+    ...(tags.length > 0 ? { keywords: tags.join(", ") } : {}),
     inLanguage: "ko-KR",
   };
 

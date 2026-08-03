@@ -8,6 +8,7 @@ import { createServiceClient } from "./supabase/server";
 import { logAdmin } from "./audit";
 import { CATEGORY_ID } from "./mock/articles-meta";
 import { normalizeSlug, nextArticleSlug } from "./slug";
+import { parseTags } from "./tags";
 import type {
   ArticleStatus,
   CommentStatus,
@@ -83,6 +84,7 @@ export async function saveArticle(formData: FormData): Promise<void> {
     slug,
     title,
     subtitle: String(formData.get("subtitle") ?? "").trim() || null,
+    tags: parseTags(String(formData.get("tags") ?? "")),
     category_id:
       CATEGORY_ID[categorySlug as keyof typeof CATEGORY_ID] ?? null,
     body: body || null,

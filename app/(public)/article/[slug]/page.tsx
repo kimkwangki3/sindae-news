@@ -10,6 +10,7 @@ import ReportSheet from "@/components/ReportSheet";
 import ArticleAiNotice from "@/components/ArticleAiNotice";
 import KakaoChannelCta from "@/components/KakaoChannelCta";
 import NewsArticleJsonLd from "@/components/article/NewsArticleJsonLd";
+import TagChips from "@/components/article/TagChips";
 import { MEDIA } from "@/lib/media";
 import { findStaffByName } from "@/lib/staff";
 
@@ -90,6 +91,7 @@ export default async function ArticleDetailPage({
         author={article.author}
         section={CATEGORY_NAME[article.category]}
         siteUrl={SITE_URL}
+        tags={article.tags}
       />
       <div className="pt-4">
         <span className="inline-block rounded-full bg-rose-soft px-2.5 py-1 text-[16px] font-bold text-rose">
@@ -147,6 +149,9 @@ export default async function ArticleDetailPage({
           <p key={i}>{p}</p>
         ))}
       </div>
+
+      {/* 태그 — 본문 끝. 같은 화제의 기사로 넘어가는 통로 */}
+      <TagChips tags={article.tags} className="mt-6" />
 
       <ArticleAiNotice
         aiText={article.aiText}

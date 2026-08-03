@@ -2,6 +2,7 @@
 // 관리자 화면은 레이아웃에서 admin/superadmin만 통과시키므로 service role로 조회(RLS 우회).
 import { createServiceClient } from "@/lib/supabase/server";
 import { CATEGORY_NAME, ID_TO_SLUG } from "@/lib/mock/articles-meta";
+import { toTags } from "@/lib/tags";
 import type {
   ArticleStatus,
   AdminStat,
@@ -814,6 +815,7 @@ export interface AdminArticleEdit {
   sourceUrl: string;
   aiText: boolean;
   aiImage: boolean;
+  tags: string[];
   status: ArticleStatus;
 }
 
@@ -824,7 +826,7 @@ export async function getArticleForEdit(
   const { data, error } = await supabase
     .from("articles")
     .select(
-      "slug, title, subtitle, category_id, body, thumbnail_url, source_name, source_url, ai_text, ai_image, status",
+      "slug, title, subtitle, category_id, body, thumbnail_url, source_name, source_url, ai_text, ai_image, tags, status",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -847,6 +849,7 @@ export async function getArticleForEdit(
     sourceUrl: (r.source_url as string) ?? "",
     aiText: Boolean(r.ai_text),
     aiImage: Boolean(r.ai_image),
+    tags: toTags(r.tags),
     status: r.status as ArticleStatus,
   };
 }

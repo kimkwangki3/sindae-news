@@ -6,6 +6,7 @@ import { saveReporterArticle, type WriteState } from "@/lib/reporter-actions";
 import { CATEGORY_NAME } from "@/lib/mock/articles-meta";
 import ImageUpload from "@/components/ImageUpload";
 import ArticleAiFields from "@/components/ArticleAiFields";
+import { MAX_TAGS } from "@/lib/tags";
 
 const INITIAL: WriteState = {};
 const INPUT =
@@ -82,6 +83,17 @@ export default function ReporterWriteForm({
           placeholder="비워두면 20260801-1 처럼 자동으로 정해집니다"
           className={INPUT}
         />
+      </Field>
+
+      <Field label="태그 (선택)">
+        <input
+          name="tags"
+          placeholder="쉼표로 구분. 예: 선암사, 청년, 소개팅 프로그램"
+          className={INPUT}
+        />
+        <p className="mt-1 text-[16px] text-muted">
+          # 없이 적으세요. 최대 {MAX_TAGS}개까지 저장됩니다.
+        </p>
       </Field>
 
       <Field label="본문">

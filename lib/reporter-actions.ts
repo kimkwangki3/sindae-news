@@ -9,6 +9,7 @@ import { createClient } from "./supabase/server";
 import { notify } from "./telegram";
 import { CATEGORY_ID } from "./mock/articles-meta";
 import { normalizeSlug, nextArticleSlug } from "./slug";
+import { parseTags } from "./tags";
 
 export interface WriteState {
   ok?: boolean;
@@ -54,6 +55,7 @@ export async function saveReporterArticle(
     slug,
     title,
     subtitle: String(formData.get("subtitle") ?? "").trim() || null,
+    tags: parseTags(String(formData.get("tags") ?? "")),
     category_id:
       CATEGORY_ID[categorySlug as keyof typeof CATEGORY_ID] ?? null,
     body: body || null,

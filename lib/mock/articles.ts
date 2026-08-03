@@ -4,6 +4,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import type { ArticleSummary } from "@/components/ArticleListItem";
+import { toTags } from "@/lib/tags";
 import {
   CATEGORY_ID,
   CATEGORY_NAME,
@@ -39,6 +40,7 @@ export interface MockArticle {
   aiImage: boolean; // 대표 이미지를 AI로 생성했는지
   sourceName: string | null; // 출처 기관 (보도자료 재구성 시)
   sourceUrl: string | null; // 원문 링크
+  tags: string[]; // #키워드 — 카테고리를 가로지르는 주제 묶음
 }
 
 // timestamptz → "2026.06.25" (로케일 비의존)
@@ -125,7 +127,7 @@ export async function getArticleBySlug(
   const { data, error } = await supabase
     .from("articles")
     .select(
-      "id, slug, title, subtitle, body, thumbnail_url, category_id, view_count, published_at, updated_at, ai_text, ai_image, source_name, source_url, author:profiles!author_id(nickname)",
+      "id, slug, title, subtitle, body, thumbnail_url, category_id, view_count, published_at, updated_at, ai_text, ai_image, source_name, source_url, tags, author:profiles!author_id(nickname)",
     )
     .eq("slug", slug)
     .eq("status", "published")
@@ -151,6 +153,7 @@ export async function getArticleBySlug(
     ai_image: boolean | null;
     source_name: string | null;
     source_url: string | null;
+    tags: string[] | null;
     author?: { nickname?: string } | null;
   };
 
@@ -196,10 +199,64 @@ export async function getArticleBySlug(
     aiImage: a.ai_image ?? false,
     sourceName: a.source_name,
     sourceUrl: a.source_url,
+    tags: toTags(a.tags),
   };
 }
 
-// 같은 카테고리 다른 기사 추천
+// 태그 하나에 걸린 기사 목록. 배열 포함 연산(@>) — GIN 인덱스를 탄다.
+export async function getArticlesByTag(
+  tag: string,
+  limit = 30,
+): Promise<ArticleSummary[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("articles")
+    .select(LIST_COLS)
+    .eq("status", "published")
+    .not("published_at", "is", null)
+    .contains("tags", [tag])
+    .order("published_at", { ascending: false })
+    .limit(limit);
+
+  if (error) return [];
+  return (data ?? []).map((r) => rowToSummary(r as ListRow));
+}
+
+export interface TagCount {
+  tag: string;
+  count: number;
+}
+
+// 많이 쓰인 태그 순. 기사 수가 작아 JS에서 센다.
+// 수천 건 규모가 되면 unnest + group by 하는 뷰나 RPC로 옮긴다.
+export async function getTopTags(limit = 20): Promise<TagCount[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("articles")
+    .select("tags")
+    .eq("status", "published")
+    .not("published_at", "is", null)
+    .order("published_at", { ascending: false })
+    .limit(500);
+
+  if (error) return [];
+
+  const counts = new Map<string, number>();
+  for (const row of (data ?? []) as { tags: unknown }[]) {
+    for (const tag of toTags(row.tags)) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .map(([tag, count]) => ({ tag, count }))
+    // 많이 쓰인 순, 같으면 가나다순 — 순서가 매번 달라지지 않게 한다.
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag, "ko"))
+    .slice(0, limit);
+}
+
+// 관련 기사 추천 — 태그가 겹치는 기사를 먼저, 모자라면 같은 카테고리로 채운다.
+// 카테고리는 4개뿐이라 그것만 보면 "행정" 기사 아무거나가 붙는다.
+// 태그가 겹치면 같은 사안의 앞뒤 보도일 가능성이 높다.
 export async function getRelated(
   slug: string,
   limit = 3,
@@ -207,21 +264,69 @@ export async function getRelated(
   const supabase = createClient();
   const { data: cur } = await supabase
     .from("articles")
-    .select("category_id")
+    .select("category_id, tags")
     .eq("slug", slug)
     .maybeSingle();
   if (!cur) return [];
 
-  const { data } = await supabase
-    .from("articles")
-    .select(LIST_COLS)
-    .eq("status", "published")
-    .eq("category_id", (cur as { category_id: number }).category_id)
-    .neq("slug", slug)
-    .order("published_at", { ascending: false })
-    .limit(limit);
+  const { category_id: categoryId, tags } = cur as {
+    category_id: number | null;
+    tags: unknown;
+  };
+  const myTags = toTags(tags);
 
-  return (data ?? []).map((r) => rowToSummary(r as ListRow));
+  const picked: ListRow[] = [];
+  const seen = new Set<string>([slug]);
+
+  if (myTags.length > 0) {
+    // overlaps = 하나라도 겹치면(&&). contains(@>)는 전부 겹쳐야 해서 너무 좁다.
+    //
+    // 다만 '순천시'처럼 거의 모든 기사에 붙는 태그가 있어서, 하나만 겹쳐도
+    // 후보가 되면 사실상 최신순이 된다. 그래서 넉넉히 뽑아온 뒤 겹친 태그
+    // 개수로 다시 줄 세운다 — 많이 겹칠수록 같은 사안일 가능성이 높다.
+    const { data } = await supabase
+      .from("articles")
+      .select(`${LIST_COLS}, tags`)
+      .eq("status", "published")
+      .not("published_at", "is", null)
+      .overlaps("tags", myTags)
+      .neq("slug", slug)
+      .order("published_at", { ascending: false })
+      .limit(30);
+
+    const mine = new Set(myTags);
+    const scored = ((data ?? []) as (ListRow & { tags: unknown })[])
+      .map((r) => ({
+        row: r,
+        hits: toTags(r.tags).filter((t) => mine.has(t)).length,
+      }))
+      // 겹친 개수 내림차순. 같으면 위 쿼리가 준 최신순 그대로 둔다.
+      .sort((a, b) => b.hits - a.hits);
+
+    for (const { row } of scored.slice(0, limit)) {
+      picked.push(row);
+      seen.add(row.slug);
+    }
+  }
+
+  if (picked.length < limit && categoryId !== null) {
+    const { data } = await supabase
+      .from("articles")
+      .select(LIST_COLS)
+      .eq("status", "published")
+      .eq("category_id", categoryId)
+      .neq("slug", slug)
+      .order("published_at", { ascending: false })
+      .limit(limit + seen.size);
+    for (const r of (data ?? []) as ListRow[]) {
+      if (picked.length >= limit) break;
+      if (seen.has(r.slug)) continue;
+      picked.push(r);
+      seen.add(r.slug);
+    }
+  }
+
+  return picked.slice(0, limit).map(rowToSummary);
 }
 
 // 홈 헤드라인(가장 최신 1건). 기사 없으면 null.

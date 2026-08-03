@@ -4,6 +4,7 @@ import { PageHead } from "@/components/admin/ui";
 import ImageUpload from "@/components/ImageUpload";
 import ArticleAiFields from "@/components/ArticleAiFields";
 import { CATEGORY_NAME, type CategorySlug } from "@/lib/mock/articles";
+import { MAX_TAGS, tagsToInput } from "@/lib/tags";
 import { getArticleForEdit } from "@/lib/mock/admin";
 import { notFound } from "next/navigation";
 
@@ -109,7 +110,28 @@ export default async function NewArticlePage({
         </div>
 
         <div className="flex flex-col gap-1.5">
+          <label htmlFor="tags" className="text-[18px] font-bold">
+            태그 (선택){" "}
+            <span className="font-normal text-muted">
+              — 쉼표로 구분, 최대 {MAX_TAGS}개
+            </span>
+          </label>
+          <input
+            id="tags"
+            name="tags"
+            defaultValue={tagsToInput(editing?.tags)}
+            placeholder="선암사, 청년, 소개팅 프로그램"
+            className="min-h-[48px] rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose"
+          />
+          <p className="text-[16px] text-muted">
+            # 없이 적으세요. 기사 아래에 #태그로 표시되고, 누르면 같은 태그
+            기사들이 모입니다.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
           <label htmlFor="body" className="text-[18px] font-bold">
+
             본문
           </label>
           <textarea

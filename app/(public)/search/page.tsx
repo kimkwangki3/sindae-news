@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { searchAll } from "@/lib/mock/search";
+import { getTopTags } from "@/lib/mock/articles";
+import TagChips from "@/components/article/TagChips";
 
 export const metadata = { title: "검색 · 해룡신문" };
 
@@ -9,7 +11,12 @@ export default async function SearchPage({
   searchParams: { q?: string };
 }) {
   const q = (searchParams.q ?? "").trim();
-  const groups = q ? await searchAll(q) : [];
+  // 검색어가 없을 땐 빈 화면 대신 태그를 보여준다 — 뭘 검색해야 할지
+  // 모르는 방문자에게 이 신문이 무슨 이야기를 다뤄왔는지가 곧 실마리다.
+  const [groups, topTags] = await Promise.all([
+    q ? searchAll(q) : Promise.resolve([]),
+    q ? Promise.resolve([]) : getTopTags(16),
+  ]);
   const total = groups.reduce((n, g) => n + g.hits.length, 0);
 
   return (
@@ -33,9 +40,19 @@ export default async function SearchPage({
 
       {/* 결과 */}
       {q === "" ? (
-        <p className="py-16 text-center text-sm text-muted">
-          찾고 싶은 단어를 입력해 보세요
-        </p>
+        <div className="pt-8">
+          <p className="text-center text-sm text-muted">
+            찾고 싶은 단어를 입력해 보세요
+          </p>
+          {topTags.length > 0 && (
+            <section className="mt-8">
+              <h2 className="mb-2 text-sm font-bold text-rose-deep">
+                많이 다룬 주제
+              </h2>
+              <TagChips tags={topTags.map((t) => t.tag)} />
+            </section>
+          )}
+        </div>
       ) : total === 0 ? (
         <p className="py-16 text-center text-sm text-muted">
           ‘{q}’ 검색 결과가 없습니다
