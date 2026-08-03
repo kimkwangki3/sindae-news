@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import CategoryNav from "@/components/CategoryNav";
 import SiteJsonLd from "@/components/SiteJsonLd";
 import AdSlot from "@/components/AdSlot";
@@ -22,14 +23,22 @@ function SectionTitle({ title, href }: { title: string; href: string }) {
   );
 }
 
+// 홈에 보여줄 최신 기사 수. 헤드라인 1건을 빼야 하므로 하나 더 받아온다.
+const HOME_LIST = 10;
+
 export default async function HomePage() {
-  const [lead, localPage, peoplePage] = await Promise.all([
+  const [lead, latest] = await Promise.all([
     getLead(),
-    getArticlesPage("local", 0, 3),
-    getArticlesPage("people", 0, 2),
+    // 분류를 가리지 않고 발행 최신순. 홈은 "지금 무슨 일이 있었나"를 보는
+    // 자리라 분류별로 나눠 놓으면 정작 방금 올라온 기사가 아래로 밀린다.
+    getArticlesPage(null, 0, HOME_LIST + 1),
   ]);
-  const localNews = localPage.items;
-  const people = peoplePage.items;
+
+  // 헤드라인으로 크게 띄운 기사가 바로 아래 목록에 또 나오면 같은 기사를
+  // 두 번 읽게 된다.
+  const items = latest.items
+    .filter((a) => a.slug !== lead?.slug)
+    .slice(0, HOME_LIST);
 
   return (
     <>
@@ -46,13 +55,30 @@ export default async function HomePage() {
               오늘의 헤드라인
             </span>
             <Link href={`/article/${lead.slug}`} className="mt-3.5 block">
-              <Thumb
-                src={lead.thumbnailUrl}
-                sizes="(max-width: 768px) 100vw, 720px"
-                className="h-[200px] w-full"
-                rounded="rounded-card"
-                alt={lead.title}
-              />
+              {/* 헤드라인 사진은 자르지 않는다 — 안내 포스터처럼 글자가 들어간
+                  이미지를 200px 상자에 맞춰 잘라내면 정작 읽어야 할 날짜·장소가
+                  사라진다. 기사 상세와 같은 기준이다.
+                  화면 맨 위라 미리 받아야 첫 화면이 늦지 않는다(priority).
+                  width/height는 자리를 미리 잡기 위한 값이고, 로드된 뒤에는
+                  h-auto가 실제 비율을 따라가므로 어떤 비율이든 잘리지 않는다. */}
+              {lead.thumbnailUrl ? (
+                <Image
+                  src={lead.thumbnailUrl}
+                  alt={lead.title}
+                  width={1448}
+                  height={1086}
+                  sizes="(max-width: 768px) 100vw, 720px"
+                  priority
+                  className="h-auto w-full rounded-card"
+                />
+              ) : (
+                <Thumb
+                  src={null}
+                  className="h-[200px] w-full"
+                  rounded="rounded-card"
+                  alt=""
+                />
+              )}
               <h2 className="mt-3.5 text-[28px] font-extrabold leading-snug">
                 {lead.title}
               </h2>
@@ -66,22 +92,29 @@ export default async function HomePage() {
 
         <AdSlot slot="home-top" placeholder />
 
-        {/* 해룡소식 */}
+        {/* 최신 기사 — 분류를 나누지 않고 올라온 순서대로.
+            분류별 묶음은 상단 분류 메뉴와 /articles/[분류]에서 볼 수 있다. */}
         <section>
-          <SectionTitle title="해룡소식" href="/articles/local" />
-          {localNews.map((a) => (
+          <SectionTitle title="최신 기사" href="/articles" />
+          {items.slice(0, 5).map((a) => (
             <ArticleListItem key={a.slug} article={a} />
           ))}
         </section>
 
         <AdSlot slot="home-mid" />
 
-        {/* 해룡인물 */}
         <section>
-          <SectionTitle title="해룡인물" href="/articles/people" />
-          {people.map((a) => (
+          {items.slice(5).map((a) => (
             <ArticleListItem key={a.slug} article={a} />
           ))}
+          {items.length >= HOME_LIST && (
+            <Link
+              href="/articles"
+              className="mt-2 flex min-h-[48px] items-center justify-center rounded-card border border-line bg-white text-sm font-bold text-rose-deep"
+            >
+              기사 더 보기 ›
+            </Link>
+          )}
         </section>
 
         <AdSlot slot="home-bottom" />
