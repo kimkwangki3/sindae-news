@@ -11,6 +11,7 @@ import ArticleAiNotice from "@/components/ArticleAiNotice";
 import KakaoChannelCta from "@/components/KakaoChannelCta";
 import NewsArticleJsonLd from "@/components/article/NewsArticleJsonLd";
 import TagChips from "@/components/article/TagChips";
+import ArticlePhoto from "@/components/article/ArticlePhoto";
 import { MEDIA } from "@/lib/media";
 import { findStaffByName } from "@/lib/staff";
 
@@ -130,13 +131,21 @@ export default async function ArticleDetailPage({
       {/* 대표 이미지 — alt는 제목만 넣지 말고 무엇을 담은 이미지인지 밝힌다.
           AI로 만든 이미지는 현장 사진으로 오인되지 않게 바로 아래 캡션을 단다. */}
       <figure className="mt-4">
-        <Thumb
-          src={article.thumbnailUrl}
-          sizes="(max-width: 768px) 100vw, 720px"
-          className="h-[210px] w-full"
-          rounded="rounded-card"
-          alt={`${article.title} 관련 이미지`}
-        />
+        {article.thumbnailUrl ? (
+          // 상세에서는 자르지 않는다 — 안내 포스터처럼 글자가 들어간 이미지는
+          // 잘리면 정보가 사라진다. 탭하면 전체화면으로 원본을 볼 수 있다.
+          <ArticlePhoto
+            src={article.thumbnailUrl}
+            alt={`${article.title} 관련 이미지`}
+          />
+        ) : (
+          <Thumb
+            src={null}
+            className="h-[210px] w-full"
+            rounded="rounded-card"
+            alt=""
+          />
+        )}
         {article.thumbnailUrl && article.aiImage && (
           <figcaption className="mt-1.5 text-[16px] text-muted">
             이미지: AI 생성 · 실제 현장 사진이 아닙니다
