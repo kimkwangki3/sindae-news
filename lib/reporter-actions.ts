@@ -10,6 +10,7 @@ import { notify } from "./telegram";
 import { CATEGORY_ID } from "./mock/articles-meta";
 import { normalizeSlug, nextArticleSlug } from "./slug";
 import { parseTags } from "./tags";
+import { parseBlocks, blocksToPlainText, collectImageUrls } from "./blocks";
 
 export interface WriteState {
   ok?: boolean;
@@ -30,9 +31,20 @@ export async function saveReporterArticle(
   const intent = String(formData.get("intent") ?? "draft"); // draft | submit
   const title = String(formData.get("title") ?? "").trim();
   const categorySlug = String(formData.get("category") ?? "local");
-  const body = String(formData.get("body") ?? "").trim();
-  const thumbnailUrl = String(formData.get("thumbnail_url") ?? "").trim();
   const pledge = formData.get("pledge_ack") === "on";
+
+  // 본문 — 편집기가 보낸 블록 JSON은 믿지 않고 허용 목록만으로 다시 만든다.
+  // 쓸 만한 블록이 없으면 예전처럼 text로 저장한다(관리자 에디터와 같은 규칙).
+  const blocks = parseBlocks(formData.get("body_blocks"));
+  const body = blocks
+    ? blocksToPlainText(blocks)
+    : String(formData.get("body") ?? "").trim();
+
+  // 대표 이미지를 따로 고르지 않았으면 본문 첫 사진을 쓴다. 목록 카드와 공유
+  // 미리보기에 사진이 비면 기사가 눈에 띄지 않는다.
+  const thumbnailUrl =
+    String(formData.get("thumbnail_url") ?? "").trim() ||
+    (blocks ? (collectImageUrls(blocks)[0] ?? "") : "");
 
   if (title.length < 2) return { error: "제목을 입력해 주세요." };
 
@@ -59,6 +71,8 @@ export async function saveReporterArticle(
     category_id:
       CATEGORY_ID[categorySlug as keyof typeof CATEGORY_ID] ?? null,
     body: body || null,
+    body_blocks: blocks,
+    body_format: blocks ? "blocks" : "text",
     thumbnail_url: thumbnailUrl || null,
     author_id: user.id,
     status,

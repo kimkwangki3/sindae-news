@@ -5,7 +5,9 @@ import { useFormState, useFormStatus } from "react-dom";
 import { saveReporterArticle, type WriteState } from "@/lib/reporter-actions";
 import { CATEGORY_NAME } from "@/lib/mock/articles-meta";
 import ImageUpload from "@/components/ImageUpload";
+import BlockEditor from "@/components/BlockEditor";
 import ArticleAiFields from "@/components/ArticleAiFields";
+import { ARTICLE_PALETTE } from "@/lib/blocks";
 import { MAX_TAGS } from "@/lib/tags";
 
 const INITIAL: WriteState = {};
@@ -96,20 +98,23 @@ export default function ReporterWriteForm({
         </p>
       </Field>
 
-      <Field label="본문">
-        <textarea
-          name="body"
-          rows={12}
-          placeholder="기사 본문을 입력하세요. 빈 줄로 문단을 구분합니다."
-          className="w-full resize-y rounded-element border border-line bg-white p-3.5 text-sm leading-relaxed outline-none focus:border-rose"
-        />
-      </Field>
+      {/* 본문 — 문단·사진·소제목·인용·구분선을 순서대로 쌓는다.
+          편집 내용이 React 상태에 있어서, 저장이 실패해 폼이 다시 그려져도
+          쓰던 기사가 남는다(예전 textarea보다 오히려 안전하다). */}
+      <BlockEditor
+        name="body_blocks"
+        textName="body"
+        bucket="articles"
+        palette={ARTICLE_PALETTE}
+        label="본문"
+        hint="칸을 누르면 색·소제목·순서 바꾸기가 나옵니다. 사진은 원하는 문단 아래에 넣을 수 있어요."
+      />
 
       <ImageUpload
         name="thumbnail_url"
         bucket="articles"
         label="대표 이미지(선택)"
-        hint="목록·상세 상단에 표시됩니다. 6MB 이하 권장."
+        hint="목록·상세 상단에 표시됩니다. 비워두면 본문 첫 사진을 씁니다. 6MB 이하 권장."
       />
 
       <ArticleAiFields />
