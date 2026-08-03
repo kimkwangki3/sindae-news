@@ -20,7 +20,7 @@ import { parsePhotoUrls } from "./photos";
 // ── 타입 ──────────────────────────────────────────────────────────────
 export type BlockColor =
   | "ink" // 기본 본문색
-  | "rose" // 브랜드 강조
+  | "accent" // 강조 — 네이비 + 굵게
   | "red"
   | "blue"
   | "green"
@@ -50,20 +50,27 @@ export type BodyFormat = "text" | "blocks";
 // ── 허용 목록 ─────────────────────────────────────────────────────────
 const COLORS: readonly BlockColor[] = [
   "ink",
-  "rose",
+  "accent",
   "red",
   "blue",
   "green",
   "brown",
   "muted",
 ];
+
+// 예전에 저장된 값 → 지금 이름. 강조색은 처음에 브랜드 로즈였다가 네이비로
+// 바뀌었는데, 이름만 달라졌을 뿐 뜻은 같다. 이 표가 없으면 그때 쓴 기사의
+// 강조가 검증에서 걸러져 기본색으로 되돌아간다.
+const LEGACY_COLOR: Record<string, BlockColor> = { rose: "accent" };
 const STYLES: readonly TextStyle[] = ["normal", "heading", "quote"];
 
 // 색 이름 → Tailwind 클래스. 문자열을 여기에 통째로 적어둬야 Tailwind가
 // 빌드할 때 클래스를 찾아낸다(`text-${color}` 처럼 조립하면 스타일이 사라진다).
 export const COLOR_CLASS: Record<BlockColor, string> = {
   ink: "text-ink",
-  rose: "text-rose-deep",
+  // 강조는 색과 굵기를 한 몸으로 다룬다. 둘을 따로 고르게 하면 사람마다
+  // 다르게 조합해 기사마다 강조 모양이 달라진다.
+  accent: "text-body-navy font-bold",
   red: "text-body-red",
   blue: "text-body-blue",
   green: "text-body-green",
@@ -83,7 +90,7 @@ export function colorClass(c?: BlockColor): string {
 // 팔레트 UI에 쓸 라벨. 기사에는 이 중 일부만 노출한다(신문 톤 유지).
 export const COLOR_LABEL: Record<BlockColor, string> = {
   ink: "기본",
-  rose: "강조",
+  accent: "강조",
   red: "빨강",
   blue: "파랑",
   green: "초록",
@@ -91,8 +98,8 @@ export const COLOR_LABEL: Record<BlockColor, string> = {
   muted: "연회색",
 };
 
-/** 기사 본문용 팔레트 — 기본 + 브랜드 강조 1색. */
-export const ARTICLE_PALETTE: readonly BlockColor[] = ["ink", "rose"];
+/** 기사 본문용 팔레트 — 기본 + 강조 1색. */
+export const ARTICLE_PALETTE: readonly BlockColor[] = ["ink", "accent"];
 /** 게시판용 팔레트 — 주민 자유글이라 폭을 넓게. */
 export const BOARD_PALETTE: readonly BlockColor[] = COLORS;
 
@@ -159,8 +166,9 @@ export function parseBlocks(raw: unknown): Block[] | null {
       if (text.length > budget) break; // 전체 한도 초과 — 여기서 자른다
       budget -= text.length;
 
-      const color = COLORS.includes(rec.color as BlockColor)
-        ? (rec.color as BlockColor)
+      const named = LEGACY_COLOR[String(rec.color)] ?? rec.color;
+      const color = COLORS.includes(named as BlockColor)
+        ? (named as BlockColor)
         : undefined;
       const style = STYLES.includes(rec.style as TextStyle)
         ? (rec.style as TextStyle)
