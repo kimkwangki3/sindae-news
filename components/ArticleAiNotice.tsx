@@ -18,10 +18,15 @@ export default function ArticleAiNotice({
 }) {
   const hasSource = Boolean(sourceName || sourceUrl);
 
+  // 고지문은 본문(20px)보다 확실히 작아야 읽는 흐름을 끊지 않는다.
+  // 반드시 실려야 하는 문구지만 기사보다 눈에 띌 이유는 없다.
+  // 세 블록의 크기를 하나로 맞춰 놓아야 따로 놀지 않는다.
+  const NOTICE = "rounded-card border border-line bg-ivory-2 p-4 text-[15px] leading-relaxed";
+
   return (
     <div className="mt-6 flex flex-col gap-3">
       {hasSource && (
-        <aside className="rounded-card border border-line bg-ivory-2 p-4 text-[17px] leading-relaxed">
+        <aside className={NOTICE}>
           <p className="font-bold text-ink">📎 출처</p>
           <p className="mt-1.5 text-muted">
             {sourceName ?? "원문 자료"}
@@ -43,7 +48,7 @@ export default function ArticleAiNotice({
       )}
 
       {(aiText || aiImage) && (
-        <aside className="rounded-card border border-line bg-ivory-2 p-4 text-[17px] leading-relaxed text-muted">
+        <aside className={`${NOTICE} text-muted`}>
           <p className="font-bold text-ink">🤖 AI 생성 고지</p>
           {aiText && (
             <p className="mt-1.5">
@@ -61,7 +66,7 @@ export default function ArticleAiNotice({
       )}
 
       {/* 항상 노출 — 저작권 + 정정보도 청구 창구(언론중재법) + 제보 */}
-      <aside className="rounded-card border border-line bg-ivory-2 p-4 text-[16px] leading-relaxed text-muted">
+      <aside className={`${NOTICE} text-muted`}>
         <p>
           ⓒ {MEDIA.name}({MEDIA.regNo}) · 무단전재 및 재배포 금지
         </p>

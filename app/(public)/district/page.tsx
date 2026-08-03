@@ -53,7 +53,10 @@ export default async function DistrictPage({
       <div className="flex justify-end px-[18px]">
         <Link
           href="/district/business/register"
-          className="flex min-h-[40px] items-center rounded-element bg-rose-deep px-3.5 text-sm font-bold text-white"
+          // 글자 크기를 전체적으로 올리면서 이 버튼만 유난히 커졌다.
+          // 자주 누르는 버튼이 아니라 목록을 가리지 않을 만큼만 남긴다.
+          // 높이(40px)는 그대로 둔다 — 더 낮추면 누르기 어려워진다.
+          className="flex min-h-[40px] items-center rounded-element bg-rose-deep px-3 text-[16px] font-bold text-white"
         >
           ＋ 업체 등록
         </Link>

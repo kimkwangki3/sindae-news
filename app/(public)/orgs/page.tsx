@@ -54,7 +54,8 @@ export default async function OrgsPage({
         <p className="text-[18px] text-muted">우리 동네 단체를 만나고 함께해요</p>
         <Link
           href="/orgs/register"
-          className="flex min-h-[40px] items-center rounded-element bg-rose-deep px-3.5 text-sm font-bold text-white"
+          // 업체 등록 버튼과 같은 크기로 맞춘다(app/(public)/district/page.tsx).
+          className="flex min-h-[40px] items-center rounded-element bg-rose-deep px-3 text-[16px] font-bold text-white"
         >
           ＋ 단체 등록
         </Link>
