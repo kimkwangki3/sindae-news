@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import PhotoGallery from "@/components/PhotoGallery";
+import PostBody from "@/components/PostBody";
 import ReportSheet from "@/components/ReportSheet";
 import PostComments from "@/components/community/PostComments";
 import PostOwnerControls from "@/components/community/PostOwnerControls";
@@ -71,14 +72,25 @@ export default async function BoardDetailPage({
         {post.author} · {post.createdAt} · 👁 {post.viewCount.toLocaleString()}
       </p>
 
-      <p className="mt-5 whitespace-pre-line border-t border-line pt-5 text-[20px] leading-[1.85]">
-        {post.body}
-      </p>
-
-      {post.photos.length > 0 && (
-        <div className="mt-4">
-          <PhotoGallery photos={post.photos} alt={post.title} />
+      {/* 본문 — 블록으로 쓴 글은 사진이 본문 안에 순서대로 들어 있다.
+          그래서 아래 갤러리를 함께 띄우면 같은 사진이 두 번 나온다.
+          예전 글(body_format='text')은 지금까지와 똑같이 본문 + 갤러리다. */}
+      {post.bodyBlocks ? (
+        <div className="mt-5 border-t border-line pt-5">
+          <PostBody blocks={post.bodyBlocks} alt={post.title} />
         </div>
+      ) : (
+        <>
+          <p className="mt-5 whitespace-pre-line border-t border-line pt-5 text-[20px] leading-[1.85]">
+            {post.body}
+          </p>
+
+          {post.photos.length > 0 && (
+            <div className="mt-4">
+              <PhotoGallery photos={post.photos} alt={post.title} />
+            </div>
+          )}
+        </>
       )}
 
       <div className="my-6 flex items-center justify-center gap-3">

@@ -2,6 +2,7 @@
 // 시그니처는 동일하나 전부 async.
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
+import { readBlocks, type Block } from "@/lib/blocks";
 
 // --- 공통 ------------------------------------------------------------
 export interface PostComment {
@@ -145,6 +146,10 @@ export interface BoardPost {
   commentCount: number;
   viewCount: number;
   photos: string[];
+  // 블록 본문(사진 중간 삽입·문단 색). 목록 조회에서는 항상 null이고
+  // 상세 조회에서만 채운다 — 목록 카드는 본문을 쓰지 않는데 블록까지
+  // 끌어오면 글마다 쓸데없이 무거워진다.
+  bodyBlocks: Block[] | null;
   pinned: boolean;
   mine?: boolean; // 현재 로그인 사용자가 작성
   orgId: string | null; // 단체 명의 글이면 해당 단체
@@ -153,6 +158,9 @@ export interface BoardPost {
 
 const BOARD_COLS =
   "id, category, title, body, like_count, view_count, is_pinned, created_at, author_id, org_id, author:profiles!author_id(nickname), org:organizations!org_id(name), board_comments(count), board_photos(url, sort)";
+
+// 상세 화면에서만 블록 본문을 함께 읽는다.
+const BOARD_DETAIL_COLS = `${BOARD_COLS}, body_blocks, body_format`;
 
 function toBoardPost(r: Record<string, unknown>): BoardPost {
   return {
@@ -166,6 +174,8 @@ function toBoardPost(r: Record<string, unknown>): BoardPost {
     commentCount: embeddedCount(r.board_comments),
     viewCount: Number(r.view_count ?? 0),
     photos: embeddedPhotos(r.board_photos),
+    // 목록 조회에는 컬럼 자체가 없어 undefined → null이 된다.
+    bodyBlocks: r.body_format === "blocks" ? readBlocks(r.body_blocks) : null,
     pinned: Boolean(r.is_pinned),
     orgId: (r.org_id as string) ?? null,
     orgName: (r.org as { name?: string } | null)?.name ?? null,
@@ -201,7 +211,7 @@ export async function getBoardPost(id: string): Promise<BoardPost | null> {
   const [{ data }, user] = await Promise.all([
     supabase
       .from("board_posts")
-      .select(BOARD_COLS)
+      .select(BOARD_DETAIL_COLS)
       .eq("id", id)
       .eq("visibility", "visible")
       .maybeSingle(),

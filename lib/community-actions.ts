@@ -7,6 +7,7 @@ import { createClient, createServiceClient } from "./supabase/server";
 import { getIpHash } from "./ip";
 import { TIP_DAILY_LIMIT } from "./tips";
 import { parsePhotoUrls } from "./photos";
+import { parseBlocks, blocksToPlainText, collectImageUrls, type Block } from "./blocks";
 import { notify } from "./telegram";
 import { type PostComment } from "./mock/community";
 
@@ -48,6 +49,28 @@ async function replacePostPhotos(
 ): Promise<void> {
   await supabase.from(table).delete().eq("post_id", id);
   await savePostPhotos(supabase, table, "post_id", id, urls);
+}
+
+// 게시판 본문 읽기 — 편집기가 보낸 블록 JSON은 믿지 않고 허용 목록만으로
+// 다시 만든다. 쓸 만한 블록이 없으면 예전처럼 text로 저장한다.
+//
+// 본문에 넣은 사진은 board_photos에도 그대로 기록한다. 사진이 본문 JSON 안에만
+// 있으면 나중에 목록 썸네일이나 관리자 점검에서 찾을 길이 없어진다.
+function readBoardBody(formData: FormData, photoMax: number): {
+  body: string;
+  blocks: Block[] | null;
+  photoUrls: string[];
+} {
+  const blocks = parseBlocks(formData.get("body_blocks"));
+  return {
+    blocks,
+    body: blocks
+      ? blocksToPlainText(blocks)
+      : String(formData.get("body") ?? "").trim(),
+    photoUrls: blocks
+      ? collectImageUrls(blocks)
+      : parsePhotoUrls(formData.get("photos"), photoMax),
+  };
 }
 
 // 로그인 필수 가드(글쓰기 redirect형).
@@ -92,10 +115,9 @@ export async function createBoardPost(formData: FormData): Promise<void> {
   const user = await requireMemberOrRedirect();
   const title = String(formData.get("title") ?? "").trim();
   const category = String(formData.get("category") ?? "daily");
-  const body = String(formData.get("body") ?? "").trim();
   if (title.length < 2) throw new Error("제목을 입력해 주세요.");
 
-  const photoUrls = parsePhotoUrls(formData.get("photos"), 10);
+  const { body, blocks, photoUrls } = readBoardBody(formData, 10);
   const supabase = createClient();
   const { data, error } = await supabase
     .from("board_posts")
@@ -104,6 +126,8 @@ export async function createBoardPost(formData: FormData): Promise<void> {
       category,
       title,
       body: body || null,
+      body_blocks: blocks,
+      body_format: blocks ? "blocks" : "text",
     })
     .select("id")
     .single();
@@ -147,14 +171,16 @@ export async function updateBoardPost(
   const user = await requireMemberOrRedirect();
   const title = String(formData.get("title") ?? "").trim();
   if (title.length < 2) throw new Error("제목을 입력해 주세요.");
-  const photoUrls = parsePhotoUrls(formData.get("photos"), 10);
+  const { body, blocks, photoUrls } = readBoardBody(formData, 10);
   const supabase = createClient();
   const { error } = await supabase
     .from("board_posts")
     .update({
       category: String(formData.get("category") ?? "daily"),
       title,
-      body: String(formData.get("body") ?? "").trim() || null,
+      body: body || null,
+      body_blocks: blocks,
+      body_format: blocks ? "blocks" : "text",
     })
     .eq("id", id)
     .eq("author_id", user.id);

@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { createBoardPost, updateBoardPost } from "@/lib/community-actions";
 import LoginRequired from "@/components/community/LoginRequired";
-import ImageUpload from "@/components/ImageUpload";
+import BlockEditor from "@/components/BlockEditor";
+import { BOARD_PALETTE, textToBlocks } from "@/lib/blocks";
 import {
   BOARD_WRITE_CATS,
   BOARD_CAT_NAME,
@@ -74,26 +75,29 @@ export default async function BoardWritePage({
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="body" className="text-[18px] font-bold">
-            내용
-          </label>
-          <textarea
-            id="body"
-            name="body"
-            rows={8}
-            defaultValue={post?.body ?? ""}
-            placeholder="자유롭게 이야기해보세요"
-            className="w-full resize-y rounded-element border border-line bg-white p-3.5 text-sm leading-relaxed outline-none focus:border-rose"
-          />
-        </div>
+        {/* 내용 — 사진을 글 중간에 넣을 수 있다. 사진 첨부칸을 따로 두지 않는
+            이유는, 두 군데서 사진을 넣게 되면 어느 쪽에 넣은 사진이 어디에
+            나오는지 알 수 없기 때문이다.
 
-        <ImageUpload
-          name="photos"
+            예전에 쓴 글을 열 때는 본문을 문단으로 쪼개고, 아래에 붙어 있던
+            사진들을 그 뒤에 이어 붙인다. 이렇게 하지 않으면 편집기에 사진이
+            안 보이고, 그대로 저장하는 순간 원래 있던 사진이 전부 사라진다. */}
+        <BlockEditor
+          name="body_blocks"
+          textName="body"
           bucket="board"
-          label="사진 첨부 (최대 10장)"
-          max={10}
-          defaultUrls={post?.photos ?? []}
+          palette={BOARD_PALETTE}
+          defaultBlocks={
+            post?.bodyBlocks ?? [
+              ...textToBlocks(post?.body ?? ""),
+              ...(post?.photos ?? []).map((url) => ({
+                type: "image" as const,
+                url,
+              })),
+            ]
+          }
+          label="내용"
+          hint="칸을 누르면 글자색·소제목·순서 바꾸기가 나옵니다. 사진은 원하는 문단 아래에 넣을 수 있어요."
         />
 
         <button
