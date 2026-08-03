@@ -12,6 +12,7 @@ import KakaoChannelCta from "@/components/KakaoChannelCta";
 import NewsArticleJsonLd from "@/components/article/NewsArticleJsonLd";
 import TagChips from "@/components/article/TagChips";
 import ArticlePhoto from "@/components/article/ArticlePhoto";
+import PostBody from "@/components/PostBody";
 import { MEDIA } from "@/lib/media";
 import { findStaffByName } from "@/lib/staff";
 
@@ -153,11 +154,21 @@ export default async function ArticleDetailPage({
         )}
       </figure>
 
-      <div className="mt-5 flex flex-col gap-4 text-[20px] leading-[1.85]">
-        {article.body.map((p, i) => (
-          <p key={i}>{p}</p>
-        ))}
-      </div>
+      {/* 본문 — 블록으로 저장된 기사만 새 경로로 그린다.
+          예전 기사(body_format='text')는 아래 문단 반복 그대로다. */}
+      {article.bodyBlocks ? (
+        <PostBody
+          blocks={article.bodyBlocks}
+          alt={`${article.title} 관련 사진`}
+          className="mt-5"
+        />
+      ) : (
+        <div className="mt-5 flex flex-col gap-4 text-[20px] leading-[1.85]">
+          {article.body.map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
+        </div>
+      )}
 
       {/* 태그 — 본문 끝. 같은 화제의 기사로 넘어가는 통로 */}
       <TagChips tags={article.tags} className="mt-6" />

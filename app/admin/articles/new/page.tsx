@@ -2,7 +2,9 @@ import Link from "next/link";
 import { saveArticle } from "@/lib/admin-actions";
 import { PageHead } from "@/components/admin/ui";
 import ImageUpload from "@/components/ImageUpload";
+import BlockEditor from "@/components/BlockEditor";
 import ArticleAiFields from "@/components/ArticleAiFields";
+import { ARTICLE_PALETTE, textToBlocks } from "@/lib/blocks";
 import { CATEGORY_NAME, type CategorySlug } from "@/lib/mock/articles";
 import { MAX_TAGS, tagsToInput } from "@/lib/tags";
 import { getArticleForEdit } from "@/lib/mock/admin";
@@ -129,26 +131,23 @@ export default async function NewArticlePage({
           </p>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="body" className="text-[18px] font-bold">
-
-            본문
-          </label>
-          <textarea
-            id="body"
-            name="body"
-            rows={12}
-            defaultValue={preBody}
-            placeholder="본문을 작성하세요"
-            className="resize-y rounded-element border border-line bg-white p-3.5 text-sm leading-relaxed outline-none focus:border-rose"
-          />
-        </div>
+        {/* 본문 — 문단·사진·소제목·인용·구분선을 순서대로 쌓는다.
+            예전에 text로 저장된 기사는 열 때 문단 블록으로 바꿔 채운다. */}
+        <BlockEditor
+          name="body_blocks"
+          textName="body"
+          bucket="articles"
+          palette={ARTICLE_PALETTE}
+          defaultBlocks={editing?.bodyBlocks ?? textToBlocks(preBody)}
+          label="본문"
+          hint="칸을 누르면 색·소제목·순서 바꾸기가 나옵니다. 사진은 원하는 문단 아래에 넣을 수 있어요."
+        />
 
         <ImageUpload
           name="thumbnail_url"
           bucket="articles"
           label="대표 이미지"
-          hint="목록·상세 상단 썸네일. 6MB 이하 권장."
+          hint="목록·상세 상단 썸네일. 비워두면 본문 첫 사진을 씁니다. 6MB 이하 권장."
           defaultUrls={editing?.thumbnailUrl ? [editing.thumbnailUrl] : []}
         />
 

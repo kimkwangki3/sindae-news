@@ -23,6 +23,13 @@ const config: Config = {
         "tag-org-bg": "#E3F1E8",
         "tag-org-fg": "#3F8F5E",
         "rose-soft": "#F6E7EA", // 키커/뱃지 배경
+        // 본문 강조색(lib/blocks.ts 팔레트) — 아이보리 배경 위 본문 글씨로
+        // 쓰이므로 대비 4.5:1 이상이 나오도록 뱃지용 색보다 어둡게 잡았다.
+        // 뱃지용(tag-*-fg)을 그대로 쓰면 긴 문장에서 읽기 힘들다.
+        "body-red": "#B3352F",
+        "body-blue": "#2C5F94",
+        "body-green": "#2F7A4C",
+        "body-brown": "#8A5E22",
       },
       fontFamily: {
         // next/font 변수로 주입 (app/layout.tsx)

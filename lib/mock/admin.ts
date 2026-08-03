@@ -3,6 +3,7 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { CATEGORY_NAME, ID_TO_SLUG } from "@/lib/mock/articles-meta";
 import { toTags } from "@/lib/tags";
+import { readBlocks, type Block } from "@/lib/blocks";
 import type {
   ArticleStatus,
   AdminStat,
@@ -810,6 +811,8 @@ export interface AdminArticleEdit {
   subtitle: string;
   categorySlug: string;
   body: string;
+  // 블록 본문. 예전 글은 null이고, 편집기가 body를 문단 블록으로 바꿔 연다.
+  bodyBlocks: Block[] | null;
   thumbnailUrl: string;
   sourceName: string;
   sourceUrl: string;
@@ -826,7 +829,7 @@ export async function getArticleForEdit(
   const { data, error } = await supabase
     .from("articles")
     .select(
-      "slug, title, subtitle, category_id, body, thumbnail_url, source_name, source_url, ai_text, ai_image, tags, status",
+      "slug, title, subtitle, category_id, body, body_blocks, body_format, thumbnail_url, source_name, source_url, ai_text, ai_image, tags, status",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -844,6 +847,7 @@ export async function getArticleForEdit(
     subtitle: (r.subtitle as string) ?? "",
     categorySlug: r.category_id ? ID_TO_SLUG[r.category_id as number] : "local",
     body: (r.body as string) ?? "",
+    bodyBlocks: r.body_format === "blocks" ? readBlocks(r.body_blocks) : null,
     thumbnailUrl: (r.thumbnail_url as string) ?? "",
     sourceName: (r.source_name as string) ?? "",
     sourceUrl: (r.source_url as string) ?? "",

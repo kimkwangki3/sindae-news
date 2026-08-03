@@ -9,6 +9,7 @@ import { logAdmin } from "./audit";
 import { CATEGORY_ID } from "./mock/articles-meta";
 import { normalizeSlug, nextArticleSlug } from "./slug";
 import { parseTags } from "./tags";
+import { parseBlocks, blocksToPlainText, collectImageUrls } from "./blocks";
 import type {
   ArticleStatus,
   CommentStatus,
@@ -54,8 +55,20 @@ export async function saveArticle(formData: FormData): Promise<void> {
   const user = await assertAdmin();
   const title = String(formData.get("title") ?? "").trim();
   const categorySlug = String(formData.get("category") ?? "local");
-  const body = String(formData.get("body") ?? "").trim();
-  const thumbnailUrl = String(formData.get("thumbnail_url") ?? "").trim();
+
+  // 본문 — 편집기가 보낸 블록 JSON은 믿지 않고 허용 목록만으로 다시 만든다.
+  // 쓸 수 있는 블록이 하나도 없으면(빈 본문·이상한 값) 예전처럼 text로 저장한다.
+  // 어느 쪽이든 body 컬럼은 계속 채운다 — 목록 요약과 공유 미리보기가 이걸 읽는다.
+  const blocks = parseBlocks(formData.get("body_blocks"));
+  const body = blocks
+    ? blocksToPlainText(blocks)
+    : String(formData.get("body") ?? "").trim();
+
+  // 대표 이미지를 따로 고르지 않았으면 본문 첫 사진을 쓴다. 목록 카드와 공유
+  // 미리보기에 사진이 비면 기사가 눈에 띄지 않는다.
+  const thumbnailUrl =
+    String(formData.get("thumbnail_url") ?? "").trim() ||
+    (blocks ? (collectImageUrls(blocks)[0] ?? "") : "");
   const status = String(formData.get("status") ?? "draft") as ArticleStatus;
   if (title.length < 2) throw new Error("제목을 입력해 주세요.");
 
@@ -88,6 +101,8 @@ export async function saveArticle(formData: FormData): Promise<void> {
     category_id:
       CATEGORY_ID[categorySlug as keyof typeof CATEGORY_ID] ?? null,
     body: body || null,
+    body_blocks: blocks,
+    body_format: blocks ? "blocks" : "text",
     thumbnail_url: thumbnailUrl || null,
     author_id: user.id,
     status,

@@ -20,9 +20,13 @@ const PLACEHOLDER_H = 1086;
 export default function ArticlePhoto({
   src,
   alt,
+  priority = true,
 }: {
   src: string;
   alt: string;
+  // 대표 사진은 화면 맨 위라 먼저 받아야 한다(기본값). 본문 중간 사진까지
+  // 전부 priority로 두면 서로 대역폭을 뺏어 첫 화면이 오히려 늦어진다.
+  priority?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
@@ -56,7 +60,8 @@ export default function ArticlePhoto({
           width={PLACEHOLDER_W}
           height={PLACEHOLDER_H}
           sizes="(max-width: 768px) 100vw, 720px"
-          priority
+          priority={priority}
+          loading={priority ? undefined : "lazy"}
           className="h-auto w-full"
         />
       </button>

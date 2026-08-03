@@ -5,6 +5,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { ArticleSummary } from "@/components/ArticleListItem";
 import { toTags } from "@/lib/tags";
+import { readBlocks, type Block } from "@/lib/blocks";
 import {
   CATEGORY_ID,
   CATEGORY_NAME,
@@ -27,7 +28,9 @@ export interface MockArticle {
   title: string;
   subtitle: string | null; // 부제 — 상세 화면에만 노출
   excerpt: string;
-  body: string[]; // 문단 배열
+  body: string[]; // 문단 배열 — 예전 방식. 요약·공유 설명이 계속 이걸 쓴다
+  // 블록 본문(사진 중간 삽입·강조색). null이면 예전 방식대로 body를 문단으로 그린다.
+  bodyBlocks: Block[] | null;
   author: string;
   publishedAt: string; // "2026.06.25" — 화면 표시용
   publishedAtIso: string | null; // 구조화 데이터(datePublished)용 원본
@@ -127,7 +130,7 @@ export async function getArticleBySlug(
   const { data, error } = await supabase
     .from("articles")
     .select(
-      "id, slug, title, subtitle, body, thumbnail_url, category_id, view_count, published_at, updated_at, ai_text, ai_image, source_name, source_url, tags, author:profiles!author_id(nickname)",
+      "id, slug, title, subtitle, body, body_blocks, body_format, thumbnail_url, category_id, view_count, published_at, updated_at, ai_text, ai_image, source_name, source_url, tags, author:profiles!author_id(nickname)",
     )
     .eq("slug", slug)
     .eq("status", "published")
@@ -144,6 +147,8 @@ export async function getArticleBySlug(
     title: string;
     subtitle: string | null;
     body: string | null;
+    body_blocks: unknown;
+    body_format: string | null;
     thumbnail_url: string | null;
     category_id: number | null;
     view_count: number | null;
@@ -182,6 +187,10 @@ export async function getArticleBySlug(
     subtitle: a.subtitle,
     excerpt: "",
     body: toParagraphs(a.body),
+    // 블록으로 저장된 기사만 블록으로 그린다. 예전 기사는 예전 경로 그대로다.
+    // 저장된 값도 한 번 더 검증을 거치며, 못 읽으면 null이 되어 body로 되돌아간다.
+    bodyBlocks:
+      a.body_format === "blocks" ? readBlocks(a.body_blocks) : null,
     author: a.author?.nickname ?? "편집부",
     publishedAt: fmtDate(a.published_at),
     publishedAtIso: a.published_at,
