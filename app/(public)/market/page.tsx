@@ -61,7 +61,8 @@ export default async function MarketPage({
       <div className="flex justify-end px-[18px]">
         <Link
           href="/market/write"
-          className="flex min-h-[40px] items-center rounded-element bg-rose-deep px-3.5 text-sm font-bold text-white"
+          // 업체·단체 등록 버튼과 같은 크기(app/(public)/district/page.tsx).
+          className="flex min-h-[40px] items-center rounded-element bg-rose-deep px-3 text-[16px] font-bold text-white"
         >
           ＋ 글쓰기
         </Link>

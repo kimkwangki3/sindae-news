@@ -93,7 +93,8 @@ export default function ArticleManager({
         action={
           <Link
             href="/admin/articles/new"
-            className="flex min-h-[40px] items-center rounded-element bg-rose-deep px-3.5 text-sm font-bold text-white"
+            // 공개 화면의 같은 버튼들과 크기를 맞춘다.
+            className="flex min-h-[40px] items-center rounded-element bg-rose-deep px-3 text-[16px] font-bold text-white"
           >
             ＋ 새 기사
           </Link>
