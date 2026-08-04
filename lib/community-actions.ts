@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { getCurrentUser } from "./auth";
 import { createClient, createServiceClient } from "./supabase/server";
 import { getIpHash } from "./ip";
@@ -10,6 +11,11 @@ import { parsePhotoUrls } from "./photos";
 import { parseBlocks, blocksToPlainText, collectImageUrls, type Block } from "./blocks";
 import { notify } from "./telegram";
 import { type PostComment } from "./mock/community";
+
+// 조회수 중복 방지 쿠키 — 최근 본 게시글 표식을 담아둔다.
+const BOARD_SEEN_COOKIE = "bv_seen";
+const BOARD_SEEN_MAX = 60;
+const BOARD_SEEN_DAYS = 1;
 
 // timestamptz → "06.28 14:20"
 function fmtShort(ts: string): string {
@@ -364,6 +370,47 @@ export async function toggleBoardLike(postId: string): Promise<LikeResult> {
 export interface TipState {
   ok?: boolean;
   error?: string;
+}
+
+// 게시글 조회수 — 상세 화면의 BoardViewTracker가 진입할 때 호출한다.
+//
+// 새로고침할 때마다 올라가면 안 되므로, 이미 본 글을 쿠키에 적어두고 두 번째부터는
+// 그냥 돌아간다. 쿠키가 커지지 않게 uuid 앞 8자리만, 최근 BOARD_SEEN_MAX개만 남긴다.
+// 로그인 여부와 무관하게 동작해야 해서 회원 기록이 아니라 쿠키를 쓴다.
+export async function trackBoardView(postId: string): Promise<void> {
+  const jar = cookies();
+  const seen = (jar.get(BOARD_SEEN_COOKIE)?.value ?? "")
+    .split(".")
+    .filter(Boolean);
+  const key = postId.slice(0, 8);
+  if (seen.includes(key)) return;
+
+  // board_posts UPDATE는 RLS로 글쓴이에게만 열려 있어(bpost_modify) 남이 읽을 때는
+  // 올릴 수가 없다. 그래서 이 갱신만 service_role로 처리한다(서버 전용 경로).
+  const admin = createServiceClient();
+  const { data } = await admin
+    .from("board_posts")
+    .select("view_count")
+    .eq("id", postId)
+    .maybeSingle();
+  if (!data) return;
+
+  const { error } = await admin
+    .from("board_posts")
+    .update({ view_count: Number(data.view_count ?? 0) + 1 })
+    .eq("id", postId);
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error("[view] 게시글 조회수 갱신 실패:", error.message);
+    return; // 못 올렸으면 본 걸로 치지 않는다 — 다음 방문에 다시 시도한다.
+  }
+
+  jar.set(BOARD_SEEN_COOKIE, [key, ...seen].slice(0, BOARD_SEEN_MAX).join("."), {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: BOARD_SEEN_DAYS * 24 * 60 * 60,
+  });
 }
 
 // 제보 — 비로그인 허용(reporter_id nullable). tips insert.

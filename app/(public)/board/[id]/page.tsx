@@ -6,6 +6,7 @@ import ReportSheet from "@/components/ReportSheet";
 import PostComments from "@/components/community/PostComments";
 import PostOwnerControls from "@/components/community/PostOwnerControls";
 import BoardLike from "@/components/community/BoardLike";
+import BoardViewTracker from "@/components/community/BoardViewTracker";
 import { getCurrentUser } from "@/lib/auth";
 import { deleteBoardPost } from "@/lib/community-actions";
 import ShareButton from "@/components/ShareButton";
@@ -39,6 +40,7 @@ export default async function BoardDetailPage({
 
   return (
     <div className="px-[18px] pb-10">
+      <BoardViewTracker postId={post.id} />
       <div className="flex items-center justify-between py-3">
         <Link href="/board" className="text-sm text-muted">
           ‹ 자유게시판
