@@ -3,7 +3,12 @@ import { searchAll } from "@/lib/mock/search";
 import { getTopTags } from "@/lib/mock/articles";
 import TagChips from "@/components/article/TagChips";
 
-export const metadata = { title: "검색 · 해룡신문" };
+// 검색 결과는 색인할 이유가 없다. ?q= 하나마다 다른 주소가 생겨 사실상
+// 무한한 중복 페이지가 되고, 크롤링 예산만 갉아먹는다. 링크는 따라가게 둔다.
+export const metadata = {
+  title: "검색 · 해룡신문",
+  robots: { index: false, follow: true },
+};
 
 export default async function SearchPage({
   searchParams,

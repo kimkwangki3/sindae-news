@@ -6,7 +6,10 @@ import LoginRequired from "@/components/community/LoginRequired";
 import OrgMemberManager from "@/components/orgs/OrgMemberManager";
 import { getOrg } from "@/lib/mock/orgs";
 
-export const metadata = { title: "가입 관리 · 지역단체" };
+export const metadata = {
+  title: "가입 관리 · 지역단체",
+  robots: { index: false, follow: true },
+};
 
 export default async function OrgManagePage({
   params,

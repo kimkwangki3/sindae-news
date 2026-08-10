@@ -3,7 +3,10 @@ import TipForm from "@/components/community/TipForm";
 import { getCurrentUser } from "@/lib/auth";
 import { TIP_DAILY_LIMIT } from "@/lib/tips";
 
-export const metadata = { title: "제보하기 · 해룡신문" };
+export const metadata = {
+  title: "제보하기 · 해룡신문",
+  alternates: { canonical: "/tips" },
+};
 
 // 제보는 로그인한 사람만 보낼 수 있다. 사실관계를 되물으려면 연락이 닿아야 하고,
 // 익명 제보는 남용을 막을 방법이 없다.

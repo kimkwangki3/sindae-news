@@ -7,7 +7,11 @@ import {
   type BizCategory,
 } from "@/lib/mock/district";
 
-export const metadata = { title: "해룡상권 · 해룡신문" };
+// ?cat= 이 붙어도 정규 주소는 /district 하나로 고정한다(중복 방지).
+export const metadata = {
+  title: "해룡상권 · 해룡신문",
+  alternates: { canonical: "/district" },
+};
 
 const CHIPS: { key: BizCategory | "all"; label: string }[] = [
   { key: "all", label: "전체" },

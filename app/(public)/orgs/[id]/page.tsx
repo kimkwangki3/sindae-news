@@ -14,7 +14,12 @@ export async function generateMetadata({
   params: { id: string };
 }) {
   const o = await getOrg(params.id);
-  return { title: o ? `${o.name} · 지역단체` : "지역단체 · 해룡신문" };
+  if (!o) return { title: "지역단체 · 해룡신문" };
+  return {
+    title: `${o.name} · 지역단체`,
+    // ?p= 로 소식 페이지를 넘겨도 정규 주소는 단체 첫 화면 하나로 모은다.
+    alternates: { canonical: `/orgs/${params.id}` },
+  };
 }
 
 export default async function OrgDetailPage({

@@ -18,7 +18,11 @@ export async function generateMetadata({
   params: { id: string };
 }) {
   const b = await getBusiness(params.id);
-  return { title: b ? `${b.name} · 해룡상권` : "해룡상권 · 해룡신문" };
+  if (!b) return { title: "해룡상권 · 해룡신문" };
+  return {
+    title: `${b.name} · 해룡상권`,
+    alternates: { canonical: `/district/${params.id}` },
+  };
 }
 
 export default async function StoreDetailPage({

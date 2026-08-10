@@ -22,7 +22,11 @@ export async function generateMetadata({
   params: { id: string };
 }) {
   const p = await getBoardPost(params.id);
-  return { title: p ? `${p.title} · 자유게시판` : "자유게시판 · 해룡신문" };
+  if (!p) return { title: "자유게시판 · 해룡신문" };
+  return {
+    title: `${p.title} · 자유게시판`,
+    alternates: { canonical: `/board/${params.id}` },
+  };
 }
 
 export default async function BoardDetailPage({

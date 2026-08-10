@@ -5,7 +5,10 @@ import LoginRequired from "@/components/community/LoginRequired";
 import OrgJoinForm from "@/components/orgs/OrgJoinForm";
 import { getOrg } from "@/lib/mock/orgs";
 
-export const metadata = { title: "가입 신청 · 지역단체" };
+export const metadata = {
+  title: "가입 신청 · 지역단체",
+  robots: { index: false, follow: true },
+};
 
 export default async function OrgJoinPage({
   params,

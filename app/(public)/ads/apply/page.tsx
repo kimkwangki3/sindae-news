@@ -5,6 +5,7 @@ export const metadata = {
   title: "광고 문의 · 해룡신문",
   description:
     "해룡신문 배너 광고 문의. 순천시 해룡면 신대·복성·선월지구 주민에게 노출됩니다. 카카오톡 채널로 문의하세요.",
+  alternates: { canonical: "/ads/apply" },
 };
 
 // 예전에는 로그인 + 업체 등록을 마친 회원만 온라인으로 신청할 수 있었다.

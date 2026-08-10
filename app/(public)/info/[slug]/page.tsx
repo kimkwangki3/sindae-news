@@ -17,6 +17,7 @@ export async function generateMetadata({
   return {
     title: `${page.title} · 해룡신문`,
     description: page.summary ?? undefined,
+    alternates: { canonical: `/info/${page.slug}` },
   };
 }
 

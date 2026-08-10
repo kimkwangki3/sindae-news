@@ -10,7 +10,10 @@ import LoginRequired from "@/components/community/LoginRequired";
 import ImageUpload from "@/components/ImageUpload";
 import { REGIONS } from "@/lib/region";
 
-export const metadata = { title: "나눔마켓 글쓰기 · 해룡신문" };
+export const metadata = {
+  title: "나눔마켓 글쓰기 · 해룡신문",
+  robots: { index: false, follow: true },
+};
 
 
 

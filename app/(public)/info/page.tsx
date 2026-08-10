@@ -5,6 +5,7 @@ export const metadata = {
   title: "생활정보 · 해룡신문",
   description:
     "해룡면 신대·복성·선월지구 생활정보 — 버스 시간표, 야간·휴일 병원과 약국, 재활용 배출 요일, 어린이집·학원, 민원 안내.",
+  alternates: { canonical: "/info" },
 };
 
 // 검색으로 찾아오는 페이지다. 기사와 달리 시간이 지나도 값이 떨어지지 않으므로

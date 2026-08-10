@@ -1,6 +1,9 @@
 import RecruitForm from "@/components/RecruitForm";
 
-export const metadata = { title: "기자 모집 · 해룡신문" };
+export const metadata = {
+  title: "기자 모집 · 해룡신문",
+  alternates: { canonical: "/recruit" },
+};
 
 export default function RecruitPage() {
   return (

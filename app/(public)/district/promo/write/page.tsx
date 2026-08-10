@@ -5,7 +5,10 @@ import { writePromo } from "@/lib/local-actions";
 import LoginRequired from "@/components/community/LoginRequired";
 import ImageUpload from "@/components/ImageUpload";
 
-export const metadata = { title: "홍보 글쓰기 · 해룡신문" };
+export const metadata = {
+  title: "홍보 글쓰기 · 해룡신문",
+  robots: { index: false, follow: true },
+};
 
 const PROMO_CATS = ["이벤트", "신메뉴", "공지"];
 

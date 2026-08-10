@@ -5,7 +5,10 @@ import LoginRequired from "@/components/community/LoginRequired";
 import ImageUpload from "@/components/ImageUpload";
 import { ORG_CAT_NAME, type OrgCategory } from "@/lib/mock/orgs";
 
-export const metadata = { title: "지역단체 등록 · 해룡신문" };
+export const metadata = {
+  title: "지역단체 등록 · 해룡신문",
+  robots: { index: false, follow: true },
+};
 
 const CATS = Object.entries(ORG_CAT_NAME) as [OrgCategory, string][];
 const INPUT =

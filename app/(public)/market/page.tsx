@@ -7,7 +7,10 @@ import {
   type MarketCategory,
 } from "@/lib/mock/community";
 
-export const metadata = { title: "나눔마켓 · 해룡신문" };
+export const metadata = {
+  title: "나눔마켓 · 해룡신문",
+  alternates: { canonical: "/market" },
+};
 
 const CHIPS: { key: MarketCategory | "all"; label: string }[] = [
   { key: "all", label: "전체" },

@@ -12,6 +12,9 @@ import {
   getLead,
 } from "@/lib/mock/articles";
 
+// 제목·설명은 루트 레이아웃의 기본값을 그대로 쓴다. 여기서는 정규 주소만 밝힌다.
+export const metadata = { alternates: { canonical: "/" } };
+
 function SectionTitle({ title, href }: { title: string; href: string }) {
   return (
     <div className="mb-3 mt-6 flex items-center justify-between">

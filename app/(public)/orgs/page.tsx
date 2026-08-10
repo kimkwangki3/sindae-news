@@ -3,7 +3,11 @@ import Thumb from "@/components/Thumb";
 import AdSlot from "@/components/AdSlot";
 import { getOrgs, ORG_CAT_NAME, type OrgCategory } from "@/lib/mock/orgs";
 
-export const metadata = { title: "지역단체 · 해룡신문" };
+// ?cat= 이 붙어도 정규 주소는 /orgs 하나로 고정한다(중복 방지).
+export const metadata = {
+  title: "지역단체 · 해룡신문",
+  alternates: { canonical: "/orgs" },
+};
 
 const CHIPS: { key: OrgCategory | "all"; label: string }[] = [
   { key: "all", label: "전체" },

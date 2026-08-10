@@ -19,11 +19,13 @@ export function generateMetadata({ params }: { params: { handle: string } }) {
   return {
     title,
     description: s.bio,
+    alternates: { canonical: `/reporters/${params.handle}` },
     // openGraph를 정의하면 상위 것을 대체하므로 이미지를 여기에도 넣는다.
     openGraph: {
       title,
       description: s.bio,
       type: "profile",
+      url: `/reporters/${params.handle}`,
       images: ["/og-image.png"],
     },
   };

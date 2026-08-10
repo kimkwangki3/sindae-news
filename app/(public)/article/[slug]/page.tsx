@@ -51,10 +51,14 @@ export async function generateMetadata({
   return {
     title,
     description,
+    // 이 기사의 정규 주소. metadataBase가 있어 상대경로가 절대 URL로 펴진다.
+    // 없으면 구글이 기사를 홈의 중복으로 보고 색인에서 뺀다.
+    alternates: { canonical: `/article/${a.slug}` },
     openGraph: {
       title,
       description,
       type: "article",
+      url: `/article/${a.slug}`,
       images: [image],
       publishedTime: a.publishedAtIso ?? undefined,
       modifiedTime: a.updatedAtIso ?? undefined,

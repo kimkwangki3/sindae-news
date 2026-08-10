@@ -41,8 +41,12 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   applicationName: "해룡신문",
+  // canonical(정규 주소)은 여기에 두면 안 된다. 루트 레이아웃의 metadata는
+  // 하위 페이지가 같은 항목을 선언하지 않으면 그대로 상속되므로, 여기에
+  // canonical: "/" 를 적으면 모든 하위 페이지가 "나는 홈의 중복이다"라고
+  // 구글에 알리게 된다(2026-08 색인 누락의 원인). 각 page.tsx가 자기 경로를
+  // 직접 선언한다.
   alternates: {
-    canonical: "/",
     // RSS 자동 발견용. 이게 있으면 크롤러·리더가 피드를 알아서 찾는다.
     types: { "application/rss+xml": `${SITE_URL}/rss.xml` },
   },

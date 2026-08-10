@@ -7,7 +7,12 @@ import {
   type BoardCategory,
 } from "@/lib/mock/community";
 
-export const metadata = { title: "자유게시판 · 해룡신문" };
+// ?cat= 으로 분류를 걸러도 같은 글 목록의 다른 배열일 뿐이다. 정규 주소는
+// 파라미터 없는 /board 하나로 고정해 중복 페이지로 잡히지 않게 한다.
+export const metadata = {
+  title: "자유게시판 · 해룡신문",
+  alternates: { canonical: "/board" },
+};
 
 type ChipKey = "all" | "popular" | "org" | BoardCategory;
 

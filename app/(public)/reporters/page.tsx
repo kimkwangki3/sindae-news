@@ -5,6 +5,7 @@ import { MEDIA } from "@/lib/media";
 export const metadata = {
   title: `필자 소개 · ${MEDIA.name}`,
   description: `${MEDIA.name} 기사를 쓰는 사람들. 담당 분야와 연락처를 공개합니다.`,
+  alternates: { canonical: "/reporters" },
 };
 
 // 필자 목록 — 기사 바이라인과 푸터에서 연결된다.

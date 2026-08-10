@@ -7,7 +7,10 @@ import LoginRequired from "@/components/community/LoginRequired";
 import ImageUpload from "@/components/ImageUpload";
 import { getOrg } from "@/lib/mock/orgs";
 
-export const metadata = { title: "단체 소식 글쓰기 · 지역단체" };
+export const metadata = {
+  title: "단체 소식 글쓰기 · 지역단체",
+  robots: { index: false, follow: true },
+};
 
 // 단체 소식은 게시판(board_posts)에 저장되므로 게시판 분류 코드를 그대로 쓴다.
 // 한글 라벨을 값으로 넣으면 게시판에서 분류 배지가 빈칸으로 나온다.

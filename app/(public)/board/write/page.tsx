@@ -11,7 +11,12 @@ import {
   getBoardPost,
 } from "@/lib/mock/community";
 
-export const metadata = { title: "게시판 글쓰기 · 해룡신문" };
+// 로그인해야 쓸 수 있는 입력 화면이다. 크롤러에게는 빈 로그인 안내로만 보이니
+// 색인하지 않는다(사이트맵에도 없다).
+export const metadata = {
+  title: "게시판 글쓰기 · 해룡신문",
+  robots: { index: false, follow: true },
+};
 
 export default async function BoardWritePage({
   searchParams,

@@ -22,7 +22,11 @@ export function generateMetadata({
   params: { category: string };
 }) {
   const name = CATEGORY_NAME[params.category as CategorySlug];
-  return { title: name ? `${name} · 해룡신문` : "기사 · 해룡신문" };
+  if (!name) return { title: "기사 · 해룡신문" };
+  return {
+    title: `${name} · 해룡신문`,
+    alternates: { canonical: `/articles/${params.category}` },
+  };
 }
 
 export default async function CategoryPage({
