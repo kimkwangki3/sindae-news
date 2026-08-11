@@ -182,6 +182,23 @@ export interface CategoryTotal {
   views: number;
 }
 
+// --- 사이트 접속(방문자·페이지뷰) ---
+export interface VisitDay {
+  date: string; // YYYY-MM-DD (한국 시간 기준)
+  label: string; // 8.11
+  weekday: string; // 월
+  visitors: number; // 순 방문자(UV)
+  views: number; // 페이지뷰(PV)
+}
+
+export interface VisitStats {
+  today: VisitDay;
+  yesterday: VisitDay;
+  days: VisitDay[]; // 오래된 날 → 오늘
+  // 집계 함수/테이블이 아직 없으면 false — 화면에서 안내로 바꿔 보여준다.
+  available: boolean;
+}
+
 // --- 설정 ---
 export interface AuditLogRow {
   id: string;

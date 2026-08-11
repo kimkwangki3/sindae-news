@@ -29,6 +29,8 @@ import type {
   ReporterLevel,
   ContentStatRow,
   CategoryTotal,
+  VisitDay,
+  VisitStats,
   AuditLogRow,
   SlotRow,
   LegalPageRow,
@@ -63,6 +65,8 @@ export type {
   AdminCorrectionRow,
   ContentStatRow,
   CategoryTotal,
+  VisitDay,
+  VisitStats,
   AuditLogRow,
   SlotRow,
   LegalPageRow,
@@ -726,6 +730,87 @@ export async function getCategoryTotals(): Promise<CategoryTotal[]> {
     count: v.count,
     views: v.views,
   }));
+}
+
+// --- 사이트 접속(방문자·페이지뷰) -----------------------------------
+// 날짜는 한국 시간 기준이다. 서버(Vercel)는 UTC로 도니 그냥 자르면
+// "오늘"이 아침 9시에 바뀐다.
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+const WEEKDAY = ["일", "월", "화", "수", "목", "금", "토"];
+
+function emptyVisitDay(dateAtUtcNoon: Date): VisitDay {
+  const date = dateAtUtcNoon.toISOString().slice(0, 10);
+  return {
+    date,
+    label: `${dateAtUtcNoon.getUTCMonth() + 1}.${dateAtUtcNoon.getUTCDate()}`,
+    weekday: WEEKDAY[dateAtUtcNoon.getUTCDay()],
+    visitors: 0,
+    views: 0,
+  };
+}
+
+// 최근 N일(오래된 날 → 오늘)의 빈 칸을 먼저 만든다. 방문이 없던 날도
+// 그래프에서 자리를 지켜야 추세가 보인다.
+function recentKstDays(days: number): VisitDay[] {
+  const nowKst = new Date(Date.now() + KST_OFFSET_MS);
+  const out: VisitDay[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    out.push(
+      emptyVisitDay(
+        new Date(
+          Date.UTC(
+            nowKst.getUTCFullYear(),
+            nowKst.getUTCMonth(),
+            nowKst.getUTCDate() - i,
+          ),
+        ),
+      ),
+    );
+  }
+  return out;
+}
+
+export async function getVisitStats(days = 7): Promise<VisitStats> {
+  const filled = recentKstDays(Math.max(days, 2));
+  const blank: VisitStats = {
+    today: filled[filled.length - 1],
+    yesterday: filled[filled.length - 2],
+    days: filled,
+    available: false,
+  };
+
+  const supabase = createServiceClient();
+  // 집계는 DB에서 한다 — 로그 원본을 끌어오면 PostgREST 행 상한에 걸려
+  // 방문이 늘수록 조용히 적은 수를 보게 된다.
+  const { data, error } = await supabase.rpc("daily_visit_stats", {
+    p_days: filled.length,
+  });
+  // 마이그레이션 전이면 "집계 준비 전"으로 보여준다(0명으로 착각시키지 않는다).
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error("[admin] daily_visit_stats 실패:", error.message);
+    return blank;
+  }
+
+  const byDate = new Map<string, { visitors: number; views: number }>();
+  for (const r of (data ?? []) as {
+    day: string;
+    visitors: number | string;
+    views: number | string;
+  }[]) {
+    byDate.set(String(r.day).slice(0, 10), {
+      visitors: Number(r.visitors ?? 0),
+      views: Number(r.views ?? 0),
+    });
+  }
+
+  const merged = filled.map((d) => ({ ...d, ...(byDate.get(d.date) ?? {}) }));
+  return {
+    today: merged[merged.length - 1],
+    yesterday: merged[merged.length - 2],
+    days: merged,
+    available: true,
+  };
 }
 
 // --- 설정: 감사로그 / 슬롯 / 관리자 / 법적페이지 ---------------------

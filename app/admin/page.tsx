@@ -4,8 +4,13 @@ import {
   getAdminQueueCounts,
   getArticleStatsList,
   getBoardStatsList,
+  getVisitStats,
 } from "@/lib/mock/admin";
 import { PageHead } from "@/components/admin/ui";
+import VisitCard from "@/components/admin/VisitCard";
+
+// 접속 통계는 계속 바뀐다 — 대시보드를 정적으로 굳히지 않는다.
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "대시보드 · 관리자" };
 
@@ -20,11 +25,12 @@ const QUEUE: { key: keyof Awaited<ReturnType<typeof getAdminQueueCounts>>; label
 ];
 
 export default async function AdminDashboard() {
-  const [stats, counts, articles, boards] = await Promise.all([
+  const [stats, counts, articles, boards, visits] = await Promise.all([
     getAdminStats(),
     getAdminQueueCounts(),
     getArticleStatsList(5),
     getBoardStatsList(5),
+    getVisitStats(7),
   ]);
   const todo = QUEUE.filter((q) => counts[q.key] > 0);
   const todoTotal = QUEUE.reduce((s, q) => s + counts[q.key], 0);
@@ -32,6 +38,9 @@ export default async function AdminDashboard() {
   return (
     <div className="px-[18px] py-5">
       <PageHead title="대시보드" sub="한눈에 보는 현황" />
+
+      {/* 오늘 접속 */}
+      <VisitCard stats={visits} />
 
       {/* 처리할 일 */}
       <section className="mb-6 rounded-card border border-line bg-white p-4">

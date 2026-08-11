@@ -2,6 +2,7 @@ import TopBar from "@/components/TopBar";
 import IdentityBar from "@/components/IdentityBar";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
+import VisitTracker from "@/components/VisitTracker";
 import { getCurrentUser } from "@/lib/auth";
 
 // 공개 영역 공통 셸: 상단바 + 아이덴티티바 + (페이지 콘텐츠) + 하단탭.
@@ -20,6 +21,7 @@ export default async function PublicLayout({
       <main className="flex-1">{children}</main>
       <Footer />
       <BottomNav />
+      <VisitTracker />
     </div>
   );
 }
