@@ -1,24 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import {
-  getArticlesPage,
-  type ArticlesPage,
-  type CategorySlug,
-} from "@/lib/mock/articles";
 import { type MockComment, fmtDateTime } from "@/lib/mock/comments";
 import { type ArticleViewEvent } from "@/lib/mock/views";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getIpHash } from "@/lib/ip";
-
-// 무한스크롤 더보기 — 클라이언트 컴포넌트에서 호출.
-export async function loadMoreArticles(
-  category: CategorySlug | null,
-  cursor: number,
-): Promise<ArticlesPage> {
-  return getArticlesPage(category, cursor);
-}
 
 // slug → article id 헬퍼
 async function articleIdBySlug(slug: string): Promise<string | null> {

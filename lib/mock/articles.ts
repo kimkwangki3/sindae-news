@@ -46,10 +46,33 @@ export interface MockArticle {
   tags: string[]; // #키워드 — 카테고리를 가로지르는 주제 묶음
 }
 
-// timestamptz → "2026.06.25" (로케일 비의존)
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+// timestamptz → 한국시각으로 옮긴 Date. 서버는 UTC로 돌기 때문에 날짜를
+// 다룰 때마다 이걸 거친다.
+function toKst(ts: string): Date {
+  return new Date(new Date(ts).getTime() + KST_OFFSET_MS);
+}
+
+// timestamptz → "2026.06.25" (한국시각 기준)
+//
+// ISO 앞 10자를 그대로 쓰면 UTC 날짜가 나온다. 자정부터 오전 9시 사이에
+// 발행한 기사가 전날 날짜로 보인다 — 초안이 매일 아침 6시에 올라오니
+// 그냥 두면 매번 하루 어긋난다.
 function fmtDate(ts: string | null): string {
   if (!ts) return "";
-  return ts.slice(0, 10).replace(/-/g, ".");
+  const k = toKst(ts);
+  if (Number.isNaN(k.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${k.getUTCFullYear()}.${pad(k.getUTCMonth() + 1)}.${pad(k.getUTCDate())}`;
+}
+
+// 그 시각이 속한 한국시각 하루의 시작(=00:00 KST)을 ISO로.
+function kstDayStart(ts: string | number): string {
+  const k = new Date(new Date(ts).getTime() + KST_OFFSET_MS);
+  const midnight =
+    Date.UTC(k.getUTCFullYear(), k.getUTCMonth(), k.getUTCDate()) - KST_OFFSET_MS;
+  return new Date(midnight).toISOString();
 }
 
 // 본문 text → 문단 배열.
@@ -120,6 +143,103 @@ export async function getArticlesPage(
   return {
     items,
     nextCursor: count !== null && next < count ? next : null,
+  };
+}
+
+export interface PagedArticles {
+  items: ArticleSummary[];
+  page: number; // 1부터
+  totalPages: number;
+  total: number;
+}
+
+// 쪽 번호로 넘기는 목록. 무한스크롤과 달리 "몇 쪽 중 몇 쪽"을 알 수 있어야
+// 하므로 전체 건수(count)를 같이 받는다.
+export async function getArticlesByPage(
+  category: CategorySlug | null,
+  page = 1,
+  perPage = 10,
+): Promise<PagedArticles> {
+  const current = Math.max(1, Math.floor(page) || 1);
+  const from = (current - 1) * perPage;
+
+  const supabase = createClient();
+  let q = supabase
+    .from("articles")
+    .select(LIST_COLS, { count: "exact" })
+    .eq("status", "published")
+    .not("published_at", "is", null)
+    .order("published_at", { ascending: false })
+    .range(from, from + perPage - 1);
+
+  if (category) q = q.eq("category_id", CATEGORY_ID[category]);
+
+  const { data, count, error } = await q;
+  if (error) {
+    // 조회 실패 시 빈 쪽으로 안전 폴백(화면 깨짐 방지)
+    return { items: [], page: current, totalPages: 1, total: 0 };
+  }
+
+  const total = count ?? 0;
+  return {
+    items: (data ?? []).map((r) => rowToSummary(r as ListRow)),
+    page: current,
+    totalPages: Math.max(1, Math.ceil(total / perPage)),
+    total,
+  };
+}
+
+export interface TodayNews {
+  items: ArticleSummary[];
+  date: string; // 화면에 띄울 날짜 "2026.08.12"
+  isToday: boolean; // false면 오늘 기사가 없어 가장 최근 발행일을 대신 보여준 것
+}
+
+// 금일 뉴스 — 한국시각 오늘 올라온 기사.
+//
+// 매일 나오는 신문이 아니라서 오늘 발행분이 없는 날이 흔하다. 그럴 때
+// 빈 화면만 띄우면 '금일 뉴스'가 막다른 길이 된다. 가장 최근에 기사가
+// 나온 날을 통째로 대신 보여주고, 오늘이 아니라는 것을 화면에 밝힌다.
+export async function getTodayArticles(limit = 30): Promise<TodayNews> {
+  const supabase = createClient();
+  const base = () =>
+    supabase
+      .from("articles")
+      .select(LIST_COLS)
+      .eq("status", "published")
+      .not("published_at", "is", null)
+      .order("published_at", { ascending: false });
+
+  const todayStart = kstDayStart(Date.now());
+  const { data: today } = await base().gte("published_at", todayStart).limit(limit);
+  const todayRows = (today ?? []) as ListRow[];
+  if (todayRows.length > 0) {
+    return {
+      items: todayRows.map(rowToSummary),
+      date: fmtDate(todayStart),
+      isToday: true,
+    };
+  }
+
+  const { data: latest } = await base().limit(1);
+  const newest = ((latest ?? []) as ListRow[])[0];
+  if (!newest?.published_at) {
+    return { items: [], date: fmtDate(todayStart), isToday: true };
+  }
+
+  const dayStart = kstDayStart(newest.published_at);
+  const dayEnd = new Date(
+    new Date(dayStart).getTime() + 24 * 60 * 60 * 1000,
+  ).toISOString();
+  const { data: sameDay } = await base()
+    .gte("published_at", dayStart)
+    .lt("published_at", dayEnd)
+    .limit(limit);
+
+  return {
+    items: ((sameDay ?? []) as ListRow[]).map(rowToSummary),
+    date: fmtDate(dayStart),
+    isToday: false,
   };
 }
 
