@@ -6,6 +6,7 @@ import {
   type RecruitState,
 } from "@/lib/recruit-actions";
 import { REGIONS } from "@/lib/region";
+import { MEDIA, OPERATOR_PAREN } from "@/lib/media";
 
 const INITIAL: RecruitState = {};
 
@@ -107,8 +108,8 @@ export default function RecruitForm() {
           </p>
           <p>
             명예훼손, 허위사실 유포, 저작권·개인정보 침해 등으로 발생하는{" "}
-            <b>민·형사상 모든 책임은 작성 기자가 부담</b>하며, 해룡신문(운영사
-            DSBH)은 이에 대한 책임을 지지 않습니다.
+            <b>민·형사상 모든 책임은 작성 기자가 부담</b>하며, {MEDIA.name}
+            {OPERATOR_PAREN}은 이에 대한 책임을 지지 않습니다.
           </p>
           <p>취재·보도 시 언론윤리강령과 관련 법령을 준수할 것을 서약합니다.</p>
         </div>

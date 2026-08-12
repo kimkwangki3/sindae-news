@@ -1,5 +1,5 @@
 -- =====================================================================
---  해룡신문 (DSBH) — Database Schema  [PostgreSQL / Supabase]
+--  해룡신문 — Database Schema  [PostgreSQL / Supabase]
 --  작성: 2026-06  ·  설계 기준: design-mockup.html 의 전체 화면
 --  실행 순서: 이 파일을 Supabase SQL Editor 에 그대로 붙여넣어 실행
 -- =====================================================================

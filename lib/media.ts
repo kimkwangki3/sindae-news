@@ -34,8 +34,25 @@ export const MEDIA = {
   // 홈 구조화 데이터의 sameAs로 나가 구글이 "같은 매체의 다른 계정"으로 묶는다.
   // 주소가 바뀌면 없는 페이지를 가리키게 되므로 옮길 때 여기도 같이 고칠 것.
   naverBlog: "https://blog.naver.com/sdtime0801",
-  operator: "DSBH",
+  // 사업자 등록을 매체명으로 냈다(2026-08-12 발행인 확인). 전에는 DSBH였다.
+  operator: "해룡신문",
+  // 사업자등록증(순천세무서, 2026-08-07 발급). 상호는 매체명과 같다.
+  //
+  // ⚠️ 등록증의 나머지 기재사항은 화면에 올리지 않는다.
+  //    대표자 성명·생년월일은 개인정보이고, 사업장 소재지는 자택이다
+  //    (아래 address와 같은 곳 — 2026-07-31 발행인 결정).
+  bizNo: "645-71-00706",
   circulation: "전국",
   audience: "일반",
   price: "무가",
 } as const;
+
+// 운영사가 매체 자신이면 "해룡신문(운영사 해룡신문)"처럼 겹쳐 적지 않는다.
+// 다시 별도 운영사를 두게 되면 위 operator 한 줄만 고쳐도 문구가 되살아난다.
+const SEPARATE_OPERATOR: boolean = MEDIA.operator !== MEDIA.name;
+
+// "(운영사 DSBH)" 또는 "" — 매체명 뒤에 덧붙이는 괄호.
+export const OPERATOR_PAREN = SEPARATE_OPERATOR ? `(운영사 ${MEDIA.operator})` : "";
+
+// "운영사 DSBH, " 또는 "" — 괄호 안에서 다른 말과 이어 쓸 때.
+export const OPERATOR_PREFIX = SEPARATE_OPERATOR ? `운영사 ${MEDIA.operator}, ` : "";

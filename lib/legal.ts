@@ -2,7 +2,7 @@
 // ⚠️ 발행인·편집인·발행소·명칭·홈페이지 주소가 바뀌면 변경등록 신고가 먼저다(미신고 발행 과태료).
 // 후속: 관리자 '법적 페이지' 관리에서 DB로 편집 가능하게 전환(db/legal-migration.sql 실행 필요).
 
-import { MEDIA } from "./media";
+import { MEDIA, OPERATOR_PREFIX } from "./media";
 
 export interface LegalSection {
   heading?: string;
@@ -52,6 +52,7 @@ const DOCS: LegalDoc[] = [
           `홈페이지: ${MEDIA.homepage}`,
           `보급지역: ${MEDIA.circulation} · 보급대상: ${MEDIA.audience} · ${MEDIA.price}`,
           `운영사: ${MEDIA.operator}`,
+          `사업자등록번호: ${MEDIA.bizNo}`,
         ],
       },
       {
@@ -164,7 +165,7 @@ const DOCS: LegalDoc[] = [
       {
         heading: "제1조 (목적)",
         body: [
-          `이 약관은 ${MEDIA.name}(운영사 ${MEDIA.operator}, 이하 ‘회사’)이 ${MEDIA.homepage}에서 제공하는 인터넷신문 및 부속 서비스(이하 ‘서비스’)의 이용 조건과 절차, 회사와 이용자의 권리·의무를 정하는 것을 목적으로 합니다.`,
+          `이 약관은 ${MEDIA.name}(${OPERATOR_PREFIX}이하 ‘회사’)이 ${MEDIA.homepage}에서 제공하는 인터넷신문 및 부속 서비스(이하 ‘서비스’)의 이용 조건과 절차, 회사와 이용자의 권리·의무를 정하는 것을 목적으로 합니다.`,
         ],
       },
       {
@@ -302,7 +303,7 @@ const DOCS: LegalDoc[] = [
     sections: [
       {
         body: [
-          `${MEDIA.name}(운영사 ${MEDIA.operator}, 이하 ‘회사’)은 「개인정보 보호법」에 따라 이용자의 개인정보를 보호하고 관련 권익을 보장합니다.`,
+          `${MEDIA.name}(${OPERATOR_PREFIX}이하 ‘회사’)은 「개인정보 보호법」에 따라 이용자의 개인정보를 보호하고 관련 권익을 보장합니다.`,
         ],
       },
       {

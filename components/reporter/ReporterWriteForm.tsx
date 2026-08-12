@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { saveReporterArticle, type WriteState } from "@/lib/reporter-actions";
 import { CATEGORY_NAME } from "@/lib/mock/articles-meta";
+import { MEDIA } from "@/lib/media";
 import ImageUpload from "@/components/ImageUpload";
 import BlockEditor from "@/components/BlockEditor";
 import ArticleAiFields from "@/components/ArticleAiFields";
@@ -130,8 +131,8 @@ export default function ReporterWriteForm({
         />
         <span>
           <b className="text-rose-deep">⚖ 기사 책임 서약</b>
-          <br />본 기사의 모든 법적·윤리적 책임은 회사(DSBH)가 아닌 작성 기자
-          본인에게 있음에 동의합니다. (제출 시 동의 시각이 기록됩니다)
+          <br />본 기사의 모든 법적·윤리적 책임은 회사({MEDIA.operator})가 아닌
+          작성 기자 본인에게 있음에 동의합니다. (제출 시 동의 시각이 기록됩니다)
         </span>
       </label>
 
