@@ -1,5 +1,5 @@
 import { MEDIA } from "@/lib/media";
-import { findStaffByName } from "@/lib/staff";
+import { findStaffByName, isDesk } from "@/lib/staff";
 
 // 기사 구조화 데이터(schema.org NewsArticle).
 // 이게 없으면 구글이 이 페이지를 '뉴스 기사'로 인식하지 못해 뉴스 후보에서 빠진다.
@@ -42,16 +42,17 @@ export default function NewsArticleJsonLd({
     // 수정 이력이 없으면 발행일과 같게 둔다(둘 다 실제 값).
     dateModified: updatedAtIso ?? publishedAtIso ?? undefined,
     // 필자 프로필이 있으면 url까지 넣는다. 구글은 '필자를 추적할 수 있는가'를 본다.
+    // 바이라인이 매체 자신이면 Person이 아니라 Organization이다 — 사람이 아닌
+    // 것을 Person으로 내보내면 구조화 데이터가 사실과 어긋난다.
     author: (() => {
       const staff = findStaffByName(author);
-      return staff
-        ? {
-            "@type": "Person",
-            name: staff.name,
-            jobTitle: staff.title,
-            url: `${siteUrl}/reporters/${staff.handle}`,
-          }
-        : { "@type": "Person", name: author };
+      if (!staff) return { "@type": "Person", name: author };
+      return {
+        "@type": isDesk(staff.name) ? "Organization" : "Person",
+        name: staff.name,
+        ...(isDesk(staff.name) ? {} : { jobTitle: staff.title }),
+        url: `${siteUrl}/reporters/${staff.handle}`,
+      };
     })(),
     publisher: {
       "@type": "NewsMediaOrganization",
