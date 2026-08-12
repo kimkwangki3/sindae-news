@@ -83,12 +83,33 @@ export async function sendDraft(d, index) {
 
 // 실행 요약. 초안이 0건이거나 수집이 실패해도 침묵하지 않는다 —
 // 조용히 멈춘 자동화는 며칠 뒤에야 알아차리게 된다.
-export async function sendRunReport({ drafted, skipped, failures }) {
+//
+// slots: 하루 구성 칸별 결과 [{label, made, candidates}]
+// notes: 비어 있는 칸의 사유
+// headlines: 제목만 확인되고 본문을 못 구한 지역 소식(발행인이 직접 확인할 거리)
+export async function sendRunReport({ drafted, skipped, failures, slots, notes, headlines }) {
   const lines = [`<b>🗞 초안 생성 완료 — ${drafted}건</b>`];
-  if (skipped > 0) lines.push(`이미 처리한 자료 ${skipped}건은 건너뛰었습니다.`);
-  if (failures.length > 0) {
+
+  if (slots?.length > 0) {
+    lines.push("");
+    for (const s of slots) {
+      lines.push(`${s.made > 0 ? "✅" : "—"} ${esc(s.label)}: ${s.made}건`);
+    }
+  }
+  if (skipped > 0) lines.push("", `이미 처리한 자료 ${skipped}건은 건너뛰었습니다.`);
+  if (notes?.length > 0) {
+    lines.push("");
+    for (const n of notes) lines.push(`· ${esc(clip(n, 140))}`);
+  }
+  // 본문을 못 읽어 기사로 못 쓴 것들. 여기 걸린 건 대개 발로 확인해야 한다.
+  if (headlines?.length > 0) {
+    lines.push("", "<b>🔎 제목만 확인된 지역 소식</b>", "<i>본문을 못 읽어 초안은 못 만들었습니다.</i>");
+    for (const h of headlines) lines.push(`· [${esc(h.outlet)}] ${esc(clip(h.title, 60))}`);
+  }
+  if (failures?.length > 0) {
     lines.push("", "<b>수집 실패</b>");
     for (const f of failures.slice(0, 5)) lines.push(`· ${esc(clip(f, 120))}`);
+    if (failures.length > 5) lines.push(`· 외 ${failures.length - 5}건`);
   }
   if (drafted === 0) {
     lines.push("", "오늘은 올릴 만한 새 자료가 없었습니다.");

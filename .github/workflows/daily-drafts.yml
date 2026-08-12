@@ -39,9 +39,16 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          # 순천시청은 해외 IP에 응답하지 않는다. 서울 리전에서 도는
-          # 우리 사이트의 중계 경로를 거쳐 읽는다.
+          # 순천시청과 일부 언론사는 해외 IP에 응답하지 않는다. 서울 리전에서
+          # 도는 우리 사이트의 중계 경로를 거쳐 읽는다.
           RELAY_URL: https://www.sdtime.net/api/relay
           RELAY_SECRET: ${{ secrets.TELEGRAM_WEBHOOK_SECRET }}
-          DRAFT_COUNT: "3"
+          # 하루 구성 — 시청 1 + 해룡면 사건사고 1 + 순천 사건사고 1 + 전국 1.
+          # 자료가 없는 칸은 비운다(0건으로 보고된다).
+          DRAFT_CITY: "1"
+          DRAFT_TIER1: "1"
+          DRAFT_TIER2: "1"
+          DRAFT_TIER3: "1"
+          # 어제 하루를 통째로 덮도록 새벽 6시 기준 30시간을 본다.
+          NEWS_WINDOW_HOURS: "30"
         run: node draft.mjs

@@ -1,19 +1,34 @@
-// 순천시청 자료 중계 — 서울 리전 전용.
+// 취재 자료 중계 — 서울 리전 전용.
 //
 // 시청 서버가 해외 IP 요청에는 응답하지 않는다(GitHub Actions 러너에서 두 게시판
 // 모두 시간 초과). 초안 생성은 GitHub에서 돌아야 하므로, 읽는 일만 한국에 있는
 // 이 라우트가 대신한다. preferredRegion으로 서울(icn1)에 고정한다.
+// 사건사고를 참고하는 언론사 사이트도 같은 이유로 여기를 거친다.
 //
 // 열린 프록시가 되지 않도록 두 가지를 건다:
-//   1) 중계 대상 도메인을 순천시청 하나로 못 박는다(SSRF 차단)
+//   1) 중계 대상 도메인을 아래 목록으로 못 박는다(SSRF 차단)
 //   2) 비밀값을 아는 호출만 받는다 — 웹훅과 같은 값을 쓴다
 
 export const runtime = "edge";
 export const preferredRegion = ["icn1"];
 export const dynamic = "force-dynamic";
 
-// 순천시청 도메인만. www 와 m 두 호스트를 쓴다(게시판에 따라 다르다).
-const ALLOWED_HOSTS = ["www.suncheon.go.kr", "m.suncheon.go.kr"];
+// 읽어도 되는 곳만. 여기 없는 주소는 403으로 막는다.
+//   · 순천시청 — www 와 m 두 호스트를 쓴다(게시판에 따라 다르다)
+//   · 언론사 — automation/news.mjs 의 FEEDS 와 짝이다. 한쪽만 고치면 막힌다.
+const ALLOWED_HOSTS = [
+  "www.suncheon.go.kr",
+  "m.suncheon.go.kr",
+  "news.google.com",
+  "www.yna.co.kr",
+  "www.jnilbo.com",
+  "www.namdonews.com",
+  "www.agoranews.kr",
+  "www.gjdream.com",
+  "newsis.com",
+  "www.newsis.com",
+  "news.sbs.co.kr",
+];
 
 // 엣지 함수는 25초 안에 응답을 시작해야 한다. 그보다 앞서 끊는다.
 const UPSTREAM_TIMEOUT_MS = 20000;
@@ -61,9 +76,9 @@ export async function GET(req: Request): Promise<Response> {
       cache: "no-store",
       signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
-    if (!res.ok) return fail(`시청 서버 응답 ${res.status}`, 502);
+    if (!res.ok) return fail(`${parsed.hostname} 응답 ${res.status}`, 502);
 
-    // 본문을 그대로 넘긴다. 파싱은 호출한 쪽(collect.mjs)이 한다.
+    // 본문을 그대로 넘긴다. 파싱은 호출한 쪽(collect.mjs / news.mjs)이 한다.
     return new Response(await res.text(), {
       status: 200,
       headers: {
