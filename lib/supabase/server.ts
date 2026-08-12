@@ -41,7 +41,20 @@ export function createServiceClient() {
   return createAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } },
+    {
+      auth: { persistSession: false, autoRefreshToken: false },
+      // 관리자 화면은 언제나 '지금' 값을 봐야 한다.
+      //
+      // Next는 서버에서 나가는 fetch를 가로채 데이터 캐시에 넣을 수 있다.
+      // service role 조회는 전부 관리자용이고 화면도 force-dynamic이라
+      // 캐시해서 얻을 것이 없으므로 요청마다 no-store로 못 박는다.
+      // (대시보드가 옛 수치를 보이던 건 이쪽이 아니라 클라이언트 라우터
+      //  캐시 때문이었다 — next.config.mjs 참고)
+      global: {
+        fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+          fetch(input, { ...init, cache: "no-store" }),
+      },
+    },
   );
 }
 

@@ -32,9 +32,19 @@ export default function AutoRefresh({
     };
     const timer = setInterval(tick, seconds * 1000);
     document.addEventListener("visibilitychange", tick);
+
+    // 뒤로가기로 돌아온 화면은 브라우저가 통째로 얼려 뒀다 되살린다
+    // (bfcache). 그때는 이 컴포넌트가 다시 붙지 않아 위 검사가 돌지 않으므로
+    // 되살아난 순간을 따로 잡아 갱신한다.
+    const onShow = (e: PageTransitionEvent) => {
+      if (e.persisted) router.refresh();
+    };
+    window.addEventListener("pageshow", onShow);
+
     return () => {
       clearInterval(timer);
       document.removeEventListener("visibilitychange", tick);
+      window.removeEventListener("pageshow", onShow);
     };
   }, [router, renderedAt, seconds]);
 
