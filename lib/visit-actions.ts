@@ -1,15 +1,14 @@
 "use server";
 
 import { cookies, headers } from "next/headers";
-import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { isDemoMode } from "@/lib/auth";
 import { getIpHash } from "@/lib/ip";
 
 // 방문자 구분 쿠키. 기사 조회수처럼 IP만으로 세면 같은 아파트·회사에서 온
 // 여러 명이 한 명으로 뭉개진다. 사람을 특정하는 값이 아니라 무작위 UUID다.
+// 심는 곳은 middleware.ts — 여기서는 읽기만 한다.
 const VISITOR_COOKIE = "hn_vid";
-const VISITOR_MAX_AGE = 60 * 60 * 24 * 180; // 180일
 
 // 검색엔진·모니터링 봇은 "접속한 주민"이 아니다. 걸러내지 않으면
 // 색인이 도는 날 방문자 수가 통째로 부풀어 숫자를 믿을 수 없게 된다.
@@ -27,23 +26,12 @@ export async function trackVisit(rawPath: string): Promise<void> {
   const path = rawPath.split("?")[0].slice(0, 200);
   if (!path.startsWith("/")) return;
 
-  const jar = cookies();
-  const existing = jar.get(VISITOR_COOKIE)?.value;
-  const vid = existing && existing.length === 36 ? existing : randomUUID();
-
-  // 올 때마다 만료를 미뤄 준다 — 자주 오는 주민이 6개월마다 새 방문자로
-  // 세지 않도록.
-  try {
-    jar.set(VISITOR_COOKIE, vid, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: VISITOR_MAX_AGE,
-    });
-  } catch {
-    // 쿠키를 쓸 수 없는 컨텍스트 — 기록 자체는 계속한다.
-  }
+  // 쿠키가 없으면 새로 만들지 않는다. 여기서 UUID를 새로 뽑으면 쿠키가
+  // 저장되지 않는 방문자는 페이지를 볼 때마다 새 방문자로 세어진다 —
+  // 실제로 그렇게 부풀려지고 있었다. 없을 땐 null로 두고 집계 함수가
+  // ip_hash로 대신 세게 한다(coalesce, page-views-migration.sql).
+  const raw = cookies().get(VISITOR_COOKIE)?.value;
+  const vid = raw && raw.length === 36 ? raw : null;
 
   const supabase = createClient();
   const {

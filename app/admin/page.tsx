@@ -8,6 +8,7 @@ import {
 } from "@/lib/mock/admin";
 import { PageHead } from "@/components/admin/ui";
 import VisitCard from "@/components/admin/VisitCard";
+import AutoRefresh from "@/components/admin/AutoRefresh";
 
 // 접속 통계는 계속 바뀐다 — 대시보드를 정적으로 굳히지 않는다.
 export const dynamic = "force-dynamic";
@@ -35,12 +36,20 @@ export default async function AdminDashboard() {
   const todo = QUEUE.filter((q) => counts[q.key] > 0);
   const todoTotal = QUEUE.reduce((s, q) => s + counts[q.key], 0);
 
+  // 이 화면을 언제 그렸는지. AutoRefresh가 "지금 보고 있는 게 옛 화면인가"를
+  // 판단하는 기준이자, 카드에 적는 기준 시각이다.
+  const renderedAt = Date.now();
+  const updatedAt = new Date(renderedAt + 9 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(11, 16);
+
   return (
     <div className="px-[18px] py-5">
+      <AutoRefresh renderedAt={renderedAt} />
       <PageHead title="대시보드" sub="한눈에 보는 현황" />
 
       {/* 오늘 접속 */}
-      <VisitCard stats={visits} />
+      <VisitCard stats={visits} updatedAt={updatedAt} />
 
       {/* 처리할 일 */}
       <section className="mb-6 rounded-card border border-line bg-white p-4">

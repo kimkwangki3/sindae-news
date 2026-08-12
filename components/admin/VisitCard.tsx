@@ -34,16 +34,25 @@ function delta(today: number, yesterday: number): string {
 
 // 대시보드 "오늘 접속" 카드 — 당일 방문자(UV)·페이지뷰(PV)와 최근 7일 추세.
 // 방문자는 방문자 쿠키 기준 순 방문자다(같은 사람이 여러 페이지를 봐도 1명).
-export default function VisitCard({ stats }: { stats: VisitStats }) {
+// updatedAt: 이 숫자를 언제 읽어 온 것인지(한국시간 "18:42"). 화면이 언제
+// 것인지 밝혀 두지 않으면 옛 수치를 지금 수치로 착각하게 된다.
+export default function VisitCard({
+  stats,
+  updatedAt,
+}: {
+  stats: VisitStats;
+  updatedAt?: string;
+}) {
   const { today, yesterday, days, available } = stats;
   const max = Math.max(...days.map((d) => d.visitors), 1);
 
   return (
     <section className="mb-6 rounded-card border border-line bg-white p-4">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 flex items-center justify-between gap-2">
         <h2 className="text-sm font-bold text-rose-deep">오늘 접속</h2>
-        <span className="text-xs text-muted">
-          {today.label}({today.weekday}) · 한국시간 기준
+        <span className="text-right text-xs text-muted">
+          {today.label}({today.weekday}) · 한국시간{" "}
+          {updatedAt ? `${updatedAt} 기준` : "기준"}
         </span>
       </div>
 
