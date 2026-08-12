@@ -4,7 +4,7 @@ import { MEDIA } from "@/lib/media";
 
 export const metadata = {
   title: `필자 소개 · ${MEDIA.name}`,
-  description: `${MEDIA.name} 편집부. 담당 분야와 연락처를 공개합니다.`,
+  description: `${MEDIA.name} 기사를 쓰는 사람들. 담당 분야와 연락처를 공개합니다.`,
   alternates: { canonical: "/reporters" },
 };
 
@@ -14,8 +14,8 @@ export default function ReportersPage() {
     <div className="px-[18px] py-5">
       <h1 className="text-xl text-rose-deep">필자 소개</h1>
       <p className="mt-1.5 text-[18px] leading-relaxed text-muted">
-        해룡신문 기사를 쓰는 곳입니다. 취재 요청이나 정정 요청은 아래 이메일로
-        바로 보내주셔도 됩니다.
+        해룡신문 기사를 쓰는 사람들입니다. 취재 요청이나 정정 요청은 담당 필자
+        이메일로 바로 보내주셔도 됩니다.
       </p>
 
       <ul className="mt-5 flex flex-col gap-2.5">

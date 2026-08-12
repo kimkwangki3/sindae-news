@@ -25,13 +25,16 @@ const nextConfig = {
     ],
   },
 
-  // 필자 프로필을 개인 성명에서 편집부로 바꾸면서 주소가 달라졌다(2026-08-12).
-  // 옛 주소는 사이트맵에 올라가 색인됐을 수 있으므로 404로 떨구지 않는다.
+  // 필자 프로필 주소를 잠깐 /reporters/haeryong 으로 바꿨다가 같은 날
+  // 실명 주소로 되돌렸다(2026-08-12). 그 사이 사이트맵에 올라간 주소를
+  // 구글이 가져갔을 수 있으므로 404로 떨구지 않고 되돌아오게 한다.
+  //
+  // 방향은 하나만 둔다. 양쪽으로 걸면 무한 리다이렉트가 된다.
   async redirects() {
     return [
       {
-        source: "/reporters/kimkwangki",
-        destination: "/reporters/haeryong",
+        source: "/reporters/haeryong",
+        destination: "/reporters/kimkwangki",
         permanent: true,
       },
     ];
