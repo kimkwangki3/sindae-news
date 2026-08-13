@@ -12,6 +12,7 @@ import KakaoChannelCta from "@/components/KakaoChannelCta";
 import NewsArticleJsonLd from "@/components/article/NewsArticleJsonLd";
 import TagChips from "@/components/article/TagChips";
 import ArticlePhoto from "@/components/article/ArticlePhoto";
+import linkify from "@/components/Linkify";
 import PostBody from "@/components/PostBody";
 import { MEDIA } from "@/lib/media";
 import { findStaffByName } from "@/lib/staff";
@@ -167,9 +168,9 @@ export default async function ArticleDetailPage({
           className="mt-5"
         />
       ) : (
-        <div className="mt-5 flex flex-col gap-4 text-[20px] leading-[1.85]">
+        <div className="mt-5 flex min-w-0 flex-col gap-4 break-words text-[20px] leading-[1.85]">
           {article.body.map((p, i) => (
-            <p key={i}>{p}</p>
+            <p key={i}>{linkify(p)}</p>
           ))}
         </div>
       )}

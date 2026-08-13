@@ -12,6 +12,12 @@
   html {
     /* iOS 탭 하이라이트 제거, 모바일 우선 */
     -webkit-tap-highlight-color: transparent;
+
+    /* 어딘가에서 글자 한 덩어리가 칸을 넘쳐도 화면 전체가 옆으로 밀리지는
+       않게 한다. hidden 이 아니라 clip 인 이유 — hidden 은 스크롤 컨테이너를
+       만들어 상단 고정(sticky) 헤더를 망가뜨린다. 카테고리 탭처럼 일부러
+       옆으로 넘기는 칸은 자기 안에서 스크롤하므로 영향이 없다. */
+    overflow-x: clip;
   }
 
   body {

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import PhotoGallery from "@/components/PhotoGallery";
+import linkify from "@/components/Linkify";
 import PostBody from "@/components/PostBody";
 import ReportSheet from "@/components/ReportSheet";
 import PostComments from "@/components/community/PostComments";
@@ -87,8 +88,8 @@ export default async function BoardDetailPage({
         </div>
       ) : (
         <>
-          <p className="mt-5 whitespace-pre-line border-t border-line pt-5 text-[20px] leading-[1.85]">
-            {post.body}
+          <p className="mt-5 whitespace-pre-line break-words border-t border-line pt-5 text-[20px] leading-[1.85]">
+            {linkify(post.body)}
           </p>
 
           {post.photos.length > 0 && (

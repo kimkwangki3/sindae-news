@@ -1,4 +1,5 @@
 import ArticlePhoto from "@/components/article/ArticlePhoto";
+import linkify from "@/components/Linkify";
 import { colorClass, type Block } from "@/lib/blocks";
 
 // 블록 본문 렌더러 — 기사·게시판 공용.
@@ -18,8 +19,10 @@ export default function PostBody({
   className?: string;
 }) {
   return (
+    // min-w-0 + break-words — 주소나 긴 영문처럼 끊을 곳이 없는 글자가 와도
+    // 칸 밖으로 밀어내지 않는다(밀려나면 화면 전체가 옆으로 스크롤된다).
     <div
-      className={`flex flex-col gap-4 text-[20px] leading-[1.85] ${className}`}
+      className={`flex min-w-0 flex-col gap-4 break-words text-[20px] leading-[1.85] ${className}`}
     >
       {blocks.map((b, i) => {
         if (b.type === "divider") {
@@ -53,7 +56,7 @@ export default function PostBody({
               key={i}
               className={`mt-2 whitespace-pre-line text-[24px] font-extrabold leading-snug ${color}`}
             >
-              {b.text}
+              {linkify(b.text)}
             </h2>
           );
         }
@@ -64,7 +67,7 @@ export default function PostBody({
               key={i}
               className={`whitespace-pre-line border-l-4 border-line pl-4 ${color}`}
             >
-              {b.text}
+              {linkify(b.text)}
             </blockquote>
           );
         }
@@ -72,7 +75,7 @@ export default function PostBody({
         // 한 문단 안의 줄바꿈은 그대로 살린다(주소·명단처럼 줄을 맞춰 쓴 경우).
         return (
           <p key={i} className={`whitespace-pre-line ${color}`}>
-            {b.text}
+            {linkify(b.text)}
           </p>
         );
       })}
