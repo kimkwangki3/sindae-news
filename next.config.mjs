@@ -22,6 +22,13 @@ const nextConfig = {
         hostname: "*.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
+      // 유튜브 섬네일. 영상만 넣은 기사도 목록 카드와 공유 미리보기에
+      // 그림이 뜨게 하려면 여기를 열어둬야 한다(lib/blocks.ts coverImageUrl).
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+        pathname: "/vi/**",
+      },
     ],
   },
 

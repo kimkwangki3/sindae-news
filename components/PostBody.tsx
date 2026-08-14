@@ -1,5 +1,6 @@
 import ArticlePhoto from "@/components/article/ArticlePhoto";
 import linkify from "@/components/Linkify";
+import YouTubeEmbed from "@/components/YouTubeEmbed";
 import { colorClass, type Block } from "@/lib/blocks";
 
 // 블록 본문 렌더러 — 기사·게시판 공용.
@@ -38,6 +39,22 @@ export default function PostBody({
                 src={b.url}
                 alt={b.caption ? `${alt} — ${b.caption}` : alt}
                 priority={false}
+              />
+              {b.caption && (
+                <figcaption className="mt-1.5 text-[16px] text-muted">
+                  {b.caption}
+                </figcaption>
+              )}
+            </figure>
+          );
+        }
+
+        if (b.type === "video") {
+          return (
+            <figure key={i}>
+              <YouTubeEmbed
+                videoId={b.videoId}
+                title={b.caption ? `${alt} — ${b.caption}` : alt || "영상"}
               />
               {b.caption && (
                 <figcaption className="mt-1.5 text-[16px] text-muted">

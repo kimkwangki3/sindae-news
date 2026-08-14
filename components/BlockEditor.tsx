@@ -9,6 +9,8 @@ import {
   MAX_BLOCKS,
   MAX_CAPTION_LEN,
   MAX_TEXT_LEN,
+  youtubeId,
+  youtubeThumb,
   type Block,
   type BlockColor,
   type TextStyle,
@@ -32,6 +34,9 @@ type Item = { id: number; block: Block };
 // 매번 새 객체를 만든다. 하나를 돌려쓰면 여러 칸이 같은 객체를 가리키게 되어,
 // 나중에 누군가 블록을 직접 고치는 코드를 넣는 순간 엉뚱한 칸이 같이 바뀐다.
 const emptyText = (): Block => ({ type: "text", text: "" });
+// 주소를 붙여넣기 전의 빈 영상칸. videoId가 비어 있으면 저장 때 검증에서
+// 걸러지므로(lib/blocks.ts), 빈 채로 남겨둬도 본문에는 나가지 않는다.
+const emptyVideo = (): Block => ({ type: "video", videoId: "" });
 
 const BTN =
   "min-h-[40px] rounded-element border border-line bg-white px-3 text-[16px] font-bold text-muted";
@@ -90,7 +95,8 @@ export default function BlockEditor({
     }
     const item = { id: nextId.current++, block };
     setItems((prev) => insertInto(prev, item, afterId));
-    if (block.type === "text") setActiveId(item.id);
+    // 글·영상은 넣자마자 입력할 게 있다. 도구 모음을 함께 펼쳐준다.
+    if (block.type === "text" || block.type === "video") setActiveId(item.id);
   }
 
   function removeAt(id: number) {
@@ -206,6 +212,18 @@ export default function BlockEditor({
                 </div>
               )}
 
+              {block.type === "video" && (
+                <VideoField
+                  videoId={block.videoId}
+                  caption={block.caption ?? ""}
+                  onFocus={() => setActiveId(it.id)}
+                  onVideoId={(videoId) => replaceAt(it.id, { ...block, videoId })}
+                  onCaption={(caption) =>
+                    replaceAt(it.id, { ...block, caption })
+                  }
+                />
+              )}
+
               {block.type === "divider" && (
                 <button
                   type="button"
@@ -301,6 +319,14 @@ export default function BlockEditor({
                       >
                         📷사진
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => insert(emptyVideo(), it.id)}
+                        disabled={full}
+                        className={`${BTN} disabled:opacity-40`}
+                      >
+                        ▶영상
+                      </button>
                     </span>
                   </div>
                 </div>
@@ -330,6 +356,14 @@ export default function BlockEditor({
         </button>
         <button
           type="button"
+          onClick={() => insert(emptyVideo(), null)}
+          disabled={full}
+          className={`${BTN} disabled:opacity-40`}
+        >
+          ▶ 영상
+        </button>
+        <button
+          type="button"
           onClick={() => insert({ type: "divider" }, null)}
           disabled={full}
           className={`${BTN} disabled:opacity-40`}
@@ -349,6 +383,79 @@ export default function BlockEditor({
 
       {hint && !error && <p className="text-[16px] text-muted">{hint}</p>}
       {error && <p className="text-[16px] text-rose-deep">{error}</p>}
+    </div>
+  );
+}
+
+// 유튜브 주소를 붙여넣는 칸.
+//
+// 편집기에서는 플레이어를 띄우지 않고 미리보기 그림만 보여준다. 글 쓰는 중에
+// 영상이 재생될 이유가 없고, 영상마다 유튜브 스크립트를 끌어오면 편집 화면이
+// 무거워진다. 대신 그림은 보여준다 — 엉뚱한 영상을 붙였는지는 저장 전에
+// 눈으로 확인할 수 있어야 한다.
+function VideoField({
+  videoId,
+  caption,
+  onVideoId,
+  onCaption,
+  onFocus,
+}: {
+  videoId: string;
+  caption: string;
+  onVideoId: (id: string) => void;
+  onCaption: (v: string) => void;
+  onFocus: () => void;
+}) {
+  // 입력칸에는 사람이 친 그대로를 둔다. 블록에는 ID만 저장하므로, 여기까지
+  // ID로 바꿔치기하면 주소를 붙여넣자마자 글자가 뒤바뀌어 당황하게 된다.
+  const [raw, setRaw] = useState(() =>
+    videoId ? `https://youtu.be/${videoId}` : "",
+  );
+  const bad = raw.trim().length > 0 && !videoId;
+
+  return (
+    <div>
+      <input
+        value={raw}
+        inputMode="url"
+        onFocus={onFocus}
+        onChange={(e) => {
+          setRaw(e.target.value);
+          onVideoId(youtubeId(e.target.value) ?? "");
+        }}
+        placeholder="유튜브 주소 붙여넣기"
+        aria-label="유튜브 주소"
+        className={`min-h-[44px] w-full rounded-element border px-3 text-[16px] outline-none ${
+          bad ? "border-rose-deep" : "border-line focus:border-rose"
+        }`}
+      />
+
+      {videoId && (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={youtubeThumb(videoId)}
+            alt="영상 미리보기"
+            onClick={onFocus}
+            className="mt-1.5 aspect-video w-full rounded-element bg-black object-cover"
+          />
+          <input
+            value={caption}
+            maxLength={MAX_CAPTION_LEN}
+            onFocus={onFocus}
+            onChange={(e) => onCaption(e.target.value)}
+            placeholder="영상 설명 (선택)"
+            className="mt-1.5 min-h-[40px] w-full rounded-element border border-line px-3 text-[16px] outline-none focus:border-rose"
+          />
+        </>
+      )}
+
+      {bad && (
+        <p className="mt-1.5 text-[16px] text-rose-deep">
+          유튜브 주소를 알아볼 수 없어요. 공유 → 링크 복사로 받은 주소를
+          붙여넣어 주세요. (비워 두면 저장할 때 이 칸은 사라집니다)
+        </p>
+      )}
     </div>
   );
 }

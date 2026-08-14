@@ -40,10 +40,17 @@ export interface ImageBlock {
   url: string;
   caption?: string;
 }
+// 영상은 유튜브 ID 11자만 저장한다. 주소도, 유튜브가 주는 퍼가기 코드도
+// 저장하지 않는다 — 화면에 그릴 iframe 주소는 이 ID로 우리가 직접 조립한다.
+export interface VideoBlock {
+  type: "video";
+  videoId: string;
+  caption?: string;
+}
 export interface DividerBlock {
   type: "divider";
 }
-export type Block = TextBlock | ImageBlock | DividerBlock;
+export type Block = TextBlock | ImageBlock | VideoBlock | DividerBlock;
 
 export type BodyFormat = "text" | "blocks";
 
@@ -123,6 +130,34 @@ function safeImageUrl(raw: unknown): string | null {
   return ok === s ? s : null;
 }
 
+// 유튜브 ID는 11자, 그것도 URL에 안전한 글자만 쓴다.
+const YT_ID = /^[A-Za-z0-9_-]{11}$/;
+
+// 기자가 붙여넣을 만한 주소 모양을 전부 받는다 — 공유 링크(youtu.be),
+// 주소창(watch?v=), 쇼츠, 라이브, 퍼가기 코드 속 embed 주소.
+const YT_URL =
+  /(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:[^\s]*&)?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/;
+
+/**
+ * 유튜브 주소·ID → ID 11자. 못 알아보면 null.
+ *
+ * 보안 — 여기서 살아남는 것은 [A-Za-z0-9_-] 11자뿐이고, 저장도 재생도 그 ID로만
+ * 한다. 그래서 주소의 호스트가 진짜 유튜브인지는 따질 필요조차 없다.
+ * "evil.com/youtube.com/watch?v=…" 를 넣어도 우리가 만드는 주소는 언제나
+ * youtube-nocookie.com/embed/<ID> 다. 남의 주소를 iframe 에 심을 길이 없다.
+ */
+export function youtubeId(raw: unknown): string | null {
+  const s = String(raw ?? "").trim();
+  if (!s) return null;
+  if (YT_ID.test(s)) return s; // 이미 ID(저장된 값을 다시 읽는 경우)
+  return s.match(YT_URL)?.[1] ?? null;
+}
+
+/** 영상 미리보기 그림. hqdefault 는 어떤 영상에도 반드시 있다(maxres는 없을 수 있다). */
+export function youtubeThumb(videoId: string): string {
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+}
+
 function asRecord(v: unknown): Record<string, unknown> | null {
   return v && typeof v === "object" && !Array.isArray(v)
     ? (v as Record<string, unknown>)
@@ -183,16 +218,25 @@ export function parseBlocks(raw: unknown): Block[] | null {
       continue;
     }
 
-    if (rec.type === "image") {
-      const url = safeImageUrl(rec.url);
-      if (!url) continue; // 허용되지 않은 URL은 조용히 버린다
+    if (rec.type === "image" || rec.type === "video") {
+      // 사진은 허용된 스토리지 주소만, 영상은 유튜브 ID만 통과한다.
+      let block: ImageBlock | VideoBlock;
+      if (rec.type === "image") {
+        const url = safeImageUrl(rec.url);
+        if (!url) continue; // 알아볼 수 없는 값은 조용히 버린다
+        block = { type: "image", url };
+      } else {
+        const videoId = youtubeId(rec.videoId);
+        if (!videoId) continue;
+        block = { type: "video", videoId };
+      }
+
       const caption = String(rec.caption ?? "")
         .replace(/\s+/g, " ")
         .trim()
         .slice(0, MAX_CAPTION_LEN);
-      const block: ImageBlock = { type: "image", url };
-      // 글자수 한도에 걸리면 캡션만 포기한다. 사진 자체는 글자수를 차지하지
-      // 않으므로 여기서 사진까지 버리면 애먼 것이 사라진다.
+      // 글자수 한도에 걸리면 캡션만 포기한다. 사진·영상 자체는 글자수를
+      // 차지하지 않으므로 여기서 그것까지 버리면 애먼 것이 사라진다.
       if (caption && caption.length <= budget) {
         budget -= caption.length;
         block.caption = caption;
@@ -232,10 +276,11 @@ export function blocksToPlainText(blocks: Block[]): string {
     .filter(Boolean);
   if (paras.length) return paras.join("\n\n");
 
-  // 사진만 있는 글이면 캡션이라도 남긴다(설명이 완전히 비는 것보단 낫다).
+  // 사진·영상만 있는 글이면 캡션이라도 남긴다(설명이 완전히 비는 것보단 낫다).
   return blocks
-    .filter((b): b is ImageBlock => b.type === "image")
-    .map((b) => b.caption?.trim() ?? "")
+    .map((b) =>
+      b.type === "image" || b.type === "video" ? (b.caption?.trim() ?? "") : "",
+    )
     .filter(Boolean)
     .join("\n\n");
 }
@@ -269,11 +314,26 @@ export function textToBlocks(body: string | null | undefined): Block[] {
   }));
 }
 
-/** 본문에 쓰인 사진 URL을 순서대로. 대표 이미지 자동 선택 등에 쓴다. */
+/** 본문에 쓰인 사진 URL을 순서대로. 게시판 사진 목록 등에 쓴다. */
 export function collectImageUrls(blocks: Block[]): string[] {
   return blocks
     .filter((b): b is ImageBlock => b.type === "image")
     .map((b) => b.url);
+}
+
+/**
+ * 대표 이미지 후보 — 본문 첫 사진, 없으면 첫 영상의 유튜브 섬네일.
+ *
+ * 영상만 넣은 기사도 목록 카드와 공유 미리보기에 그림이 뜨게 하려는 것이다.
+ * 사진 목록(collectImageUrls)에는 이 주소를 섞지 않는다 — 거기 들어가면
+ * 게시판 사진첩에 남의 서버 그림이 사진인 척 끼어든다.
+ */
+export function coverImageUrl(blocks: Block[]): string {
+  for (const b of blocks) {
+    if (b.type === "image") return b.url;
+    if (b.type === "video") return youtubeThumb(b.videoId);
+  }
+  return "";
 }
 
 /** 저장된 jsonb를 화면에서 쓰기 전에 한 번 더 통과시킨다(DB를 믿지 않는다). */
