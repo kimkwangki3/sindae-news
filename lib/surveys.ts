@@ -7,12 +7,21 @@
 // 절대 끌어오면 안 된다. DB를 읽는 코드는 lib/mock/surveys.ts 에 있다
 // (이 저장소는 데이터 접근을 그 폴더에 모아 둔다).
 
-import { REGIONS } from "./region";
-
 // ── 상수 ──────────────────────────────────────────────────────────────
 
-/** 거주 지구 선택지. DB의 survey_district_ok() 와 글자까지 같아야 한다. */
-export const SURVEY_DISTRICTS = REGIONS;
+/**
+ * 거주 지역 선택지. DB의 survey_district_ok() 와 글자까지 같아야 한다.
+ *
+ * 회원가입에 쓰는 lib/region.ts 의 REGIONS(다섯 갈래)와 일부러 다르게 둔다.
+ * 가입할 때는 한 번 고르고 마는 값이라 자세해도 되지만, 설문은 답할 때마다
+ * 고르는 값이다. 선택지가 길어질수록 그냥 '선택 안 함'으로 넘어가 버려
+ * 정작 교차 분석에 쓸 응답이 줄어든다. 세 갈래면 기사에 쓰기 충분하다.
+ *
+ * 그래서 이 둘은 서로 맞출 필요가 없고, 맞추려 해서도 안 된다 — 회원의
+ * neighborhood 값(복성지구·선월지구 등)을 여기 규칙으로 검사하면 멀쩡한
+ * 계정이 걸린다.
+ */
+export const SURVEY_DISTRICTS = ["신대지구", "해룡면", "그 외 지역"] as const;
 
 /** 연령대 선택지. DB의 survey_age_band_ok() 와 글자까지 같아야 한다. */
 export const AGE_BANDS = [

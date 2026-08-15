@@ -111,7 +111,7 @@ export default function SurveyForm({ survey }: { survey?: AdminSurvey }) {
             defaultChecked={survey?.collectDistrict ?? true}
             className="h-5 w-5 accent-rose-deep"
           />
-          거주 지구
+          거주 지역
         </label>
         <label className="flex min-h-[44px] items-center gap-2 text-[17px]">
           <input

@@ -71,7 +71,7 @@ create table if not exists survey_votes (
   survey_id   uuid not null references surveys(id) on delete cascade,
   option_id   uuid not null references survey_options(id) on delete cascade,
   user_id     uuid not null references profiles(id) on delete cascade,
-  district    text,                 -- lib/region.ts 의 REGIONS 와 같은 값만
+  district    text,                 -- survey_district_ok() 가 허용한 값만
   age_band    text,
   ip_hash     text,                 -- 원본 IP는 저장하지 않는다. 해시만
   created_at  timestamptz not null default now()
@@ -89,12 +89,14 @@ create index if not exists survey_votes_ip_idx
 -- ---------------------------------------------------------------------
 -- 2. 허용값 — 화면과 글자까지 같아야 한다
 -- ---------------------------------------------------------------------
--- 거주 지구는 lib/region.ts 의 REGIONS 를 그대로 옮긴 것이다. 온보딩·기자모집·
--- 단체가입이 모두 그 목록을 쓰므로, 여기만 다른 글자를 쓰면 교차 통계가
--- 어긋난다("신대지구" ≠ "신대"). 한쪽을 고치면 반드시 다른 쪽도 고칠 것.
+-- 거주 지역은 lib/surveys.ts 의 SURVEY_DISTRICTS 와 글자까지 같아야 한다.
+-- 한쪽을 고치면 반드시 다른 쪽도 고칠 것("신대지구" ≠ "신대").
+--
+-- 회원가입에 쓰는 lib/region.ts 의 REGIONS(다섯 갈래)와는 일부러 다르다.
+-- 가입은 한 번 고르고 마는 값이라 자세해도 되지만, 설문은 답할 때마다 고르는
+-- 값이라 길어지면 '선택 안 함'으로 넘어가 버린다. 세 갈래면 기사에 충분하다.
 create or replace function survey_district_ok(v text) returns boolean as $$
-  select v is null or v in
-    ('신대지구','복성지구','선월지구','해룡면 그 외','그 외 지역');
+  select v is null or v in ('신대지구','해룡면','그 외 지역');
 $$ language sql immutable;
 
 create or replace function survey_age_band_ok(v text) returns boolean as $$

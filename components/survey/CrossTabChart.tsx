@@ -1,6 +1,6 @@
 import type { CrossTab } from "@/lib/mock/admin-surveys";
 
-// 교차표 — 거주 지구별·연령대별로 무엇을 골랐는지.
+// 교차표 — 거주 지역별·연령대별로 무엇을 골랐는지.
 //
 // 여기부터는 계열이 여럿이라 색이 정보를 나른다. 색 목록은 tailwind.config.ts
 // 의 chart-1…5 고정 순서를 쓴다. 순서를 섞으면 색맹 구분 검증이 깨진다.

@@ -224,7 +224,7 @@ export async function getSurveyBreakdown(
 
   const cross: CrossTab[] = [];
   if (survey.collectDistrict) {
-    cross.push(build("district", "거주 지구별", (v) => v.district));
+    cross.push(build("district", "거주 지역별", (v) => v.district));
   }
   if (survey.collectAgeBand) {
     cross.push(build("age_band", "연령대별", (v) => v.age_band));

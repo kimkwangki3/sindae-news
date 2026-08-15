@@ -22,7 +22,7 @@ const MESSAGE: Record<string, string> = {
   NOT_STARTED: "아직 시작 전인 조사예요.",
   ALREADY_ENDED: "마감된 조사예요.",
   INVALID_OPTION: "보기를 다시 선택해 주세요.",
-  INVALID_DISTRICT: "거주 지구를 다시 선택해 주세요.",
+  INVALID_DISTRICT: "거주 지역을 다시 선택해 주세요.",
   INVALID_AGE_BAND: "연령대를 다시 선택해 주세요.",
   SERVER_ERROR: "잠시 문제가 생겼어요. 다시 시도해 주세요.",
 };
@@ -113,7 +113,7 @@ export default function VoteForm({
           </p>
           {collectDistrict && (
             <label className="flex flex-col gap-1">
-              <span className="text-[17px] font-bold">거주 지구</span>
+              <span className="text-[17px] font-bold">거주 지역</span>
               <select
                 value={district}
                 onChange={(e) => setDistrict(e.target.value)}
