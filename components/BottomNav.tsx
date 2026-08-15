@@ -43,6 +43,14 @@ const ICONS: Record<string, JSX.Element> = {
       <path d="M8 9h8M8 12h5" />
     </>
   ),
+  // 설문 — 결과 막대. 다른 탭이 전부 건물·종이 모양이라 한눈에 구분된다.
+  "/surveys": (
+    <>
+      <path d="M4 20h16" />
+      <rect x="6" y="12" width="3.5" height="5.5" />
+      <rect x="12.5" y="7" width="3.5" height="10.5" />
+    </>
+  ),
 };
 
 // 하단 고정 탭바 — 선형 아이콘 + 활성 인디케이터(rose). 터치 타깃 44px+.

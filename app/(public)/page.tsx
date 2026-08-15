@@ -6,6 +6,8 @@ import AdSlot from "@/components/AdSlot";
 import Thumb from "@/components/Thumb";
 import ArticleListItem from "@/components/ArticleListItem";
 import { MEDIA } from "@/lib/media";
+import { getFeaturedSurvey } from "@/lib/mock/surveys";
+import { remainingLabel } from "@/lib/surveys";
 import {
   CATEGORY_NAME,
   getArticlesPage,
@@ -30,11 +32,12 @@ function SectionTitle({ title, href }: { title: string; href: string }) {
 const HOME_LIST = 10;
 
 export default async function HomePage() {
-  const [lead, latest] = await Promise.all([
+  const [lead, latest, survey] = await Promise.all([
     getLead(),
     // 분류를 가리지 않고 발행 최신순. 홈은 "지금 무슨 일이 있었나"를 보는
     // 자리라 분류별로 나눠 놓으면 정작 방금 올라온 기사가 아래로 밀린다.
     getArticlesPage(null, 0, HOME_LIST + 1),
+    getFeaturedSurvey(),
   ]);
 
   // 헤드라인으로 크게 띄운 기사가 바로 아래 목록에 또 나오면 같은 기사를
@@ -91,6 +94,30 @@ export default async function HomePage() {
               </p>
             </Link>
           </section>
+        )}
+
+        {/* 진행 중인 주민 의견 조사. 헤드라인 바로 아래에 둔다 — 마감이 있는
+            일이라 아래로 내리면 끝난 뒤에 보게 된다. 없으면 자리도 없다. */}
+        {survey && (
+          <Link
+            href={`/surveys/${survey.slug}`}
+            className="mt-5 flex flex-col gap-1.5 rounded-card border border-rose bg-rose-soft p-4"
+          >
+            <span className="flex items-center gap-1.5 text-[16px] font-bold text-rose-deep">
+              📊 주민 의견 조사
+              {remainingLabel(survey.endsAt) && (
+                <span className="font-normal text-muted">
+                  · {remainingLabel(survey.endsAt)}
+                </span>
+              )}
+            </span>
+            <span className="text-[21px] font-bold leading-snug">
+              {survey.title}
+            </span>
+            <span className="text-[17px] text-muted">
+              참여 {survey.totalVotes.toLocaleString()}명 · 눌러서 참여하기
+            </span>
+          </Link>
         )}
 
         <AdSlot slot="home-top" placeholder />

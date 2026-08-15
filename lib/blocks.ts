@@ -47,10 +47,31 @@ export interface VideoBlock {
   videoId: string;
   caption?: string;
 }
+/**
+ * 설문 결과 그래프.
+ *
+ * 집계 숫자를 블록 안에 그대로 박아 둔다. 설문을 다시 열거나 표가 더 들어와도
+ * 이미 나간 기사의 숫자가 조용히 바뀌면 안 된다 — 기사는 발행 시점의 사실을
+ * 고정하는 글이다. surveyId 는 원본 조사로 가는 링크에만 쓴다.
+ */
+export interface ChartBlock {
+  type: "chart";
+  surveyId: string;
+  surveySlug: string; // 원문으로 가는 주소. 공개 화면은 id가 아니라 slug로 연다
+  title: string;
+  totalVotes: number;
+  options: { label: string; count: number }[];
+  capturedAt: string; // 집계를 뜬 시각(ISO)
+}
 export interface DividerBlock {
   type: "divider";
 }
-export type Block = TextBlock | ImageBlock | VideoBlock | DividerBlock;
+export type Block =
+  | TextBlock
+  | ImageBlock
+  | VideoBlock
+  | ChartBlock
+  | DividerBlock;
 
 export type BodyFormat = "text" | "blocks";
 
@@ -129,6 +150,9 @@ function safeImageUrl(raw: unknown): string | null {
   const [ok] = parsePhotoUrls(s, 1);
   return ok === s ? s : null;
 }
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // 유튜브 ID는 11자, 그것도 URL에 안전한 글자만 쓴다.
 const YT_ID = /^[A-Za-z0-9_-]{11}$/;
@@ -245,6 +269,60 @@ export function parseBlocks(raw: unknown): Block[] | null {
       continue;
     }
 
+    if (rec.type === "chart") {
+      // 편집기가 만드는 값이 아니라 관리자 화면이 집계에서 뜬 값이다. 그래도
+      // 그대로 믿지 않는다 — 저장된 뒤 손댄 JSON이 다시 들어올 수 있다.
+      const surveyId = String(rec.surveyId ?? "");
+      if (!UUID_RE.test(surveyId)) continue;
+      // 주소는 링크가 되어 나가므로 글자를 좁게 잡는다. 여기가 헐거우면
+      // 본문에서 남의 사이트로 보내는 링크를 만들 수 있다.
+      const surveySlug = String(rec.surveySlug ?? "");
+      if (!/^[a-z0-9-]{1,60}$/.test(surveySlug)) continue;
+
+      const rawOpts = Array.isArray(rec.options) ? rec.options : [];
+      const options: ChartBlock["options"] = [];
+      for (const o of rawOpts.slice(0, 12)) {
+        const r = asRecord(o);
+        if (!r) continue;
+        const label = String(r.label ?? "")
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, 80);
+        const count = Math.max(0, Math.floor(Number(r.count) || 0));
+        if (!label) continue;
+        options.push({ label, count });
+      }
+      if (options.length < 2) continue; // 보기가 하나면 그래프가 아니다
+
+      const title = String(rec.title ?? "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, MAX_CAPTION_LEN);
+      // 총계는 보낸 값을 그대로 쓰지 않고 다시 더한다. 두 숫자가 어긋나면
+      // 비율이 100%를 넘거나 모자라 독자가 먼저 알아챈다.
+      const totalVotes = options.reduce((a, o) => a + o.count, 0);
+
+      const captured = new Date(String(rec.capturedAt ?? ""));
+      const chart: ChartBlock = {
+        type: "chart",
+        surveyId,
+        surveySlug,
+        title,
+        totalVotes,
+        options,
+        capturedAt: (isNaN(captured.getTime())
+          ? new Date()
+          : captured
+        ).toISOString(),
+      };
+
+      const cost = title.length + options.reduce((a, o) => a + o.label.length, 0);
+      if (cost > budget) break;
+      budget -= cost;
+      out.push(chart);
+      continue;
+    }
+
     if (rec.type === "divider") {
       // 구분선만 연달아 오는 건 의미가 없다.
       if (out[out.length - 1]?.type === "divider") continue;
@@ -276,11 +354,16 @@ export function blocksToPlainText(blocks: Block[]): string {
     .filter(Boolean);
   if (paras.length) return paras.join("\n\n");
 
-  // 사진·영상만 있는 글이면 캡션이라도 남긴다(설명이 완전히 비는 것보단 낫다).
+  // 사진·영상·그래프만 있는 글이면 딸린 글자라도 남긴다(설명이 완전히 비는
+  // 것보단 낫다 — 목록 요약과 공유 미리보기가 이 값을 읽는다).
   return blocks
-    .map((b) =>
-      b.type === "image" || b.type === "video" ? (b.caption?.trim() ?? "") : "",
-    )
+    .map((b) => {
+      if (b.type === "chart") return b.title.trim();
+      if (b.type === "image" || b.type === "video") {
+        return b.caption?.trim() ?? "";
+      }
+      return "";
+    })
     .filter(Boolean)
     .join("\n\n");
 }

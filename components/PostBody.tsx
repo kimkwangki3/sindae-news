@@ -1,7 +1,9 @@
 import ArticlePhoto from "@/components/article/ArticlePhoto";
 import linkify from "@/components/Linkify";
+import ResultChart from "@/components/survey/ResultChart";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
 import { colorClass, type Block } from "@/lib/blocks";
+import { buildResults } from "@/lib/surveys";
 
 // 블록 본문 렌더러 — 기사·게시판 공용.
 //
@@ -45,6 +47,40 @@ export default function PostBody({
                   {b.caption}
                 </figcaption>
               )}
+            </figure>
+          );
+        }
+
+        if (b.type === "chart") {
+          // 기사에 실리는 그래프는 발행 시점에 뜬 집계다. 조사가 그 뒤에 더
+          // 진행돼도 이 숫자는 움직이지 않는다 — 그래서 언제 뜬 것인지를
+          // 그래프 아래에 반드시 적는다. 법이 요구하는 표기는 그래프 컴포넌트
+          // 안에 박혀 있어 여기서 뺄 수 없다.
+          return (
+            <figure key={i}>
+              <p className="text-[16px] font-bold text-muted">주민 의견 조사</p>
+              <h2 className="mb-2 mt-0.5 text-[22px] font-extrabold leading-snug">
+                {b.title}
+              </h2>
+              <ResultChart
+                results={buildResults({
+                  id: b.surveyId,
+                  title: b.title,
+                  status: "closed",
+                  totalVotes: b.totalVotes,
+                  options: b.options.map((o, n) => ({ id: String(n), ...o })),
+                })}
+                showStatus={false}
+              />
+              <figcaption className="mt-1.5 text-[16px] text-muted">
+                {b.capturedAt.slice(0, 10).replace(/-/g, ".")} 집계 ·{" "}
+                <a
+                  href={`/surveys/${b.surveySlug}`}
+                  className="underline underline-offset-2"
+                >
+                  조사 원문 보기
+                </a>
+              </figcaption>
             </figure>
           );
         }

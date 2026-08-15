@@ -1,8 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getCurrentUser } from "@/lib/auth";
 
 // 상단 고정 바: 로고 + 기자모집 뱃지 / 메뉴·검색. 반투명 + 블러.
-export default function TopBar() {
+//
+// 관리자 단추는 서버에서 등급을 보고 붙인다. 브라우저 쪽 상태로 판단하면
+// 값을 고쳐 단추를 꺼낼 수 있다. 다만 단추를 숨기는 것은 편의일 뿐 보안이
+// 아니다 — 주소를 직접 쳐도 들어갈 수 없게 막는 일은 app/admin/layout.tsx 와
+// RLS가 한다. 여기서 하는 일은 '자주 쓰는 사람에게 길을 하나 놓아주는 것'뿐이다.
+//
+// getCurrentUser()는 요청당 한 번만 실제로 조회한다(cache). 공개 레이아웃이
+// 이미 부르고 있어 이 단추 때문에 늘어나는 조회는 없다.
+export default async function TopBar() {
+  const user = await getCurrentUser();
+  const isStaff = user?.role === "admin" || user?.role === "superadmin";
+
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-ivory/90 px-[18px] py-3.5 backdrop-blur">
       {/* 로고를 키운 뒤로 360px에서 뱃지 두 개까지 한 줄에 안 들어간다.
@@ -35,6 +47,14 @@ export default function TopBar() {
           >
             기사제보
           </Link>
+          {isStaff && (
+            <Link
+              href="/admin"
+              className="flex-shrink-0 whitespace-nowrap rounded-full bg-rose-deep px-2.5 py-1 text-[16px] font-bold text-white"
+            >
+              관리자
+            </Link>
+          )}
         </div>
       </div>
       <Link

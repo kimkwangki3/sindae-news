@@ -49,6 +49,7 @@ const GROUPS: Group[] = [
   {
     title: "커뮤니티",
     items: [
+      { href: "/admin/surveys", label: "주민 의견 조사" },
       { href: "/admin/comments", label: "댓글 관리" },
       { href: "/admin/board", label: "자유게시판" },
       { href: "/admin/info", label: "생활정보" },

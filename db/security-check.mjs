@@ -102,6 +102,102 @@ await mustBeEmpty("관리자 감사로그", u.from("admin_audit_logs").select("i
 await mustBeEmpty("기사 조회 원본로그", u.from("article_views").select("id"));
 await mustBeEmpty("비로그인의 미발행 기사", anon.from("articles").select("slug").neq("status", "published"));
 
+// --- 설문(주민 의견 조사) ---
+// 이 기능은 조작 방지가 존재 이유다. 화면을 거치지 않고 API를 직접 때려서
+// DB만으로 막히는지 본다. 화면 검증은 개발자도구 앞에서 아무 의미가 없다.
+async function voteCode(label, client, args, expected) {
+  const { data, error } = await client.rpc("cast_survey_vote", args);
+  const code = error ? `ERR:${error.code}` : data?.code;
+  record(code === expected, label, `받은 코드 ${code}`);
+}
+
+const sTag = `seccheck-survey-${Date.now()}`;
+async function mkSurvey(suffix, fields) {
+  const { data } = await admin.from("surveys")
+    .insert({ slug: `${sTag}-${suffix}`, title: `[점검] ${suffix}`, ...fields })
+    .select("id").single();
+  const { data: opts } = await admin.from("survey_options")
+    .insert([
+      { survey_id: data.id, label: "보기1", sort_order: 0 },
+      { survey_id: data.id, label: "보기2", sort_order: 1 },
+    ]).select("id");
+  return { id: data.id, opt: opts[0].id };
+}
+
+const sOpen = await mkSurvey("open", { status: "open" });
+const sOther = await mkSurvey("other", { status: "open" });
+const sDraft = await mkSurvey("draft", { status: "draft" });
+const sClosed = await mkSurvey("closed", { status: "closed" });
+const sEnded = await mkSurvey("ended", {
+  status: "open", ends_at: new Date(Date.now() - 86400000).toISOString(),
+});
+const sHidden = await mkSurvey("hidden", {
+  status: "open", result_visibility: "after_close",
+});
+
+// 정상 투표가 되는지 먼저 본다. 막혀 있으면 나머지 통과는 의미가 없다.
+await voteCode("설문 정상 투표", u,
+  { p_survey_id: sOpen.id, p_option_id: sOpen.opt, p_district: "신대지구" }, "VOTED");
+
+await voteCode("같은 계정 두 번 투표", u,
+  { p_survey_id: sOpen.id, p_option_id: sOpen.opt }, "ALREADY_VOTED");
+
+// 연타 — 브라우저에서 버튼을 빠르게 누르거나 스크립트로 동시에 쏘는 경우.
+// 행 잠금과 유니크 인덱스가 함께 막아야 한다.
+await Promise.all(Array.from({ length: 10 }, () =>
+  u.rpc("cast_survey_vote", { p_survey_id: sOther.id, p_option_id: sOther.opt })));
+const { count: burst } = await admin.from("survey_votes")
+  .select("id", { count: "exact", head: true }).eq("survey_id", sOther.id);
+record(burst === 1, "동시 연타 10회", `${burst}표 기록됨`);
+
+await voteCode("다른 설문의 보기로 투표", u,
+  { p_survey_id: sOpen.id, p_option_id: sOther.opt }, "INVALID_OPTION");
+await voteCode("초안 설문에 투표", u,
+  { p_survey_id: sDraft.id, p_option_id: sDraft.opt }, "SURVEY_NOT_OPEN");
+await voteCode("종료된 설문에 투표", u,
+  { p_survey_id: sClosed.id, p_option_id: sClosed.opt }, "SURVEY_NOT_OPEN");
+await voteCode("기간이 지난 설문에 투표", u,
+  { p_survey_id: sEnded.id, p_option_id: sEnded.opt }, "ALREADY_ENDED");
+// 진행 중 설문에 넣어야 한다. 함수는 기간 → 보기 → 선택값 순으로 보므로
+// 끝난 설문에 넣으면 지구 검증에 닿기도 전에 ALREADY_ENDED 로 끊긴다.
+// 이 계정은 sOpen 에 이미 투표했지만, 선택값 검증이 저장보다 앞이라
+// 허용 목록이 살아 있으면 ALREADY_VOTED 가 아니라 INVALID_* 가 나온다.
+await voteCode("거주지구에 임의 문자열", u,
+  { p_survey_id: sOpen.id, p_option_id: sOpen.opt, p_district: "<script>" },
+  "INVALID_DISTRICT");
+await voteCode("연령대에 임의 문자열", u,
+  { p_survey_id: sOpen.id, p_option_id: sOpen.opt, p_age_band: "99대" },
+  "INVALID_AGE_BAND");
+
+// 비로그인 — 실행 권한이 없어 차단되거나(42501) 함수가 거절해야 한다.
+const { data: anonVote, error: anonErr } = await anon.rpc("cast_survey_vote",
+  { p_survey_id: sOpen.id, p_option_id: sOpen.opt });
+record(Boolean(anonErr) || anonVote?.code === "UNAUTHENTICATED",
+  "비로그인 투표", anonErr ? `차단(${anonErr.code})` : `code=${anonVote?.code}`);
+
+// 함수를 건너뛰고 테이블을 직접 건드리는 경로. 여기가 뚫리면 1인 1표가 무너진다.
+await mustBlock("투표 테이블 직접 INSERT",
+  u.from("survey_votes").insert({
+    survey_id: sOpen.id, option_id: sOpen.opt, user_id: uid }));
+await mustBlock("집계 숫자 직접 조작",
+  u.from("survey_options").update({ vote_count: 9999 }).eq("id", sOpen.opt));
+await mustBlock("일반 회원이 설문 개설",
+  u.from("surveys").insert({ slug: `${sTag}-hack`, title: "[점검] 무단 개설", status: "open" }));
+await mustBlock("설문을 임의로 종료",
+  u.from("surveys").update({ status: "closed" }).eq("id", sOpen.id));
+
+// 남의 표를 들여다보는 경로. 참여자가 적으면 누가 뭘 골랐는지 드러난다.
+await mustBeEmpty("남의 투표 내역",
+  u.from("survey_votes").select("id, user_id, option_id").neq("user_id", uid));
+await mustBeEmpty("비로그인의 투표 내역", anon.from("survey_votes").select("id"));
+await mustBeEmpty("초안 설문 열람", anon.from("surveys").select("id").eq("status", "draft"));
+
+// '종료 후 공개' 설문의 진행 중 판세. 화면에서만 감추면 API로 새어 나간다.
+const { data: hidden } = await anon.rpc("get_survey_results", { p_survey_id: sHidden.id });
+record(hidden === null, "종료 후 공개 설문의 진행 중 결과", hidden ? "집계가 노출됨" : "가려짐");
+const { data: shown } = await anon.rpc("get_survey_results", { p_survey_id: sOpen.id });
+record(shown !== null, "즉시 공개 설문의 결과 조회", shown ? "정상" : "막힘");
+
 // --- 관리자 경로가 여전히 되는지 (수정이 운영을 막지 않았는지) ---
 const svcSlug = `seccheck-svc-${Date.now()}`;
 await mustWork("service_role 기사 발행(관리자 경로)",
@@ -114,6 +210,8 @@ await admin.from("board_posts").delete().eq("author_id", uid);
 await admin.from("businesses").delete().eq("owner_id", uid);
 await admin.from("organizations").delete().eq("owner_id", uid);
 await admin.from("articles").delete().like("slug", "seccheck-%");
+// 설문은 보기·투표가 cascade로 함께 지워진다.
+await admin.from("surveys").delete().like("slug", "seccheck-survey-%");
 await admin.from("profiles").delete().eq("id", uid);
 await admin.auth.admin.deleteUser(uid);
 

@@ -18,6 +18,10 @@ export const BOTTOM_TABS: BottomTab[] = [
     ? [{ href: "/market", label: "나눔마켓", icon: "🤝" }]
     : []),
   { href: "/board", label: "게시판", icon: "💬" },
+  // 탭이 여섯이 됐다. 360px에서 라벨 최소폭 합이 약 313px이라 들어간다
+  // (탭은 flex-1 이지만 글자보다 좁아지지는 않는다). 여기서 더 늘리려면
+  // '지역단체'처럼 네 글자짜리 라벨부터 줄여야 한다.
+  { href: "/surveys", label: "설문조사", icon: "📊" },
 ];
 
 export interface CategoryLink {

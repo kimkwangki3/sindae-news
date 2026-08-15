@@ -224,6 +224,28 @@ export default function BlockEditor({
                 />
               )}
 
+              {block.type === "chart" && (
+                // 그래프는 편집기에서 고치지 않는다. 집계는 조사에서 뜬 사실이라
+                // 기자가 손댈 수 있게 두면 안 된다. 자리를 옮기거나 통째로
+                // 빼는 것만 된다.
+                <button
+                  type="button"
+                  onClick={() => setActiveId(it.id)}
+                  className="w-full rounded-element border border-line bg-ivory-2 p-3 text-left"
+                >
+                  <span className="text-[16px] font-bold text-muted">
+                    📊 설문 결과 그래프
+                  </span>
+                  <span className="mt-1 block text-[18px] font-bold leading-snug">
+                    {block.title}
+                  </span>
+                  <span className="mt-1 block text-[16px] text-muted">
+                    참여 {block.totalVotes.toLocaleString()}명 ·{" "}
+                    {block.options.length}개 보기 · 숫자는 고칠 수 없습니다
+                  </span>
+                </button>
+              )}
+
               {block.type === "divider" && (
                 <button
                   type="button"

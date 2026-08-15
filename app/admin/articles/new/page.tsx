@@ -8,6 +8,7 @@ import { ARTICLE_PALETTE, textToBlocks } from "@/lib/blocks";
 import { CATEGORY_NAME, type CategorySlug } from "@/lib/mock/articles";
 import { MAX_TAGS, tagsToInput } from "@/lib/tags";
 import { getArticleForEdit } from "@/lib/mock/admin";
+import { getAdminSurvey, toArticleDraft } from "@/lib/mock/admin-surveys";
 import { notFound } from "next/navigation";
 
 export const metadata = { title: "기사 작성 · 관리자" };
@@ -15,19 +16,28 @@ export const metadata = { title: "기사 작성 · 관리자" };
 const CATEGORIES = Object.entries(CATEGORY_NAME) as [CategorySlug, string][];
 
 // 기사 작성/편집.
-//  · ?slug=  → 기존 기사 편집(전 항목 프리필, original_slug로 대상 고정)
+//  · ?slug=   → 기존 기사 편집(전 항목 프리필, original_slug로 대상 고정)
 //  · ?title=&body= → 제보 기사화 프리필
+//  · ?survey= → 설문 결과 기사화. 리드 문단 + 결과 그래프가 채워진 채로 열린다
 export default async function NewArticlePage({
   searchParams,
 }: {
-  searchParams: { title?: string; body?: string; slug?: string };
+  searchParams: { title?: string; body?: string; slug?: string; survey?: string };
 }) {
   const editing = searchParams.slug
     ? await getArticleForEdit(searchParams.slug)
     : null;
   if (searchParams.slug && !editing) notFound();
 
-  const preTitle = editing?.title ?? searchParams.title ?? "";
+  // 설문 결과는 관리자 권한으로 읽는다(초안·종료 가리지 않고). 이 화면 자체가
+  // 관리자 전용이라 여기까지 온 사람은 이미 검증을 지났다.
+  const survey =
+    !editing && searchParams.survey
+      ? await getAdminSurvey(searchParams.survey)
+      : null;
+  const draft = survey ? toArticleDraft(survey) : null;
+
+  const preTitle = editing?.title ?? draft?.title ?? searchParams.title ?? "";
   const preBody = editing?.body ?? searchParams.body ?? "";
   return (
     <div className="px-[18px] py-5">
@@ -138,7 +148,9 @@ export default async function NewArticlePage({
           textName="body"
           bucket="articles"
           palette={ARTICLE_PALETTE}
-          defaultBlocks={editing?.bodyBlocks ?? textToBlocks(preBody)}
+          defaultBlocks={
+            editing?.bodyBlocks ?? draft?.blocks ?? textToBlocks(preBody)
+          }
           label="본문"
           hint="칸을 누르면 색·소제목·순서 바꾸기가 나옵니다. 사진은 원하는 문단 아래에 넣을 수 있어요."
         />
