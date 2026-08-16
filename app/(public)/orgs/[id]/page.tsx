@@ -91,6 +91,12 @@ export default async function OrgDetailPage({
           >
             소식 글쓰기
           </Link>
+          <Link
+            href={`/orgs/${org.id}/edit`}
+            className="flex-1 rounded-element bg-rose-soft py-2.5 text-center text-xs font-bold text-rose-deep"
+          >
+            정보 수정
+          </Link>
         </div>
       )}
 
