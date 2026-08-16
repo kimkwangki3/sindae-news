@@ -14,6 +14,7 @@ import { registerOrg, type OrgRegisterState } from "@/lib/local-actions";
 // 끌고 오는 서버 전용 모듈(next/headers)까지 브라우저 번들에 딸려와 빌드가 깨진다.
 
 const INITIAL: OrgRegisterState = {};
+const THIS_YEAR = new Date().getFullYear();
 const INPUT =
   "min-h-[48px] w-full rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose";
 
@@ -77,6 +78,20 @@ export default function OrgRegisterForm({
       </Field>
       <Field label="대표자 / 직책">
         <input name="leader" placeholder="예) 홍길동 회장" className={INPUT} />
+      </Field>
+      <Field label="설립 연도 (선택)">
+        {/* 등록일이 아니라 단체가 시작된 해다. 20년 된 자치회가 올해 생긴
+            모임처럼 보이지 않게 하려고 따로 받는다. 모르면 비워 두면 되고,
+            비워 두면 화면에 연도를 아예 적지 않는다. */}
+        <input
+          name="founded_year"
+          type="number"
+          inputMode="numeric"
+          min={1900}
+          max={THIS_YEAR}
+          placeholder={`예) 2015 — 모르면 비워 두세요`}
+          className={INPUT}
+        />
       </Field>
       <Field label="활동지역">
         <input

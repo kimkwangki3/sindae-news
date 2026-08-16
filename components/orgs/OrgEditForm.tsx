@@ -15,6 +15,7 @@ import { updateOrg, type OrgEditState } from "@/lib/local-actions";
 // 끌고 오는 서버 전용 모듈까지 브라우저 번들에 딸려와 빌드가 깨진다.
 
 const INITIAL: OrgEditState = {};
+const THIS_YEAR = new Date().getFullYear();
 const INPUT =
   "min-h-[48px] w-full rounded-element border border-line bg-white px-3.5 text-sm outline-none focus:border-rose";
 
@@ -61,6 +62,7 @@ export default function OrgEditForm({
     region: string;
     contact: string;
     kakaoChannel: string | null;
+    foundedYear: number | null;
     acceptJoin: boolean;
     intro: string;
     photos: string[];
@@ -94,6 +96,19 @@ export default function OrgEditForm({
           name="leader"
           defaultValue={initial.leader}
           placeholder="예) 홍길동 회장"
+          className={INPUT}
+        />
+      </Field>
+      <Field label="설립 연도 (선택)">
+        {/* 단체가 시작된 해. 사이트에 등록한 해가 아니다. */}
+        <input
+          name="founded_year"
+          type="number"
+          inputMode="numeric"
+          min={1900}
+          max={THIS_YEAR}
+          defaultValue={initial.foundedYear ?? ""}
+          placeholder="예) 2015 — 모르면 비워 두세요"
           className={INPUT}
         />
       </Field>

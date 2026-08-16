@@ -30,7 +30,10 @@ export interface Organization {
   category: OrgCategory;
   memberCount: number;
   neighborhood: string;
-  since: string;
+  // 단체가 시작된 해. 등록일이 아니다 — 모르면 null 이고, 그때는 화면에
+  // 아무 연도도 적지 않는다(등록일로 대신 채우면 20년 된 자치회가 올해
+  // 생긴 모임처럼 보인다).
+  foundedYear: number | null;
   region: string;
   leader: string;
   contact: string;
@@ -50,7 +53,7 @@ function embeddedCount(v: unknown): number {
 }
 
 const LIST_COLS =
-  "id, name, category, leader, region, contact, kakao_channel, accept_join, intro, created_at, org_members(count), org_photos(url, sort)";
+  "id, name, category, leader, region, contact, kakao_channel, accept_join, intro, founded_year, created_at, org_members(count), org_photos(url, sort)";
 
 // 임베드된 사진 배열 → sort 순 url 목록
 function embeddedPhotoUrls(v: unknown): string[] {
@@ -66,7 +69,7 @@ function toOrgSummary(r: Record<string, unknown>): Organization {
     category: r.category as OrgCategory,
     memberCount: embeddedCount(r.org_members),
     neighborhood: "",
-    since: `${(r.created_at as string).slice(0, 4)}년`,
+    foundedYear: (r.founded_year as number | null) ?? null,
     region: (r.region as string) ?? "",
     leader: (r.leader as string) ?? "",
     contact: (r.contact as string) ?? "",

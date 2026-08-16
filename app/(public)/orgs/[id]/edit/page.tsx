@@ -59,6 +59,7 @@ export default async function OrgEditPage({
           region: org.region,
           contact: org.contact,
           kakaoChannel: org.kakaoChannel,
+          foundedYear: org.foundedYear,
           acceptJoin: org.acceptJoin,
           intro: org.intro,
           photos: org.photos,

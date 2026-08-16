@@ -102,6 +102,22 @@ function normalizeOrgName(name: string): string {
   return name.toLowerCase().replace(/\s+/g, "");
 }
 
+/**
+ * 설립 연도 입력값 → 저장할 값. 비었거나 말이 안 되면 null.
+ *
+ * DB의 CHECK 는 자리수(1900~2100)만 본다. "내년 이후는 오타"라는 판단은
+ * 지금 몇 년인지를 알아야 하는데 CHECK 제약에는 그걸 묻는 함수를 쓸 수 없다.
+ * 그래서 그 몫은 여기가 진다.
+ */
+function parseFoundedYear(raw: FormDataEntryValue | null): number | null {
+  const s = String(raw ?? "").trim();
+  if (!s) return null;
+  const n = Number(s);
+  if (!Number.isInteger(n)) return null;
+  const thisYear = new Date().getFullYear();
+  return n >= 1900 && n <= thisYear ? n : null;
+}
+
 /** 같은 이름의 단체가 이미 있는지. 거절된 것은 세지 않는다. */
 async function orgNameTaken(name: string): Promise<boolean> {
   const key = normalizeOrgName(name);
@@ -119,6 +135,7 @@ async function orgNameTaken(name: string): Promise<boolean> {
     (o) => normalizeOrgName(o.name) === key,
   );
 }
+
 export interface OrgRegisterState {
   error?: string;
 }
@@ -142,7 +159,7 @@ export async function registerOrg(
   // 같은 이름으로 이미 올라와 있으면 여기서 돌려보낸다.
   //
   // 이건 안내용이다. 진짜 차단은 DB의 유니크 인덱스가 한다
-  // (db/org-name-unique-migration.sql) — 두 사람이 동시에 같은 이름을 넣으면
+  // (db/orgs-migration.sql) — 두 사람이 동시에 같은 이름을 넣으면
   // 둘 다 이 검사를 통과하기 때문이다. 그래도 여기서 먼저 보는 이유는,
   // 인덱스에 걸려 나오는 오류는 사람이 읽을 수 있는 말이 아니어서다.
   //
@@ -166,6 +183,7 @@ export async function registerOrg(
       kakao_channel: String(formData.get("kakao_channel") ?? "").trim() || null,
       accept_join: formData.get("accept_join") === "on",
       intro: String(formData.get("intro") ?? "").trim() || null,
+      founded_year: parseFoundedYear(formData.get("founded_year")),
     })
     .select("id")
     .single();
@@ -243,6 +261,7 @@ export async function updateOrg(
         String(formData.get("kakao_channel") ?? "").trim() || null,
       accept_join: formData.get("accept_join") === "on",
       intro: String(formData.get("intro") ?? "").trim() || null,
+      founded_year: parseFoundedYear(formData.get("founded_year")),
     })
     .eq("id", orgId);
   if (error) return { error: "저장에 실패했습니다. 잠시 후 다시 시도해 주세요." };

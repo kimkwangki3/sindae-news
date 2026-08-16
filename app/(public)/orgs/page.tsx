@@ -84,9 +84,12 @@ export default async function OrgsPage({
                 <h4 className="mt-1 line-clamp-1 text-[20px] font-bold">
                   {o.name}
                 </h4>
+                {/* neighborhood 는 지금 늘 비어 있어(스키마에 없다) 빈 칸만
+                    차지했다. 대신 설립 연도를 적는다 — 오래된 단체인지가
+                    목록에서 바로 보이는 편이 고르는 데 도움이 된다. */}
                 <div className="mt-1.5 flex gap-2 text-[16px] text-muted">
                   <span>회원 {o.memberCount}명</span>
-                  <span>{o.neighborhood}</span>
+                  {o.foundedYear && <span>{o.foundedYear}년 설립</span>}
                 </div>
               </div>
             </Link>

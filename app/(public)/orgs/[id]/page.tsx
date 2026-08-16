@@ -71,13 +71,22 @@ export default async function OrgDetailPage({
         </span>
       </div>
       <h1 className="mt-2 text-[27px] font-extrabold">{org.name}</h1>
+      {/* 없는 값은 자리도 만들지 않는다. 예전에는 활동지역이 비어 있어도
+          가운뎃점을 찍어 "회원 1명 ·  · 2026년~"처럼 보였고, 그 연도마저
+          단체가 시작된 해가 아니라 우리 사이트에 등록한 해였다. */}
       <p className="mt-1 text-[18px] text-muted">
-        회원 {org.memberCount}명 · {org.neighborhood} · {org.since}~
+        {[
+          `회원 ${org.memberCount}명`,
+          org.neighborhood,
+          org.foundedYear ? `${org.foundedYear}년 설립` : "",
+        ]
+          .filter(Boolean)
+          .join(" · ")}
       </p>
 
-      {/* 운영진 메뉴 */}
+      {/* 운영진 메뉴 — 단추가 셋이라 좁은 화면에서는 줄을 바꿔 앉힌다 */}
       {isStaff && (
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 flex flex-wrap gap-2">
           <Link
             href={`/orgs/${org.id}/manage`}
             className="flex-1 rounded-element bg-rose-soft py-2.5 text-center text-xs font-bold text-rose-deep"
