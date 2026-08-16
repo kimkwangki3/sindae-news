@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
 import ImageUpload from "@/components/ImageUpload";
 import { updateOrg, type OrgEditState } from "@/lib/local-actions";
+import { MEDIA } from "@/lib/media";
 
 // 단체 소개 수정 — 운영진 전용.
 //
@@ -77,9 +78,18 @@ export default function OrgEditForm({
         <p className="mt-0.5 text-[19px] font-bold">{orgName}</p>
         <p className="mt-1.5 text-[16px] leading-relaxed text-muted">
           단체명은 바꿀 수 없습니다. 주민이 가입해 둔 단체의 이름이 달라지면
-          어느 단체였는지 알 수 없게 되기 때문입니다. 오타가 있다면 해룡신문에
+          어느 단체였는지 알 수 없게 되기 때문입니다. 오타가 있다면 아래로
           알려 주세요.
         </p>
+        {/* 업체 수정 화면과 같은 방식. 누를 곳이 없으면 문의가 오지 않는다. */}
+        <a
+          href={MEDIA.kakaoChannel}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex min-h-[44px] items-center rounded-element bg-[#FEE500] px-3.5 text-[17px] font-bold text-[#3C1E1E]"
+        >
+          💬 카카오톡으로 단체명 변경 요청
+        </a>
       </div>
 
       <Field label="분류">

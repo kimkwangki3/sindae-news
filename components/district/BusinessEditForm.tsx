@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import ImageUpload from "@/components/ImageUpload";
 import { updateBusiness, type BizEditState } from "@/lib/local-actions";
+import { MEDIA } from "@/lib/media";
 import type { BusinessEditable } from "@/lib/mock/district";
 
 // 업체 정보 수정 — 등록한 사장님 전용.
@@ -68,8 +69,19 @@ export default function BusinessEditForm({
         <p className="mt-0.5 text-[19px] font-bold">{biz.name}</p>
         <p className="mt-1.5 text-[16px] leading-relaxed text-muted">
           업체명은 바꿀 수 없습니다. 해룡신문이 확인해 실어 드린 것이 이 이름의
-          가게이기 때문입니다. 상호가 바뀌었다면 알려 주세요.
+          가게이기 때문입니다. 상호가 바뀌었다면 아래로 알려 주세요.
         </p>
+        {/* "문의해 주세요"라고만 적어두면 실제로는 문의가 오지 않는다.
+            누를 곳을 준다. 카카오톡 채널은 이미 운영 중이라 사장님이 앱을
+            새로 깔거나 메일을 쓸 필요가 없다. */}
+        <a
+          href={MEDIA.kakaoChannel}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex min-h-[44px] items-center rounded-element bg-[#FEE500] px-3.5 text-[17px] font-bold text-[#3C1E1E]"
+        >
+          💬 카카오톡으로 상호 변경 요청
+        </a>
       </div>
 
       <Field label="업종">
