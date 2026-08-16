@@ -92,6 +92,33 @@ const { data: org } = await u.from("organizations")
   .insert({ owner_id: uid, name: "점검용단체", category: "etc" }).select("id").maybeSingle();
 if (org) await mustBlock("단체 스스로 승인", u.from("organizations").update({ status: "approved" }).eq("id", org.id));
 
+// 사장님·운영진이 자기 정보를 고칠 수 있게 열어 준 뒤로(2026-08-16), 그 문으로
+// 무엇까지 되는지 확인한다. 고칠 수 있어야 하는 것과 없어야 하는 것을 함께 본다.
+if (biz) {
+  await mustWork("본인 업체 소개 수정(되어야 함)",
+    u.from("businesses").update({ intro: "점검용 소개" }).eq("id", biz.id));
+  await mustBlock("업체명 바꿔 달기",
+    u.from("businesses").update({ name: "다른가게로변경" }).eq("id", biz.id));
+  await mustBlock("사업자 확인 도장 스스로 찍기",
+    u.from("businesses").update({ biz_verified_at: new Date().toISOString() }).eq("id", biz.id));
+  await mustBlock("심사자 이름 바꿔치기",
+    u.from("businesses").update({ reviewed_by: uid }).eq("id", biz.id));
+}
+if (org) {
+  await mustWork("본인 단체 소개 수정(되어야 함)",
+    u.from("organizations").update({ intro: "점검용 소개" }).eq("id", org.id));
+  await mustBlock("단체명 바꿔 달기",
+    u.from("organizations").update({ name: "다른단체로변경" }).eq("id", org.id));
+}
+// 남의 가게는 손대지 못해야 한다. 위 셋이 통과한 것은 '내 것'이기 때문이지
+// 문이 열려서가 아니다.
+const { data: otherBiz } = await admin.from("businesses").select("id").neq("owner_id", uid).limit(1).maybeSingle();
+if (otherBiz) await mustBlock("남의 업체 정보 수정",
+  u.from("businesses").update({ intro: "남이 고침" }).eq("id", otherBiz.id));
+const { data: otherOrg } = await admin.from("organizations").select("id").neq("owner_id", uid).limit(1).maybeSingle();
+if (otherOrg) await mustBlock("남의 단체 정보 수정",
+  u.from("organizations").update({ intro: "남이 고침" }).eq("id", otherOrg.id));
+
 // --- 남의 데이터 ---
 await mustBeEmpty("다른 회원 연락처", u.from("profiles").select("id, phone, kakao_id").neq("id", uid));
 await mustBeEmpty("제보 내용", u.from("tips").select("id, body"));
