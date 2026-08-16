@@ -72,12 +72,21 @@ create policy org_modify on organizations
 -- 다른 것으로 바뀌어 있을 수 있다. 이름은 단체를 가리키는 이름표지 설명이
 -- 아니다.
 --
--- 사이트 관리자는 바꿀 수 있게 둔다 — 오타 신고가 들어왔을 때 고칠 손이
--- 하나도 없으면 그것도 곤란하다.
+-- 잠그되 오타를 고칠 손은 남겨 둔다. 신고가 들어왔는데 아무도 못 고치면
+-- 그것도 곤란하다.
+--
+-- 누구를 막는가를 '역할'로 가른다. 브라우저에서 오는 요청(anon·authenticated)만
+-- 막고, 서버가 비밀 키로 부르는 경로(service_role)와 SQL 에디터는 통과시킨다.
+--   · is_staff() 만으로 가르면 안 된다. 관리자 화면은 service_role 로 도는데
+--     그때는 auth.uid() 가 없어 is_staff() 가 거짓이 된다 — 관리자까지 막힌다.
+--   · service_role 키는 서버 환경변수에만 있다. 그 키로 부를 수 있다는 것은
+--     이미 우리 서버 코드라는 뜻이고, 거기서 다시 권한을 확인한다.
 create or replace function org_name_is_locked() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-  if new.name is distinct from old.name and not is_staff() then
+  if new.name is distinct from old.name
+     and coalesce(auth.role(), 'postgres') in ('anon', 'authenticated')
+     and not is_staff() then
     raise exception '단체명은 변경할 수 없습니다. 수정이 필요하면 해룡신문에 문의해 주세요.';
   end if;
   return new;
