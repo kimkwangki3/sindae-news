@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { VisitStats } from "@/lib/mock/admin-types";
 
 // 막대 높이는 Tailwind 클래스로만 낸다(인라인 스타일 금지). 값을 11단계로
@@ -49,7 +50,17 @@ export default function VisitCard({
   return (
     <section className="mb-6 rounded-card border border-line bg-white p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h2 className="text-sm font-bold text-rose-deep">오늘 접속</h2>
+        <h2 className="text-sm font-bold text-rose-deep">
+          오늘 접속
+          {/* 이 카드는 오늘과 최근 7일만 보여준다. 기간을 넓혀 보거나 어느
+              기사가 읽혔는지 보려면 분석 화면으로 간다. */}
+          <Link
+            href="/admin/visits"
+            className="ml-2 text-xs font-normal text-muted underline"
+          >
+            자세히 보기 ›
+          </Link>
+        </h2>
         <span className="text-right text-xs text-muted">
           {today.label}({today.weekday}) · 한국시간{" "}
           {updatedAt ? `${updatedAt} 기준` : "기준"}

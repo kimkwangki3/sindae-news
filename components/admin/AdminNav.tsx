@@ -22,6 +22,7 @@ const GROUPS: Group[] = [
     title: "현황",
     items: [
       { href: "/admin", label: "대시보드" },
+      { href: "/admin/visits", label: "접속 분석" },
       { href: "/admin/analytics", label: "통계·분석" },
     ],
   },
