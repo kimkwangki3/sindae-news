@@ -33,12 +33,16 @@ export interface PathRow {
   path: string;
   views: number;
   visitors: number;
+  // 기사 경로면 제목을 붙여 준다. 슬러그만 늘어놓으면 어느 기사인지 모른다.
+  title?: string;
 }
 
 export interface SourceRow {
   source: string;
   views: number;
   visitors: number;
+  // 우리 사이트 안에서 링크를 타고 넘어간 것. 유입이 아니라 회유(回遊)다.
+  isInternal: boolean;
 }
 
 export interface ArticleViewRow {
@@ -115,6 +119,25 @@ export async function getVisitAnalytics(days: number): Promise<VisitAnalytics> {
     }
   }
 
+  // 많이 본 쪽에 섞인 기사 주소(/article/<slug>)의 제목도 한 번에 붙인다.
+  // 슬러그만 늘어놓으면 어느 기사가 사람을 데려왔는지 알아볼 수 없다.
+  const pathRows = (pathRes.data ?? []) as Record<string, unknown>[];
+  const slugs = pathRows
+    .map((r) => String(r.path ?? ""))
+    .filter((p) => p.startsWith("/article/"))
+    .map((p) => p.slice("/article/".length))
+    .filter(Boolean);
+  const pathTitles = new Map<string, string>();
+  if (slugs.length) {
+    const { data } = await supabase
+      .from("articles")
+      .select("slug, title")
+      .in("slug", slugs);
+    for (const a of (data ?? []) as { slug: string; title: string }[]) {
+      pathTitles.set(a.slug, a.title);
+    }
+  }
+
   const { CATEGORY_NAME, ID_TO_SLUG } = await import("@/lib/mock/articles-meta");
 
   return {
@@ -124,15 +147,21 @@ export async function getVisitAnalytics(days: number): Promise<VisitAnalytics> {
       views: n(s.views),
       daysWithTraffic: n(s.days_with_traffic),
     },
-    paths: ((pathRes.data ?? []) as Record<string, unknown>[]).map((r) => ({
-      path: String(r.path ?? ""),
-      views: n(r.views),
-      visitors: n(r.visitors),
-    })),
+    paths: pathRows.map((r) => {
+      const path = String(r.path ?? "");
+      const slug = path.startsWith("/article/") ? path.slice(9) : "";
+      return {
+        path,
+        views: n(r.views),
+        visitors: n(r.visitors),
+        title: slug ? pathTitles.get(slug) : undefined,
+      };
+    }),
     sources: ((srcRes.data ?? []) as Record<string, unknown>[]).map((r) => ({
       source: String(r.source ?? "기타"),
       views: n(r.views),
       visitors: n(r.visitors),
+      isInternal: Boolean(r.is_internal),
     })),
     articles: artRows
       .map((r) => {

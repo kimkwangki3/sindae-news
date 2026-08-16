@@ -25,7 +25,14 @@ export default function VisitTracker() {
       // 시크릿 모드 등 sessionStorage 불가 — 그냥 기록한다.
     }
 
-    void trackVisit(pathname);
+    // document.referrer 는 이 문서를 열어 준 곳이다. 카카오톡·검색에서
+    // 들어왔으면 그 주소가, 주소를 직접 치거나 앱이 가려버리면 빈 값이 온다
+    // (빈 값은 '직접 방문'으로 센다). 서버는 이 값을 대신 알아낼 방법이 없다.
+    //
+    // 화면 안에서 링크를 타고 옮겨 다니는 동안에는 문서가 바뀌지 않으므로
+    // 이 값이 그대로 유지된다 — 그래서 한 번 들어온 사람의 여러 쪽 보기가
+    // 모두 같은 유입처로 잡힌다. 그게 우리가 알고 싶은 것이기도 하다.
+    void trackVisit(pathname, typeof document !== "undefined" ? document.referrer : "");
   }, [pathname]);
 
   return null;

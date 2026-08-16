@@ -15,9 +15,28 @@ const VISITOR_COOKIE = "hn_vid";
 const BOT =
   /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|monitor|pingdom|lighthouse|headless|curl|wget|python-requests|axios|okhttp/i;
 
+// 유입 경로는 브라우저가 알려준 값만 쓴다.
+//
+// 서버의 Referer 헤더를 쓰면 안 된다. 이 함수는 서버 액션이라, 그 헤더에는
+// "어디서 왔는가"가 아니라 "지금 보고 있는 우리 페이지"가 담긴다. 그래서
+// 유입 경로가 전부 sdtime.net 으로 찍혀 있었다 — 474건 중 바깥에서 온
+// 기록이 한 건도 없었다. 카카오톡에서 열든 구글에서 오든 똑같았다.
+//
+// 브라우저가 보낸 값이므로 믿을 수 없는 입력이다. 길이를 자르고, 화면에는
+// 호스트만 뽑아 쓴다(top_referrers). 접속 통계라 위험도는 낮지만 원문을
+// 그대로 어딘가에 흘리지는 않는다.
+function cleanReferrer(raw: string | undefined): string | null {
+  const s = (raw ?? "").trim();
+  if (!s || !/^https?:\/\//i.test(s)) return null;
+  return s.slice(0, 300);
+}
+
 // 공개 페이지 방문 1건 기록 — VisitTracker(클라이언트)가 경로가 바뀔 때 호출.
 // 화면을 막지 않는 부수 작업이라 실패해도 조용히 지나간다(로그만 남긴다).
-export async function trackVisit(rawPath: string): Promise<void> {
+export async function trackVisit(
+  rawPath: string,
+  referrer?: string,
+): Promise<void> {
   if (isDemoMode()) return; // .env 미설정 — 기록할 곳이 없다
 
   const ua = headers().get("user-agent") ?? "";
@@ -42,7 +61,7 @@ export async function trackVisit(rawPath: string): Promise<void> {
     path,
     ip_hash: getIpHash(),
     session_id: vid,
-    referrer: headers().get("referer")?.slice(0, 300) ?? null,
+    referrer: cleanReferrer(referrer),
     user_id: user?.id ?? null,
   });
   if (error) {

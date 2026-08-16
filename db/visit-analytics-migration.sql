@@ -65,20 +65,58 @@ $$;
 -- ---------------------------------------------------------------------
 -- 주소 전체를 그대로 묶으면 같은 검색엔진이 검색어마다 다른 줄로 흩어진다.
 -- 호스트만 남겨 묶는다. referrer 가 비면 '직접 방문'(주소 입력·앱·북마크)이다.
+--
+-- ★ 우리 도메인은 유입이 아니다. 사이트 안에서 링크를 타고 넘어가도 referrer
+--   에 우리 주소가 남는다. 처음 만들었을 때 이걸 빼지 않아 "sdtime.net 448회"
+--   가 1위로 떴다 — 정작 궁금한 카카오톡·구글·네이버가 그 아래 묻혔다.
+--   빼지 않고 'internal' 로 표시만 해서 내보낸다. 화면에서 따로 다룬다.
+--
+-- 검색엔진과 메신저는 호스트가 여러 개다(m.search.naver.com, search.naver.com…).
+-- 사람이 읽을 이름으로 묶어야 "네이버에서 몇 명"이 한 줄로 보인다.
+drop function if exists top_referrers(int, int);
 create or replace function top_referrers(p_days int default 30, p_limit int default 15)
-returns table (source text, views bigint, visitors bigint)
+returns table (source text, views bigint, visitors bigint, is_internal boolean)
 language sql stable as $$
+  with r as (
+    select
+      pv.session_id,
+      pv.ip_hash,
+      case
+        when pv.referrer is null or pv.referrer = '' then ''
+        else lower(coalesce(
+          nullif(regexp_replace(pv.referrer, '^https?://(www\.)?([^/?#]+).*$', '\2'), ''),
+          ''))
+      end as host
+    from page_views pv
+    where pv.created_at >= kst_period_start(p_days)
+  )
   select
     case
-      when pv.referrer is null or pv.referrer = '' then '직접 방문'
-      else coalesce(
-        nullif(regexp_replace(pv.referrer, '^https?://(www\.)?([^/?#]+).*$', '\2'), ''),
-        '기타')
-    end                                                     as source,
-    count(*)                                                as views,
-    count(distinct coalesce(pv.session_id, pv.ip_hash))     as visitors
-  from page_views pv
-  where pv.created_at >= kst_period_start(p_days)
+      when host = '' then '직접 방문'
+      -- 우리 주소. 도메인이 늘면 여기에 더한다.
+      when host like '%sdtime.net%'
+        or host like '%sindae.net%'
+        or host like '%sindae-news.vercel.app%'
+        or host like 'localhost%' then '사이트 안에서 이동'
+      when host like '%kakao%' then '카카오톡'
+      when host like '%google%' then '구글'
+      when host like '%naver%' then '네이버'
+      when host like '%daum%' then '다음'
+      when host like '%instagram%' then '인스타그램'
+      when host like '%facebook%' then '페이스북'
+      when host like '%youtube%' then '유튜브'
+      when host like '%bing%' then '빙'
+      else host
+    end as source,
+    count(*)                                            as views,
+    count(distinct coalesce(session_id, ip_hash))       as visitors,
+    bool_or(
+      host like '%sdtime.net%'
+      or host like '%sindae.net%'
+      or host like '%sindae-news.vercel.app%'
+      or host like 'localhost%'
+    )                                                   as is_internal
+  from r
   group by 1
   order by views desc
   limit greatest(coalesce(p_limit, 15), 1);

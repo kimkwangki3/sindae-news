@@ -70,6 +70,10 @@ export default async function AdminVisitsPage({
     getVisitAnalytics(days),
   ]);
 
+  // 바깥에서 들어온 것과 사이트 안 이동을 가른다.
+  const external = a.sources.filter((s) => !s.isInternal);
+  const internal = a.sources.filter((s) => s.isInternal);
+
   const perVisitor =
     a.summary.visitors > 0 ? a.summary.views / a.summary.visitors : 0;
   const dailyAvg =
@@ -161,10 +165,12 @@ export default async function AdminVisitsPage({
             unit="회"
             items={a.paths.map((p) => ({
               key: p.path,
+              // 기사면 제목을, 그 밖의 화면이면 우리말 이름을 앞에 둔다.
+              // 주소는 뒤에 작게 붙여 어느 쪽인지 확인할 수 있게 한다.
               label: (
                 <>
-                  {pathLabel(p.path)}
-                  {pathLabel(p.path) !== p.path && (
+                  {p.title ?? pathLabel(p.path)}
+                  {(p.title || pathLabel(p.path) !== p.path) && (
                     <span className="ml-1.5 text-[15px] text-muted">
                       {p.path}
                     </span>
@@ -176,17 +182,31 @@ export default async function AdminVisitsPage({
             }))}
           />
 
+          {/* 유입에서 '사이트 안에서 이동'은 빼고 센다. 우리 사이트 안에서
+              링크를 타고 넘어가도 referrer 에는 우리 주소가 남는데, 그것까지
+              함께 줄 세우면 늘 1위를 차지해 정작 궁금한 카카오톡·검색이
+              그 아래 묻힌다. 뺀 사실은 아래에 밝혀 둔다. */}
           <RankBars
             title="어디서 들어왔나"
             unit="회"
-            items={a.sources.map((s) => ({
+            items={external.map((s) => ({
               key: s.source,
               label: s.source,
               value: s.views,
               sub: `방문자 ${s.visitors.toLocaleString()}명`,
             }))}
-            empty="유입 경로가 기록되지 않았습니다"
+            empty="바깥에서 들어온 기록이 아직 없습니다"
           />
+          {internal.length > 0 && (
+            <p className="-mt-1 text-[15px] leading-relaxed text-muted">
+              ※ 사이트 안에서 링크를 타고 넘어간{" "}
+              {internal
+                .reduce((sum, s) => sum + s.views, 0)
+                .toLocaleString()}
+              회는 위 목록에서 제외했습니다. 밖에서 들어온 것이 아니라 우리
+              사이트를 둘러본 기록입니다.
+            </p>
+          )}
 
           <RankBars
             title="시간대별 (한국시간)"
