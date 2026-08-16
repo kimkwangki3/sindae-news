@@ -3,7 +3,11 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { PageHead, Pill } from "@/components/admin/ui";
-import { setEntityStatus, deleteEntity } from "@/lib/admin-content-actions";
+import {
+  setEntityStatus,
+  deleteEntity,
+  setBusinessVerified,
+} from "@/lib/admin-content-actions";
 import type {
   AdminEntityRow,
   ApprovalKind,
@@ -50,6 +54,19 @@ export default function ApprovalManager({
     setRows((p) => p.map((r) => (r.id === id ? { ...r, status } : r)));
     startTransition(() => setEntityStatus(kind, id, status));
   }
+  function verify(id: string, verified: boolean) {
+    // 화면을 먼저 바꾸고 서버에 보낸다. 되돌릴 수 있는 표시라 실패해도
+    // 새로고침 한 번이면 제자리로 돌아온다.
+    setRows((p) =>
+      p.map((r) =>
+        r.id === id
+          ? { ...r, bizVerifiedAt: verified ? new Date().toISOString() : null }
+          : r,
+      ),
+    );
+    startTransition(() => setBusinessVerified(id, verified));
+  }
+
   function remove(id: string) {
     if (!confirm("삭제할까요? 연결된 데이터도 함께 사라집니다.")) return;
     setRows((p) => p.filter((r) => r.id !== id));
@@ -108,6 +125,44 @@ export default function ApprovalManager({
                 {STATUS_LABEL[r.status]}
               </Pill>
             </div>
+
+            {/* 사업자등록 확인 — 업체에만. 자동 검증이 아니라 사람이
+                국세청에서 번호를 대조하고 그 결과를 남기는 자리다.
+                등록번호는 '확인용·비공개'로 받은 값이라 이 화면 밖으로는
+                나가지 않는다(공개 페이지는 확인 여부만 안다). */}
+            {kind === "business" && (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t border-line pt-2 text-[16px]">
+                <span className="text-muted">사업자</span>
+                <span className="font-mono">{r.bizRegNo || "미입력"}</span>
+                {r.bizRegNo && (
+                  <a
+                    href="https://teht.hometax.go.kr/websquare/websquare.wq?w2xPath=/ui/ab/a/a/UTEABAAA13.xml"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-element border border-line px-2 py-1 text-xs text-muted"
+                  >
+                    국세청 조회 ↗
+                  </a>
+                )}
+                {r.bizVerifiedAt ? (
+                  <button
+                    type="button"
+                    onClick={() => verify(r.id, false)}
+                    className="ml-auto rounded-full bg-tag-org-bg px-2.5 py-1 text-xs font-bold text-tag-org-fg"
+                  >
+                    ✓ 확인됨 · 취소
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => verify(r.id, true)}
+                    className="ml-auto min-h-[32px] rounded-element border border-line px-3 text-xs font-bold text-rose-deep"
+                  >
+                    사업자 확인함
+                  </button>
+                )}
+              </div>
+            )}
 
             <div className="mt-2 flex flex-wrap justify-end gap-1.5">
               {r.status === "approved" && (

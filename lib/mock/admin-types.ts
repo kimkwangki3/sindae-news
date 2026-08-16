@@ -121,6 +121,10 @@ export interface AdminEntityRow {
   status: ApprovalStatus;
   sub: string; // 업체=대표·연락처 / 단체=대표·회원수
   createdAt: string;
+  // 아래 둘은 업체에만 있다. 사업자등록번호는 '확인용·비공개'로 받은 값이라
+  // 관리자 화면 밖으로는 절대 나가지 않는다.
+  bizRegNo?: string | null;
+  bizVerifiedAt?: string | null;
 }
 
 export interface AdminPromoRow {

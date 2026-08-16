@@ -471,7 +471,9 @@ export async function getAdminEntities(
   if (kind === "business") {
     let q = supabase
       .from("businesses")
-      .select("id, name, category, status, phone, created_at, owner:profiles!owner_id(nickname)")
+      .select(
+        "id, name, category, status, phone, biz_reg_no, biz_verified_at, created_at, owner:profiles!owner_id(nickname)",
+      )
       .order("created_at", { ascending: false });
     if (filter !== "all") q = q.eq("status", filter);
     const { data } = await q;
@@ -484,6 +486,8 @@ export async function getAdminEntities(
         status: row.status as ApprovalStatus,
         sub: `${postAuthor(row.owner)} · ${(row.phone as string) ?? "-"}`,
         createdAt: fmtDateTime(row.created_at as string),
+        bizRegNo: (row.biz_reg_no as string) ?? null,
+        bizVerifiedAt: (row.biz_verified_at as string) ?? null,
       };
     });
   }

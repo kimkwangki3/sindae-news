@@ -45,6 +45,8 @@ export interface Business {
   closedDays: string;
   intro: string;
   isPromoted: boolean;
+  // 사업자등록번호를 사람이 국세청에서 대조했는가. 등록만으로는 붙지 않는다.
+  bizVerified: boolean;
   photoCount: number;
   photos: string[];
   menus: BizMenu[];
@@ -64,7 +66,7 @@ function fmtHours(open: string | null, close: string | null): string {
 
 // 목록에서도 대표 사진 1장과 평점이 필요하므로 url/rating까지 함께 가져온다.
 const LIST_COLS =
-  "id, name, category, address, kakao_channel, phone, is_24h, hours_open, hours_close, closed_days, intro, business_photos(url, sort), promo_posts(count), business_reviews(rating)";
+  "id, name, category, address, kakao_channel, phone, is_24h, hours_open, hours_close, closed_days, intro, biz_verified_at, business_photos(url, sort), promo_posts(count), business_reviews(rating)";
 
 // 임베드된 리뷰 배열 → 평균 별점(소수 첫째 자리)과 개수
 function aggregateRating(v: unknown): { rating: number; reviewCount: number } {
@@ -104,6 +106,7 @@ function toBusinessSummary(r: Record<string, unknown>): Business {
       ? (r.closed_days as string[]).join("·")
       : "",
     intro: (r.intro as string) ?? "",
+    bizVerified: Boolean(r.biz_verified_at),
     isPromoted: embeddedCount(r.promo_posts) > 0,
     photoCount: photos.length,
     photos,
@@ -241,4 +244,65 @@ export async function getMyBusinessReview(
   if (!user) return null;
   const reviews = await getBusinessReviews(businessId);
   return reviews.find((r) => r.mine) ?? null;
+}
+
+// --- 업체 정보 수정 --------------------------------------------------
+
+/** 수정 폼이 쓰는 원본 값. 화면용으로 다듬기 전의 컬럼 그대로다. */
+export interface BusinessEditable {
+  id: string;
+  name: string;
+  ownerId: string | null;
+  category: string;
+  address: string;
+  phone: string;
+  kakaoChannel: string;
+  hoursOpen: string;
+  hoursClose: string;
+  is24h: boolean;
+  closedDays: string[];
+  intro: string;
+  photos: string[];
+  bizVerifiedAt: string | null;
+}
+
+/**
+ * 수정 화면용 조회.
+ *
+ * 승인 전(pending)인 업체도 사장님은 고칠 수 있어야 하므로 status 로 거르지
+ * 않는다. 대신 RLS 가 "승인됐거나 내 것이거나 관리자"만 읽게 막는다.
+ *
+ * 사업자등록번호는 여기서 읽지 않는다. 수정 화면에 띄울 이유가 없고,
+ * 화면에 한 번 올라간 값은 어떻게든 새어 나갈 길이 생긴다.
+ */
+export async function getBusinessForEdit(
+  id: string,
+): Promise<BusinessEditable | null> {
+  const { data } = await createClient()
+    .from("businesses")
+    .select(
+      "id, name, owner_id, category, address, phone, kakao_channel, hours_open, hours_close, is_24h, closed_days, intro, biz_verified_at, business_photos(url, sort)",
+    )
+    .eq("id", id)
+    .maybeSingle();
+  if (!data) return null;
+
+  const r = data as Record<string, unknown>;
+  return {
+    id: r.id as string,
+    name: r.name as string,
+    ownerId: (r.owner_id as string) ?? null,
+    category: (r.category as string) ?? "food",
+    address: (r.address as string) ?? "",
+    phone: (r.phone as string) ?? "",
+    kakaoChannel: (r.kakao_channel as string) ?? "",
+    // time 컬럼은 "09:00:00" 으로 온다. input[type=time] 은 앞 5자만 읽는다.
+    hoursOpen: ((r.hours_open as string) ?? "").slice(0, 5),
+    hoursClose: ((r.hours_close as string) ?? "").slice(0, 5),
+    is24h: Boolean(r.is_24h),
+    closedDays: Array.isArray(r.closed_days) ? (r.closed_days as string[]) : [],
+    intro: (r.intro as string) ?? "",
+    photos: embeddedPhotoUrls(r.business_photos),
+    bizVerifiedAt: (r.biz_verified_at as string) ?? null,
+  };
 }

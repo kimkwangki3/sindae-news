@@ -39,9 +39,8 @@ export default async function StoreDetailPage({
   ]);
   const myReview = reviews.find((r) => r.mine) ?? null;
   // 업체를 여러 개 소유할 수 있으므로 그중 이 가게가 있는지로 판단
-  const isOwner = Boolean(
-    user?.businesses.some((b) => b.status === "approved" && b.id === store.id),
-  );
+  // 승인 전(pending)이라도 등록한 본인은 자기 가게 정보를 고칠 수 있어야 한다.
+  const isOwner = Boolean(user?.businesses.some((b) => b.id === store.id));
 
   return (
     <div className="px-[18px] pb-28">
@@ -88,6 +87,14 @@ export default async function StoreDetailPage({
             홍보 등록업체
           </span>
         )}
+        {/* 사업자등록번호를 사람이 국세청에서 대조한 업체에만 붙는다.
+            등록만 하면 자동으로 붙는 표시가 아니다 — 그러면 배지의 뜻이
+            없어진다. 확인 기록은 관리자만 남길 수 있다(DB 트리거). */}
+        {store.bizVerified && (
+          <span className="rounded-full bg-tag-org-bg px-2 py-0.5 text-[16px] font-bold text-tag-org-fg">
+            ✓ 사업자 확인
+          </span>
+        )}
       </div>
       <h1 className="mt-2 text-[27px] font-extrabold">{store.name}</h1>
       <p className="mt-1 text-[18px] text-muted">
@@ -102,6 +109,18 @@ export default async function StoreDetailPage({
           "아직 리뷰가 없습니다"
         )}
       </p>
+
+      {/* 사장님 메뉴 — 승인 전이어도 본인 업체면 고칠 수 있다 */}
+      {isOwner && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link
+            href={`/district/${store.id}/edit`}
+            className="flex-1 rounded-element bg-rose-soft py-2.5 text-center text-xs font-bold text-rose-deep"
+          >
+            정보 수정
+          </Link>
+        </div>
+      )}
 
       {/* 정보 */}
       <dl className="mt-4 flex flex-col gap-2.5 border-y border-line py-4 text-sm">

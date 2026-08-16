@@ -146,6 +146,37 @@ export async function setEntityStatus(
   revalidatePublic();
 }
 
+/**
+ * 사업자등록 확인 기록 — 관리자만.
+ *
+ * 자동으로 검증하지 않는다. 사람이 국세청 조회 화면에서 번호를 대조하고 그
+ * 결과를 여기에 남기는 것이다. 그래서 함수 이름도 '확인했다'이지 '검증한다'가
+ * 아니다 — 배지가 뜻하는 바는 "해룡신문이 눈으로 확인했다"이다.
+ *
+ * 사장님이 스스로 이 값을 찍지 못하도록 DB 트리거가 따로 막는다
+ * (db/business-verify-migration.sql).
+ */
+export async function setBusinessVerified(
+  id: string,
+  verified: boolean,
+): Promise<void> {
+  const admin = await assertAdmin();
+  await createServiceClient()
+    .from("businesses")
+    .update({
+      biz_verified_at: verified ? new Date().toISOString() : null,
+      biz_verified_by: verified ? admin.id : null,
+    })
+    .eq("id", id);
+  await logAdmin("set_business_verified", {
+    targetType: "business",
+    targetId: id,
+    memo: verified ? "확인" : "확인 취소",
+  });
+  revalidatePath("/admin/business");
+  revalidatePublic();
+}
+
 // 업체/단체 삭제
 export async function deleteEntity(
   kind: ApprovalKind,

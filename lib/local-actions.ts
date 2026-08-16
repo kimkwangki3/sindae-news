@@ -93,6 +93,84 @@ export async function writePromo(formData: FormData): Promise<void> {
   redirect(`/district/${businessId}`);
 }
 
+export interface BizEditState {
+  ok?: boolean;
+  error?: string;
+}
+
+// 요일 체크박스 허용값. 임의 문자열이 배열로 들어가면 화면이 깨진다.
+const WEEKDAYS = ["월", "화", "수", "목", "금", "토", "일", "연중무휴"];
+
+/**
+ * 업체 정보 수정 — 그 업체를 등록한 사장님만.
+ *
+ * 업체명은 받지 않는다. 상호를 고칠 수 있게 열면 분식집으로 승인받아 놓고
+ * 다른 이름으로 바꿔 다는 일이 가능해진다. 신문이 확인해 실어 준 것은
+ * '그 이름의 그 가게'다. DB 트리거로도 막아 뒀다
+ * (db/business-verify-migration.sql).
+ *
+ * 승인 상태와 사업자 확인 기록도 받지 않는다 — 스스로 승인 도장을 찍는 길이
+ * 열리면 이 목록을 믿을 이유가 없어진다. 그쪽도 트리거가 막는다.
+ */
+export async function updateBusiness(
+  businessId: string,
+  _prev: BizEditState,
+  formData: FormData,
+): Promise<BizEditState> {
+  const user = await getCurrentUser();
+  if (!user) return { error: "로그인이 필요합니다." };
+  if (user.is_suspended) return { error: "정지된 계정은 이용할 수 없습니다." };
+
+  // 승인 전(pending)이어도 본인 업체면 고칠 수 있어야 한다. can()의
+  // write_promo 는 '승인된' 업체만 보므로 여기서는 소유 여부만 확인한다.
+  if (!user.businesses.some((b) => b.id === businessId)) {
+    return { error: "이 업체를 등록한 분만 수정할 수 있습니다." };
+  }
+
+  const is24h = formData.get("is_24h") === "on";
+  const closedDays = formData
+    .getAll("closed_days")
+    .map(String)
+    .filter((d) => WEEKDAYS.includes(d));
+
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("businesses")
+    .update({
+      category: String(formData.get("category") ?? "food"),
+      address: String(formData.get("address") ?? "").trim() || null,
+      phone: String(formData.get("phone") ?? "").trim() || null,
+      kakao_channel:
+        String(formData.get("kakao_channel") ?? "").trim() || null,
+      // 24시간 영업이면 여닫는 시각이 뜻을 잃는다. 남겨두면 화면에
+      // "24시간 영업 09:00~21:00" 같은 말이 안 되는 줄이 생긴다.
+      hours_open: is24h ? null : String(formData.get("hours_open") ?? "") || null,
+      hours_close: is24h
+        ? null
+        : String(formData.get("hours_close") ?? "") || null,
+      is_24h: is24h,
+      closed_days: closedDays.length ? closedDays : null,
+      intro: String(formData.get("intro") ?? "").trim() || null,
+    })
+    .eq("id", businessId);
+  if (error) return { error: "저장에 실패했습니다. 잠시 후 다시 시도해 주세요." };
+
+  // 사진은 통째로 다시 쓴다(단체와 같은 방식).
+  const photoUrls = parsePhotoUrls(formData.get("photos"), 5);
+  await supabase.from("business_photos").delete().eq("business_id", businessId);
+  if (photoUrls.length) {
+    await supabase
+      .from("business_photos")
+      .insert(
+        photoUrls.map((url, sort) => ({ business_id: businessId, url, sort })),
+      );
+  }
+
+  revalidatePath(`/district/${businessId}`);
+  revalidatePath("/district");
+  return { ok: true };
+}
+
 // --- 단체 ----------------------------------------------------------
 
 // 이름 비교용 정규화. DB 인덱스가 쓰는 식과 같은 규칙이어야 한다
