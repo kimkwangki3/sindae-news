@@ -3,6 +3,7 @@
 // 평점/리뷰수는 business_reviews 임베드를 JS로 집계한다(업체 수가 적은 단계).
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
+import { kstDate } from "@/lib/datetime";
 
 export type BizCategory = "food" | "cafe" | "life" | "medical";
 
@@ -178,7 +179,7 @@ export async function getBusiness(id: string): Promise<Business | null> {
       category: row.category ?? "공지",
       title: row.title,
       body: row.body ?? "",
-      createdAt: row.created_at.slice(0, 10).replace(/-/g, "."),
+      createdAt: kstDate(row.created_at),
       photoUrls: row.photo_urls ?? [],
     };
   });
@@ -226,7 +227,7 @@ export async function getBusinessReviews(
       author: row.author?.nickname ?? "익명",
       rating: row.rating,
       body: row.body ?? "",
-      createdAt: row.created_at.slice(0, 10).replace(/-/g, "."),
+      createdAt: kstDate(row.created_at),
       mine: Boolean(user && user.id === row.author_id),
     };
   });

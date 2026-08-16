@@ -1,6 +1,7 @@
 // 기사 댓글 데이터 액세스 — Supabase(comments) 실연동.
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
+import { kstFullDateTime } from "@/lib/datetime";
 
 export interface MockComment {
   id: string;
@@ -11,11 +12,7 @@ export interface MockComment {
 }
 
 // timestamptz → "2026.06.26 14:20" (로케일 비의존, UTC 절단)
-export function fmtDateTime(ts: string): string {
-  const d = ts.slice(0, 10).replace(/-/g, ".");
-  const t = ts.slice(11, 16);
-  return `${d} ${t}`;
-}
+export const fmtDateTime = kstFullDateTime;
 
 export async function getComments(slug: string): Promise<MockComment[]> {
   const supabase = createClient();

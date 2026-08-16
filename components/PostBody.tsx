@@ -3,6 +3,7 @@ import linkify from "@/components/Linkify";
 import ResultChart from "@/components/survey/ResultChart";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
 import { colorClass, type Block } from "@/lib/blocks";
+import { kstDate } from "@/lib/datetime";
 import { buildResults } from "@/lib/surveys";
 
 // 블록 본문 렌더러 — 기사·게시판 공용.
@@ -73,7 +74,7 @@ export default function PostBody({
                 showStatus={false}
               />
               <figcaption className="mt-1.5 text-[16px] text-muted">
-                {b.capturedAt.slice(0, 10).replace(/-/g, ".")} 집계 ·{" "}
+                {kstDate(b.capturedAt)} 집계 ·{" "}
                 <a
                   href={`/surveys/${b.surveySlug}`}
                   className="underline underline-offset-2"

@@ -6,6 +6,7 @@ import {
   getBoardStatsList,
   getVisitStats,
 } from "@/lib/mock/admin";
+import { kstTime } from "@/lib/datetime";
 import { PageHead } from "@/components/admin/ui";
 import VisitCard from "@/components/admin/VisitCard";
 import AutoRefresh from "@/components/admin/AutoRefresh";
@@ -39,9 +40,7 @@ export default async function AdminDashboard() {
   // 이 화면을 언제 그렸는지. AutoRefresh가 "지금 보고 있는 게 옛 화면인가"를
   // 판단하는 기준이자, 카드에 적는 기준 시각이다.
   const renderedAt = Date.now();
-  const updatedAt = new Date(renderedAt + 9 * 60 * 60 * 1000)
-    .toISOString()
-    .slice(11, 16);
+  const updatedAt = kstTime(renderedAt);
 
   return (
     <div className="px-[18px] py-5">

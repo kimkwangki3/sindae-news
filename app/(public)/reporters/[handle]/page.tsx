@@ -3,6 +3,7 @@ import Link from "next/link";
 import { findStaffByHandle, STAFF } from "@/lib/staff";
 import { MEDIA } from "@/lib/media";
 import { createAnonClient } from "@/lib/supabase/server";
+import { kstDate } from "@/lib/datetime";
 import ArticleListItem from "@/components/ArticleListItem";
 import { CATEGORY_NAME, ID_TO_SLUG } from "@/lib/mock/articles-meta";
 
@@ -140,7 +141,7 @@ export default async function ReporterProfilePage({
                     slug: a.slug,
                     category: name,
                     title: a.title,
-                    meta: `${name} · ${(a.published_at ?? "").slice(0, 10).replace(/-/g, ".")}`,
+                    meta: `${name} · ${kstDate(a.published_at)}`,
                     thumbnailUrl: a.thumbnail_url,
                   }}
                 />

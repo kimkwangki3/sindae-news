@@ -4,6 +4,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { CATEGORY_NAME, ID_TO_SLUG } from "@/lib/mock/articles-meta";
 import { toTags } from "@/lib/tags";
 import { readBlocks, type Block } from "@/lib/blocks";
+import { kstDate, kstDateTime, kstShortDate } from "@/lib/datetime";
 import type {
   ArticleStatus,
   AdminStat,
@@ -78,12 +79,12 @@ function embeddedCount(v: unknown): number {
   return 0;
 }
 
+// 날짜 표기는 전부 한국시각으로. 문자열을 잘라 쓰면 UTC가 찍힌다
+// (lib/datetime.ts 주석 참고).
 function fmtDate(ts: string | null): string | null {
-  return ts ? ts.slice(5, 10).replace("-", ".") : null;
+  return ts ? kstShortDate(ts) : null;
 }
-function fmtDateTime(ts: string): string {
-  return `${ts.slice(5, 10).replace("-", ".")} ${ts.slice(11, 16)}`;
-}
+const fmtDateTime = kstDateTime;
 function catName(id: number | null): string {
   return id ? CATEGORY_NAME[ID_TO_SLUG[id]] ?? "" : "";
 }
@@ -588,7 +589,7 @@ export async function getActiveReporters(): Promise<AdminReporterRow[]> {
         nickname: r.nickname,
         level: r.reporter_level ?? null,
         articles: count ?? 0,
-        joinedAt: r.created_at.slice(0, 10).replace(/-/g, "."),
+        joinedAt: kstDate(r.created_at),
       };
     }),
   );
@@ -649,7 +650,7 @@ export async function getAdminMembers(): Promise<AdminMemberRow[]> {
       role: row.role,
       reporterLevel: row.reporter_level ?? null,
       neighborhood: row.neighborhood,
-      joinedAt: row.created_at.slice(0, 10).replace(/-/g, "."),
+      joinedAt: kstDate(row.created_at),
       isSuspended: row.is_suspended,
     };
   });
@@ -865,7 +866,7 @@ export async function getStaffList(): Promise<AdminMemberRow[]> {
       role: row.role as AdminMemberRow["role"],
       reporterLevel: null,
       neighborhood: (row.neighborhood as string) ?? null,
-      joinedAt: (row.created_at as string).slice(0, 10).replace(/-/g, "."),
+      joinedAt: kstDate(row.created_at as string),
       isSuspended: Boolean(row.is_suspended),
     };
   });
@@ -884,7 +885,7 @@ export async function getLegalPages(): Promise<LegalPageRow[]> {
       slug: row.slug,
       title: row.title,
       body: row.body ?? "",
-      updatedAt: row.updated_at.slice(0, 10).replace(/-/g, "."),
+      updatedAt: kstDate(row.updated_at),
     };
   });
 }

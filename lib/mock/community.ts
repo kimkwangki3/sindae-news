@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
 import { readBlocks, type Block } from "@/lib/blocks";
+import { kstDateTime } from "@/lib/datetime";
 
 // --- 공통 ------------------------------------------------------------
 export interface PostComment {
@@ -14,9 +15,7 @@ export interface PostComment {
 }
 
 // timestamptz → "06.28 14:20"
-function fmtShort(ts: string): string {
-  return `${ts.slice(5, 10).replace("-", ".")} ${ts.slice(11, 16)}`;
-}
+const fmtShort = kstDateTime;
 
 // 임베디드 count(`rel(count)`) 결과 추출
 function embeddedCount(v: unknown): number {

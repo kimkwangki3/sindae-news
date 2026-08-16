@@ -14,15 +14,10 @@ import TagChips from "@/components/article/TagChips";
 import ArticlePhoto from "@/components/article/ArticlePhoto";
 import linkify from "@/components/Linkify";
 import PostBody from "@/components/PostBody";
+import { kstDate } from "@/lib/datetime";
 import { MEDIA } from "@/lib/media";
 import { findStaffByName } from "@/lib/staff";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-
-// "2026-07-31T08:33:20Z" → "2026.07.31"
-function fmtDay(iso: string): string {
-  return iso.slice(0, 10).replace(/-/g, ".");
-}
 import {
   CATEGORY_NAME,
   getArticleBySlug,
@@ -31,6 +26,11 @@ import {
 import { getComments } from "@/lib/mock/comments";
 import { getCurrentUser } from "@/lib/auth";
 import ShareButton from "@/components/ShareButton";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+// "2026-07-31T08:33:20Z" → "2026.07.31" (한국시각)
+const fmtDay = kstDate;
 
 export async function generateMetadata({
   params,

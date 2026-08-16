@@ -1,6 +1,7 @@
 // 기자 공간 데이터 액세스 — 본인 기사 요약/목록/통계. 쿠키 클라이언트(RLS: 본인 글 조회 허용).
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_NAME, ID_TO_SLUG } from "@/lib/mock/articles-meta";
+import { kstDate } from "@/lib/datetime";
 
 export type MyArticleStatus = "draft" | "pending" | "published" | "archived";
 
@@ -113,9 +114,9 @@ export async function getMyArticles(
       views: Number(row.view_count ?? 0),
       comments: embeddedCount(row.comments),
       reactions: embeddedCount(row.article_reactions),
-      date: ((row.published_at as string) ?? (row.created_at as string) ?? "")
-        .slice(0, 10)
-        .replace(/-/g, "."),
+      date: kstDate(
+        (row.published_at as string) ?? (row.created_at as string) ?? null,
+      ),
     };
   });
 }

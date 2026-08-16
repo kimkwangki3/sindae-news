@@ -4,6 +4,7 @@
 // 시간표나 야간 약국처럼 필요할 때 찾아오는 자료다. 주소도 /info 로 나눈다.
 
 import { createAnonClient, createServiceClient } from "./supabase/server";
+import { kstDate } from "./datetime";
 
 export interface InfoPage {
   slug: string;
@@ -96,6 +97,4 @@ export async function getAllInfoPages(): Promise<InfoPage[]> {
 }
 
 // "2026.08.01" — 언제 기준 정보인지 늘 함께 보여준다.
-export function fmtUpdated(iso: string): string {
-  return iso.slice(0, 10).replace(/-/g, ".");
-}
+export const fmtUpdated = kstDate;

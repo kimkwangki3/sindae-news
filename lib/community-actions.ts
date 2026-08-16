@@ -11,6 +11,7 @@ import { parsePhotoUrls } from "./photos";
 import { parseBlocks, blocksToPlainText, collectImageUrls, type Block } from "./blocks";
 import { notify } from "./telegram";
 import { type PostComment } from "./mock/community";
+import { kstDateTime } from "./datetime";
 
 // 조회수 중복 방지 쿠키 — 최근 본 게시글 표식을 담아둔다.
 const BOARD_SEEN_COOKIE = "bv_seen";
@@ -18,9 +19,7 @@ const BOARD_SEEN_MAX = 60;
 const BOARD_SEEN_DAYS = 1;
 
 // timestamptz → "06.28 14:20"
-function fmtShort(ts: string): string {
-  return `${ts.slice(5, 10).replace("-", ".")} ${ts.slice(11, 16)}`;
-}
+const fmtShort = kstDateTime;
 
 // '오늘'은 한국 자정 기준. 서버는 UTC라 그냥 24시간 전으로 잡으면
 // 밤에 보낸 제보가 다음 날까지 발목을 잡는다.
