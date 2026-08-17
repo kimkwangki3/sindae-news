@@ -40,11 +40,24 @@ export default function PostBody({
                   화면 아래쪽에 있으므로 미리 받지 않고 지연 로드한다. */}
               <ArticlePhoto
                 src={b.url}
-                alt={b.caption ? `${alt} — ${b.caption}` : alt}
+                alt={
+                  b.ai
+                    ? `${alt ? `${alt} — ` : ""}AI로 생성한 이미지${b.caption ? ` — ${b.caption}` : ""}`
+                    : b.caption
+                      ? `${alt} — ${b.caption}`
+                      : alt
+                }
                 priority={false}
               />
-              {b.caption && (
+              {/* AI 그림은 설명이 없어도 표시를 낸다. 실제 현장 사진과 나란히
+                  놓이는 자리라, 표시가 없으면 찍은 사진으로 읽힌다. */}
+              {(b.caption || b.ai) && (
                 <figcaption className="mt-1.5 text-[16px] text-muted">
+                  {b.ai && (
+                    <span className="mr-1.5 rounded-element border border-line bg-ivory-2 px-1.5 py-0.5 font-bold text-ink">
+                      🤖 AI 생성 이미지
+                    </span>
+                  )}
                   {b.caption}
                 </figcaption>
               )}

@@ -39,6 +39,12 @@ export interface ImageBlock {
   type: "image";
   url: string;
   caption?: string;
+  // 생성형 AI로 만든 그림. 켠 사진 아래에만 고지가 붙는다.
+  //
+  // 기사 전체에 붙는 ai_image 고지(ArticleAiNotice)는 대표 이미지 하나를
+  // 가리킨다. 본문 중간에 섞인 그림은 어느 것이 실제 현장 사진이고 어느 것이
+  // 만든 그림인지 그 고지만으로는 알 수 없어, 사진마다 따로 표시한다.
+  ai?: boolean;
 }
 // 영상은 유튜브 ID 11자만 저장한다. 주소도, 유튜브가 주는 퍼가기 코드도
 // 저장하지 않는다 — 화면에 그릴 iframe 주소는 이 ID로 우리가 직접 조립한다.
@@ -248,7 +254,11 @@ export function parseBlocks(raw: unknown): Block[] | null {
       if (rec.type === "image") {
         const url = safeImageUrl(rec.url);
         if (!url) continue; // 알아볼 수 없는 값은 조용히 버린다
-        block = { type: "image", url };
+        const image: ImageBlock = { type: "image", url };
+        // 켜져 있을 때만 남긴다. 다른 값(문자열 "false" 등)이 참으로 새어
+        // 들어가면 실제 사진에 AI 표시가 붙는다 — 없느니만 못한 고지가 된다.
+        if (rec.ai === true) image.ai = true;
+        block = image;
       } else {
         const videoId = youtubeId(rec.videoId);
         if (!videoId) continue;

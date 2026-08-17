@@ -209,6 +209,29 @@ export default function BlockEditor({
                     placeholder="사진 설명 (선택)"
                     className="mt-1.5 min-h-[40px] w-full rounded-element border border-line px-3 text-[16px] outline-none focus:border-rose"
                   />
+                  {/* AI 그림 표시 — 블록을 고르지 않아도 늘 보이게 둔다. 도구
+                      모음 안에 숨기면 켜고 끄는 것을 잊고, 무엇보다 지금 이
+                      사진이 표시된 상태인지 한눈에 확인할 수 없다.
+                      끌 때는 false 가 아니라 undefined 로 되돌린다 — JSON에서
+                      키가 통째로 빠져 저장물에 흔적이 남지 않는다. */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      replaceAt(it.id, {
+                        ...block,
+                        ai: block.ai ? undefined : true,
+                      })
+                    }
+                    aria-pressed={block.ai === true}
+                    className={`mt-1.5 flex min-h-[44px] w-full items-center gap-2 rounded-element border px-3 text-left text-[16px] ${
+                      block.ai
+                        ? "border-rose bg-rose-soft font-bold text-ink"
+                        : "border-line bg-white text-muted"
+                    }`}
+                  >
+                    <span aria-hidden="true">{block.ai ? "☑" : "☐"}</span>
+                    🤖 AI로 생성한 이미지입니다
+                  </button>
                 </div>
               )}
 
