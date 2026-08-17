@@ -179,7 +179,9 @@ export default async function ArticleDetailPage({
           {article.body.map((p, i) => (
             <Fragment key={i}>
               <p>{linkify(p)}</p>
-              {i === 3 && article.body.length > 5 && (
+              {/* 블록 본문(PostBody)의 규칙과 같게 — 네 문단 뒤, 뒤에 세
+                  문단 이상 남을 때만. */}
+              {i === 3 && article.body.length >= 7 && (
                 <NetworkAd slot="article-mid" />
               )}
             </Fragment>

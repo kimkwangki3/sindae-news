@@ -26,12 +26,13 @@ export default function PostBody({
   className?: string;
   // 본문 중간에 끼울 것(지금은 광고). 넣을 자리가 없으면 그리지 않는다.
   midAd?: React.ReactNode;
-  midAdAfter?: number; // 몇 번째 칸 뒤에 끼울지
+  midAdAfter?: number; // 몇 번째 문단 뒤에 끼울지
 }) {
-  // 짧은 글에는 끼우지 않는다. 세 문단짜리 글 끝에 붙은 '본문 중간 광고'는
-  // 중간이 아니라 그냥 글 끝이고, 본문보다 광고가 커 보인다.
-  const midAt =
-    midAd && blocks.length > midAdAfter + 1 ? midAdAfter - 1 : -1;
+  // 자리는 '문단'으로 센다. 블록으로 세면 안 된다 — 텍스트 블록 하나가
+  // 문단 열넷을 품기도 한다(기사를 통째로 담은 블록이 흔하다). 실제로
+  // 블록 수로 세던 동안, 문단 26개짜리 기사가 블록이 넷이라는 이유로
+  // 광고를 받지 못하고 문단 23개짜리 기사는 블록이 일곱이라 받았다.
+  const plan = planMidAd(blocks, midAd ? midAdAfter : 0);
 
   return (
     // min-w-0 + break-words — 주소나 긴 영문처럼 끊을 곳이 없는 글자가 와도
@@ -41,8 +42,9 @@ export default function PostBody({
     >
       {blocks.map((b, i) => (
         <Fragment key={i}>
+          {plan && plan.blockIndex === i && plan.splitAt === 0 && midAd}
           {renderBlock(b, i)}
-          {i === midAt && midAd}
+          {plan && plan.blockIndex === i && plan.splitAt === null && midAd}
         </Fragment>
       ))}
     </div>
@@ -160,6 +162,22 @@ export default function PostBody({
           );
         }
 
+        // 광고가 이 블록 '안'에 들어가는 경우 — 문단 경계에서 갈라 그 사이에
+        // 끼운다. 블록 사이에만 넣을 수 있게 두면, 기사를 통째로 담은 블록
+        // 하나짜리 글에서는 광고가 맨 앞이나 맨 뒤로 밀려난다.
+        if (plan && plan.blockIndex === i && plan.splitAt) {
+          const paras = splitParagraphs(b.text);
+          const head = paras.slice(0, plan.splitAt).join("\n\n");
+          const tail = paras.slice(plan.splitAt).join("\n\n");
+          return (
+            <Fragment key={i}>
+              <p className={`whitespace-pre-line ${color}`}>{linkify(head)}</p>
+              {midAd}
+              <p className={`whitespace-pre-line ${color}`}>{linkify(tail)}</p>
+            </Fragment>
+          );
+        }
+
         // 한 문단 안의 줄바꿈은 그대로 살린다(주소·명단처럼 줄을 맞춰 쓴 경우).
         return (
           <p key={i} className={`whitespace-pre-line ${color}`}>
@@ -168,4 +186,66 @@ export default function PostBody({
         );
     }
   }
+}
+
+// 텍스트 블록 안의 문단 나누기. 빈 줄이 문단 경계다 — 한 문단 안의 줄바꿈은
+// 주소나 명단처럼 줄을 맞춰 쓴 것이라 나누면 안 된다.
+function splitParagraphs(text: string): string[] {
+  return text
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
+// 소제목 줄인지. 이 신문의 기사는 본문 안에 ■ 로 소제목을 단다. 소제목과 그
+// 아래 문단 사이에 광고가 끼면 소제목이 광고 제목처럼 읽힌다.
+function isHeadingLine(p: string): boolean {
+  return /^[■▶◆●□▣#]/.test(p.trim());
+}
+
+interface MidAdPlan {
+  blockIndex: number;
+  /** null이면 그 블록 뒤에, 0이면 앞에, 그 밖엔 블록 안 n번째 문단 뒤에. */
+  splitAt: number | null;
+}
+
+/**
+ * 본문 중간 광고를 몇 번째 문단 뒤에 넣을지 정한다.
+ *
+ * 짧은 글에는 넣지 않는다. 뒤에 남는 문단이 몇 개 없으면 '본문 중간'이
+ * 아니라 그냥 글 끝이고, 그런 자리의 광고는 본문보다 커 보인다.
+ */
+function planMidAd(blocks: Block[], afterParagraph: number): MidAdPlan | null {
+  if (afterParagraph <= 0) return null;
+  // 광고 뒤에 최소한 이만큼은 남아야 한다. 둘이면 대개 500자 안팎이라
+  // '아직 읽을 것이 남은 자리'가 된다. 하나만 남으면 그건 글 끝이다.
+  const MIN_AFTER = 2;
+
+  // 문단 수를 먼저 세어 전체 길이를 본다. 사진·그래프는 세지 않는다 —
+  // 사진만 여럿인 글이 길어 보이는 착시를 만들지 않기 위해서다.
+  const counts = blocks.map((b) =>
+    b.type === "text" ? splitParagraphs(b.text).length : 0,
+  );
+  const total = counts.reduce((a, n) => a + n, 0);
+  if (total < afterParagraph + MIN_AFTER) return null;
+
+  let seen = 0;
+  for (let i = 0; i < blocks.length; i++) {
+    const n = counts[i];
+    if (seen + n < afterParagraph) {
+      seen += n;
+      continue;
+    }
+    // 이 블록 안에서 경계를 넘는다.
+    let at = afterParagraph - seen;
+    const paras = blocks[i].type === "text" ? splitParagraphs((blocks[i] as { text: string }).text) : [];
+    // 소제목 바로 뒤에서 자르지 않는다. 한 칸 앞으로 물린다.
+    if (at > 0 && at <= paras.length && isHeadingLine(paras[at - 1] ?? "")) {
+      at -= 1;
+    }
+    if (at <= 0) return { blockIndex: i, splitAt: 0 };
+    if (at >= paras.length) return { blockIndex: i, splitAt: null };
+    return { blockIndex: i, splitAt: at };
+  }
+  return null;
 }
