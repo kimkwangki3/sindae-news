@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
+import { FEATURES } from "@/lib/features";
 
 // 상단 고정 바: 로고 + 기자모집 뱃지 / 메뉴·검색. 반투명 + 블러.
 //
@@ -35,12 +36,14 @@ export default async function TopBar() {
           />
         </Link>
         <div className="no-scrollbar flex min-w-0 gap-2 overflow-x-auto">
-          <Link
-            href="/recruit"
-            className="flex-shrink-0 whitespace-nowrap rounded-full border border-[#EAD2D8] bg-rose-soft px-2.5 py-1 text-[16px] font-bold text-rose-deep"
-          >
-            기자모집
-          </Link>
+          {FEATURES.recruit && (
+            <Link
+              href="/recruit"
+              className="flex-shrink-0 whitespace-nowrap rounded-full border border-[#EAD2D8] bg-rose-soft px-2.5 py-1 text-[16px] font-bold text-rose-deep"
+            >
+              기자모집
+            </Link>
+          )}
           <Link
             href="/tips"
             className="flex-shrink-0 whitespace-nowrap rounded-full border border-[#EAD2D8] bg-rose-soft px-2.5 py-1 text-[16px] font-bold text-rose-deep"

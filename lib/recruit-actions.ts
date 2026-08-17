@@ -2,6 +2,7 @@
 
 import { createClient } from "./supabase/server";
 import { getCurrentUser } from "./auth";
+import { FEATURES } from "./features";
 import { getClientIp } from "./ip";
 import { notify } from "./telegram";
 
@@ -15,6 +16,12 @@ export async function submitReporterApplication(
   _prev: RecruitState,
   formData: FormData,
 ): Promise<RecruitState> {
+  // 모집을 내린 동안은 여기서 끊는다. 서버액션 주소는 화면을 감춰도 살아
+  // 있어서, 폼을 감추는 것만으로는 신청이 들어오는 것을 막지 못한다.
+  if (!FEATURES.recruit) {
+    return { error: "지금은 시민기자를 모집하지 않습니다." };
+  }
+
   const name = String(formData.get("name") ?? "").trim();
   const signedName = String(formData.get("signed_name") ?? "").trim();
   const pledge = formData.get("pledge") === "on";

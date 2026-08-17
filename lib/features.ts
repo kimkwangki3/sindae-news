@@ -6,4 +6,8 @@ export const FEATURES = {
   // 나눔마켓 — 2026-07-31 발행인 요청으로 잠시 내림. 시작할 때 true로.
   // /market 라우트 자체는 살아 있어 주소로는 접근된다.
   market: false,
+  // 시민기자 모집 — 2026-08-17 발행인 요청으로 내림. 다시 뽑을 때 true로.
+  // 단추만 감추면 주소를 아는 사람은 계속 신청서를 넣는다. 신청 페이지는
+  // 안내문으로 바뀌고 서버액션도 거절한다(lib/recruit-actions.ts).
+  recruit: false,
 } as const;
