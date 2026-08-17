@@ -45,6 +45,14 @@ export default function SiteJsonLd() {
     },
     foundingDate,
     email: MEDIA.email,
+    // 화면(푸터·발행인 페이지)에 실은 것과 같은 값만 넣는다. 구조화 데이터에만
+    // 더 자세한 주소를 적으면, 화면에서 가린 것이 검색엔진에는 넘어간다.
+    telephone: MEDIA.phone,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: MEDIA.addressPublic,
+      addressCountry: "KR",
+    },
     areaServed: "전라남도 순천시 해룡면",
     // 같은 매체가 운영하는 다른 계정들. 구글이 하나의 발행사로 묶는다.
     sameAs: [MEDIA.kakaoChannel, MEDIA.naverBlog],

@@ -20,7 +20,7 @@ const DOCS: LegalDoc[] = [
   {
     slug: "publisher",
     title: "발행인·편집인",
-    updated: "2026.07.31",
+    updated: "2026.08.17",
     sections: [
       {
         body: [
@@ -33,14 +33,17 @@ const DOCS: LegalDoc[] = [
         body: [
           `명칭: ${MEDIA.name}`,
           `등록번호: ${MEDIA.regNo}`,
-          // 등록증상 전화번호(010-3535-1221)는 유지되며, 대외 연락은 이메일로 받는다.
-          `발행소 연락처: ${MEDIA.email}`,
+          // 소재지·전화번호는 법 제21조가 한 항목으로 묶어 요구한다.
+          // 2026-08-17 발행인 결정으로 게재로 돌렸다. 주소는 건물번호를 뺀
+          // 도로명까지만 적는다(자택 — lib/media.ts addressPublic).
+          `발행소: ${MEDIA.addressPublic}`,
+          `전화번호: ${MEDIA.phone}`,
+          `이메일: ${MEDIA.email}`,
           `등록연월일: ${MEDIA.regDate}`,
           `제호: ${MEDIA.name}`,
           `간별: ${MEDIA.kind}`,
           `발행인: ${MEDIA.publisher}`,
           `편집인: ${MEDIA.editor}`,
-          // 발행소 주소는 발행인 판단으로 미노출(자택). 등록증 원본은 변동 없다.
           "발행연월일: 기사별 게재일자로 갈음 (각 기사 상단 표시)",
         ],
       },
@@ -48,7 +51,7 @@ const DOCS: LegalDoc[] = [
         heading: "매체 정보",
         body: [
           `청소년보호책임자: ${MEDIA.youthOfficer}`,
-          `이메일: ${MEDIA.email}`,
+          // 연락처는 위 게재사항에 이미 적혀 있다. 두 번 적으면 한쪽만 고쳐질 뿐이다.
           `홈페이지: ${MEDIA.homepage}`,
           `보급지역: ${MEDIA.circulation} · 보급대상: ${MEDIA.audience} · ${MEDIA.price}`,
           `운영사: ${MEDIA.operator}`,

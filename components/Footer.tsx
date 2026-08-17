@@ -39,9 +39,10 @@ export default function Footer() {
           찾아 들어가야만 확인되는 구조였다. 누락은 과태료 대상이라 굳이 한 번
           더 클릭하게 만들 이유가 없다.
 
-          다만 발행소 주소와 전화번호는 여전히 넣지 않는다 — 등록증 값이 자택과
-          개인 휴대폰이다(2026-07-31 결정, 2026-08-17 재확인). 연락은 이메일로
-          받는다. 값은 lib/media.ts 한 곳에서만 바꾼다. */}
+          발행소 소재지와 전화번호도 같은 조문의 항목이라 함께 싣는다
+          (2026-08-17 발행인 결정, 그전까지는 미노출이었다). 주소는 건물번호를
+          뺀 도로명까지만 적는다 — 자택이라 집을 특정당하지 않는 선을 발행인이
+          거기로 잡았다. 값은 lib/media.ts 한 곳에서만 바꾼다. */}
       <div className="mt-4 flex flex-col gap-0.5 leading-relaxed">
         <p className="font-bold text-ink">{MEDIA.name}</p>
         <p>
@@ -54,8 +55,13 @@ export default function Footer() {
           청소년보호책임자 {MEDIA.youthOfficer} · 개인정보 보호책임자{" "}
           {MEDIA.privacyOfficer}
         </p>
+        <p>발행소 {MEDIA.addressPublic}</p>
         <p>
-          이메일{" "}
+          전화{" "}
+          <a href={`tel:${MEDIA.phoneTel}`} className="underline">
+            {MEDIA.phone}
+          </a>{" "}
+          · 이메일{" "}
           <a href={`mailto:${MEDIA.email}`} className="underline">
             {MEDIA.email}
           </a>
