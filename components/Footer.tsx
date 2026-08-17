@@ -34,13 +34,31 @@ export default function Footer() {
         </a>
       </nav>
 
-      {/* 발행소·연락처·발행인·운영사는 발행인 판단으로 푸터에서 제외(2026-07-31).
-          필요적 게재사항 전체는 /legal/publisher에, 청소년보호책임자는 홈 하단에
-          그대로 게재돼 있다. 값은 lib/media.ts 한 곳에서만 바꾼다. */}
+      {/* 신문법 제21조 게재사항을 모든 화면 아래에 둔다(2026-08-17 발행인 결정).
+          전에는 /legal/publisher 한 곳에만 두었는데, 점검하는 쪽이 그 페이지를
+          찾아 들어가야만 확인되는 구조였다. 누락은 과태료 대상이라 굳이 한 번
+          더 클릭하게 만들 이유가 없다.
+
+          다만 발행소 주소와 전화번호는 여전히 넣지 않는다 — 등록증 값이 자택과
+          개인 휴대폰이다(2026-07-31 결정, 2026-08-17 재확인). 연락은 이메일로
+          받는다. 값은 lib/media.ts 한 곳에서만 바꾼다. */}
       <div className="mt-4 flex flex-col gap-0.5 leading-relaxed">
         <p className="font-bold text-ink">{MEDIA.name}</p>
         <p>
           등록번호 {MEDIA.regNo} · {MEDIA.regDateShort} 등록 · {MEDIA.kind}
+        </p>
+        <p>
+          발행인 {MEDIA.publisher} · 편집인 {MEDIA.editor}
+        </p>
+        <p>
+          청소년보호책임자 {MEDIA.youthOfficer} · 개인정보 보호책임자{" "}
+          {MEDIA.privacyOfficer}
+        </p>
+        <p>
+          이메일{" "}
+          <a href={`mailto:${MEDIA.email}`} className="underline">
+            {MEDIA.email}
+          </a>
         </p>
         <p className="mt-2 text-[16px]">
           © 2026 {MEDIA.name}. All rights reserved.

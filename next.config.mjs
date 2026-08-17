@@ -44,6 +44,21 @@ const nextConfig = {
         destination: "/reporters/kimkwangki",
         permanent: true,
       },
+      // 법적 페이지 짧은 주소 — /privacy, /terms 처럼 바깥에서 흔히 요구하는
+      // 형태로 들어와도 열리게 한다. 애드센스·카카오 심사처럼 주소를 적어
+      // 내는 곳이 있고, 그때마다 /legal/ 을 붙여 적기를 기대할 수 없다.
+      //
+      // 실제 문서는 /legal/<slug> 한 곳에만 둔다. 같은 글이 두 주소에 살면
+      // 구글이 중복으로 보고 어느 쪽을 실을지 스스로 고른다.
+      // 목록은 lib/legal.ts 의 슬러그와 같아야 한다(설정 파일에서는 TS를
+      // 불러올 수 없어 손으로 맞춘다).
+      ...["privacy", "terms", "youth", "ethics", "correction", "publisher"].map(
+        (slug) => ({
+          source: `/${slug}`,
+          destination: `/legal/${slug}`,
+          permanent: true,
+        }),
+      ),
     ];
   },
 };
