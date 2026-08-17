@@ -72,7 +72,13 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
   // 검색엔진 소유 확인용 메타 태그. 확인이 끝나도 지우면 안 된다
   // (네이버·구글이 주기적으로 재확인하며, 사라지면 소유권이 해제된다).
+  //
+  // 구글 서치콘솔은 HTML 태그 대신 '구글 애널리틱스' 방식으로도 확인된다.
+  // GA 태그가 이미 붙어 있으므로 그쪽이 더 간단하다(붙일 것이 없다).
+  // HTML 태그 방식을 쓰려면 발급받은 코드를 NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+  // 에 넣는다 — 값이 없으면 태그 자체가 나가지 않는다.
   verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
     other: {
       "naver-site-verification":
         "96c63e5b46982a913875aab53bab2339e4d0bab5",
