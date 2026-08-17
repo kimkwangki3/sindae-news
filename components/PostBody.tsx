@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import ArticlePhoto from "@/components/article/ArticlePhoto";
 import linkify from "@/components/Linkify";
 import ResultChart from "@/components/survey/ResultChart";
@@ -17,18 +18,38 @@ export default function PostBody({
   blocks,
   alt = "",
   className = "",
+  midAd,
+  midAdAfter = 4,
 }: {
   blocks: Block[];
   alt?: string; // 사진 대체 텍스트의 바탕(보통 글 제목)
   className?: string;
+  // 본문 중간에 끼울 것(지금은 광고). 넣을 자리가 없으면 그리지 않는다.
+  midAd?: React.ReactNode;
+  midAdAfter?: number; // 몇 번째 칸 뒤에 끼울지
 }) {
+  // 짧은 글에는 끼우지 않는다. 세 문단짜리 글 끝에 붙은 '본문 중간 광고'는
+  // 중간이 아니라 그냥 글 끝이고, 본문보다 광고가 커 보인다.
+  const midAt =
+    midAd && blocks.length > midAdAfter + 1 ? midAdAfter - 1 : -1;
+
   return (
     // min-w-0 + break-words — 주소나 긴 영문처럼 끊을 곳이 없는 글자가 와도
     // 칸 밖으로 밀어내지 않는다(밀려나면 화면 전체가 옆으로 스크롤된다).
     <div
       className={`flex min-w-0 flex-col gap-4 break-words text-[20px] leading-[1.85] ${className}`}
     >
-      {blocks.map((b, i) => {
+      {blocks.map((b, i) => (
+        <Fragment key={i}>
+          {renderBlock(b, i)}
+          {i === midAt && midAd}
+        </Fragment>
+      ))}
+    </div>
+  );
+
+  function renderBlock(b: Block, i: number) {
+    {
         if (b.type === "divider") {
           return <hr key={i} className="my-2 border-line" />;
         }
@@ -145,7 +166,6 @@ export default function PostBody({
             {linkify(b.text)}
           </p>
         );
-      })}
-    </div>
-  );
+    }
+  }
 }

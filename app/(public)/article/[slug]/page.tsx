@@ -1,7 +1,9 @@
+import { Fragment } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Thumb from "@/components/Thumb";
 import AdSlot from "@/components/AdSlot";
+import NetworkAd from "@/components/NetworkAd";
 import ArticleListItem from "@/components/ArticleListItem";
 import ReactionBar from "@/components/article/ReactionBar";
 import Comments from "@/components/article/Comments";
@@ -159,18 +161,28 @@ export default async function ArticleDetailPage({
         )}
       </figure>
 
+      {/* 광고 ① 본문 시작 위. 제목·사진을 보고 본문으로 들어가는 길목이다. */}
+      <NetworkAd slot="article-top" />
+
       {/* 본문 — 블록으로 저장된 기사만 새 경로로 그린다.
-          예전 기사(body_format='text')는 아래 문단 반복 그대로다. */}
+          예전 기사(body_format='text')는 아래 문단 반복 그대로다.
+          광고 ②는 본문 안 네 칸 뒤에 들어간다. 짧은 글에는 들어가지 않는다. */}
       {article.bodyBlocks ? (
         <PostBody
           blocks={article.bodyBlocks}
           alt={`${article.title} 관련 사진`}
           className="mt-5"
+          midAd={<NetworkAd slot="article-mid" />}
         />
       ) : (
         <div className="mt-5 flex min-w-0 flex-col gap-4 break-words text-[20px] leading-[1.85]">
           {article.body.map((p, i) => (
-            <p key={i}>{linkify(p)}</p>
+            <Fragment key={i}>
+              <p>{linkify(p)}</p>
+              {i === 3 && article.body.length > 5 && (
+                <NetworkAd slot="article-mid" />
+              )}
+            </Fragment>
           ))}
         </div>
       )}
@@ -185,7 +197,10 @@ export default async function ArticleDetailPage({
         sourceUrl={article.sourceUrl}
       />
 
-      <AdSlot slot="article-mid" placeholder />
+      {/* 자체 배너 자리. 애드핏 자리표시(점선)와 나란히 놓이면 점선 상자가
+          둘이 되어 화면이 어수선해진다 — 여기서는 팔린 배너가 있을 때만
+          그린다(placeholder 를 뗐다). */}
+      <AdSlot slot="article-mid" />
 
       <ReactionBar
         slug={article.slug}
@@ -215,6 +230,9 @@ export default async function ArticleDetailPage({
         initial={comments}
         isLoggedIn={user !== null}
       />
+
+      {/* 광고 ③ 본문을 다 읽고 다음 글로 넘어가기 직전 — 관련 기사 위. */}
+      <NetworkAd slot="article-bottom" />
 
       {related.length > 0 && (
         <section className="mt-8">
