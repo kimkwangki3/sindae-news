@@ -52,17 +52,18 @@ export async function trackVisit(
   const raw = cookies().get(VISITOR_COOKIE)?.value;
   const vid = raw && raw.length === 36 ? raw : null;
 
+  // 누가 읽었는지는 남기지 않는다.
+  //
+  // 전에는 로그인한 사람의 user_id 를 함께 넣었다. 그런데 그 값을 읽는 화면이
+  // 하나도 없었다 — 쓰지도 않으면서 "이 회원이 언제 어느 기사를 봤는가"만
+  // 기한 없이 쌓고 있었던 셈이다. 지우는 장치도 없었다.
+  // 방문자 수는 session_id(무작위 쿠키)와 ip_hash 로 이미 세어진다.
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const { error } = await supabase.from("page_views").insert({
     path,
     ip_hash: getIpHash(),
     session_id: vid,
     referrer: cleanReferrer(referrer),
-    user_id: user?.id ?? null,
   });
   if (error) {
     // eslint-disable-next-line no-console
