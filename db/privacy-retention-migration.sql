@@ -15,10 +15,19 @@
 --      쓰지 않는 개인정보는 남길 이유가 없다 → 아예 기록을 끊고(코드:
 --      lib/visit-actions.ts) 기존 값도 비운다.
 --
---   2) 제보(tips.reporter_ip)·기자 신청(reporter_applications.agreed_ip)의
+--   2) 신고(reports.reporter_ip)·기자 신청(reporter_applications.agreed_ip)의
 --      접속 IP — 이쪽은 지워선 안 되는 이유가 있다. 책임 서약과 접수 사실의
 --      증빙이라 분쟁이 났을 때 필요하다. 다만 영원히 필요한 것은 아니므로
 --      3년으로 끊는다(처리방침 §5에 같은 기간을 적었다).
+--
+--      ※ 제보(tips)에는 IP 칸이 없다. 원본 IP를 남기는 곳은 이 둘뿐이다
+--        (lib/report-actions.ts · lib/recruit-actions.ts).
+--
+--  ── 2026-08-17 정정 ────────────────────────────────────────────────
+--  처음 판은 tips.reporter_ip 를 지우려 했다. 그런 컬럼은 없다 — reporter_ip
+--  는 reports 의 것이다. plpgsql 은 함수를 만들 때 컬럼을 검사하지 않아
+--  실행할 때에야 드러났다. 이미 한 번 실행했더라도 이 파일을 다시 실행하면
+--  함수가 덮어써진다.
 -- =====================================================================
 
 -- 1) 이미 쌓인 열람 이력의 회원 연결을 끊는다.
@@ -26,19 +35,19 @@
 update page_views set user_id = null where user_id is not null;
 
 -- 2) 증빙용 접속 IP를 3년 뒤 비우는 함수.
---    행을 지우지 않고 IP 칸만 비운다. 제보·신청 내용 자체는 기사와 심사의
---    근거라 남겨야 한다. 지워야 할 것은 '어느 회선에서 왔는가'다.
+--    행을 지우지 않고 IP 칸만 비운다. 신고·신청 내용 자체는 처리 근거라
+--    남겨야 한다. 지워야 할 것은 '어느 회선에서 왔는가'다.
 create or replace function purge_old_submission_ips() returns integer
 language plpgsql security definer set search_path = public as $$
 declare
-  v_tips integer;
+  v_reports integer;
   v_apps integer;
 begin
-  update tips
+  update reports
      set reporter_ip = null
    where reporter_ip is not null
      and created_at < now() - interval '3 years';
-  get diagnostics v_tips = row_count;
+  get diagnostics v_reports = row_count;
 
   update reporter_applications
      set agreed_ip = null
@@ -46,7 +55,7 @@ begin
      and created_at < now() - interval '3 years';
   get diagnostics v_apps = row_count;
 
-  return v_tips + v_apps;
+  return v_reports + v_apps;
 end;
 $$;
 
