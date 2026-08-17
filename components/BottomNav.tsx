@@ -69,7 +69,7 @@ export default function BottomNav() {
             key={tab.href}
             href={tab.href}
             aria-current={active ? "page" : undefined}
-            className={`relative flex min-h-[44px] flex-1 flex-col items-center justify-center gap-1.5 px-1 pb-2.5 pt-3.5 transition-colors lg:hover:bg-ivory-2 ${
+            className={`relative flex min-h-[44px] min-w-0 flex-1 flex-col items-center justify-center gap-1.5 px-0.5 pb-2.5 pt-3.5 transition-colors lg:hover:bg-ivory-2 ${
               active ? "text-rose-deep" : "text-muted"
             }`}
           >
@@ -89,11 +89,15 @@ export default function BottomNav() {
             >
               {ICONS[tab.href]}
             </svg>
-            <span
-              className={`text-[17px] tracking-tight ${
-                active ? "font-bold" : "font-medium"
-              }`}
-            >
+            {/* 굵기는 어느 탭에서나 같게 둔다. 본문 글꼴(고운돋움)에는 굵은
+                자체가 없어서, 굵게 쓰면 브라우저가 글자를 억지로 부풀린다.
+                그래서 고른 탭만 굵게 하면 그 라벨이 제 칸보다 넓어지고,
+                한글은 글자 사이 어디서나 줄이 바뀌므로 조용히 두 줄이 되어
+                탭바 높이가 들썩였다. 지금 어디에 있는지는 색(rose-deep)과
+                위쪽 표시줄이 이미 말해준다.
+                줄바꿈은 아예 막는다 — 라벨이 길어지면 넘쳐서 눈에 띄어야지,
+                소리 없이 접혀서는 안 된다. */}
+            <span className="whitespace-nowrap text-[17px] font-medium tracking-tight">
               {tab.label}
             </span>
           </Link>

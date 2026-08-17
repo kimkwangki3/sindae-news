@@ -9,19 +9,19 @@ export interface BottomTab {
 }
 
 // 나눔마켓 노출 여부는 lib/features.ts의 FEATURES.market 하나로 제어한다.
+//
+// 라벨은 세 글자까지만 쓴다. 탭 하나에 돌아오는 폭은 360px ÷ 6 = 60px 남짓인데
+// 네 글자를 굵게 쓰면 그보다 넓어진다. 한글은 글자 사이 어디서나 줄이 바뀔 수
+// 있어서, 넘치는 대신 조용히 두 줄이 되어 탭바 높이가 들썩였다.
+// 여기에 탭을 더하거나 라벨을 늘릴 생각이라면 그 계산부터 다시 해야 한다.
 export const BOTTOM_TABS: BottomTab[] = [
   { href: "/", label: "홈", icon: "🏠" },
   { href: "/articles", label: "기사", icon: "📰" },
   { href: "/district", label: "상권", icon: "🏪" },
-  { href: "/orgs", label: "지역단체", icon: "🏛️" },
-  ...(FEATURES.market
-    ? [{ href: "/market", label: "나눔마켓", icon: "🤝" }]
-    : []),
+  { href: "/orgs", label: "단체", icon: "🏛️" },
+  ...(FEATURES.market ? [{ href: "/market", label: "나눔", icon: "🤝" }] : []),
   { href: "/board", label: "게시판", icon: "💬" },
-  // 탭이 여섯이 됐다. 360px에서 라벨 최소폭 합이 약 313px이라 들어간다
-  // (탭은 flex-1 이지만 글자보다 좁아지지는 않는다). 여기서 더 늘리려면
-  // '지역단체'처럼 네 글자짜리 라벨부터 줄여야 한다.
-  { href: "/surveys", label: "의견수렴", icon: "📊" },
+  { href: "/surveys", label: "의견", icon: "📊" },
 ];
 
 export interface CategoryLink {

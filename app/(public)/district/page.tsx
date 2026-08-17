@@ -42,7 +42,7 @@ export default async function DistrictPage({
               key={c.key}
               href={c.key === "all" ? "/district" : `/district?cat=${c.key}`}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-[36px] items-center whitespace-nowrap rounded-full border px-3.5 text-sm ${
+              className={`flex min-h-[44px] items-center whitespace-nowrap rounded-full border px-3.5 text-[16px] ${
                 active
                   ? "border-rose bg-rose text-white"
                   : "border-line bg-white text-muted"
