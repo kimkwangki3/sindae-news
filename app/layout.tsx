@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Gowun_Batang, Gowun_Dodum } from "next/font/google";
+import Script from "next/script";
+import { ADFIT_SCRIPT, hasNetworkAds } from "@/lib/ads-network";
 import "./globals.css";
 
 // 헤드라인: Gowun Batang(serif) / 본문: Gowun Dodum(sans)
@@ -92,7 +94,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className={`${gowunBatang.variable} ${gowunDodum.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* 애드핏 로더 — 페이지당 한 번. 광고단위를 하나도 켜지 않았으면
+            부르지 않는다. 이 스크립트는 실행될 때 화면에서 kakao_ad_area 를
+            찾아 채운다. afterInteractive 라 본문이 다 그려진 뒤에 돈다. */}
+        {hasNetworkAds() && (
+          <Script src={ADFIT_SCRIPT} strategy="afterInteractive" />
+        )}
+      </body>
     </html>
   );
 }
