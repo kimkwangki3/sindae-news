@@ -18,7 +18,14 @@
 //    들어가지 않는다(2026-08-17 실측). 받아둔 DAN-6G939VHm5d3BTC0O 도
 //    같은 이유로 코드에 넣지 않는다.
 
-export type NetworkAdSlot = "article-top" | "article-mid" | "article-bottom";
+export type NetworkAdSlot =
+  | "article-top"
+  | "article-mid"
+  | "article-bottom"
+  // 목록 화면의 자리. 기사 상세에만 광고가 있으면 첫 화면부터 보는 심사자
+  // 눈에는 '설치 안 됨'으로 보인다(2026-08-18 매체 심사 보류 사유).
+  | "home-list"
+  | "articles-list";
 
 /** 광고단위 크기. 애드핏이 제공하는 규격 중 모바일에서 쓰는 둘만 둔다. */
 export type NetworkAdSize = "banner" | "rect";
@@ -50,7 +57,23 @@ export const AD_UNITS: Record<NetworkAdSlot, UnitConfig> = {
   },
   // 본문 끝, 관련 기사 위 — 단위를 더 만들면 켠다. 지금은 비워 둔다.
   // 한 기사에 광고가 여럿이면 심사에서 좋게 보지 않는다.
+  //
+  // 짧은 기사의 '본문 끝' 광고는 이 자리가 아니다. 그쪽은 article-mid 한 칸을
+  // 본문 마지막으로 옮겨 놓는 것이라(PostBody.planMidAd), 기사당 광고는 어느
+  // 경우에도 하나다.
   "article-bottom": { unit: "", size: "rect" },
+
+  // 목록 화면 — 같은 광고단위를 함께 쓴다. 한 단위를 여러 화면에서 부르는
+  // 것은 애드핏에서 정상이고, 한 화면 안에 같은 단위가 둘 뜨는 일만 없으면
+  // 된다(그래서 목록마다 자리는 하나씩만 둔다).
+  "home-list": {
+    unit: process.env.NEXT_PUBLIC_ADFIT_ARTICLE_MID ?? "DAN-SVXcSkCzKiRGY928",
+    size: "rect",
+  },
+  "articles-list": {
+    unit: process.env.NEXT_PUBLIC_ADFIT_ARTICLE_MID ?? "DAN-SVXcSkCzKiRGY928",
+    size: "rect",
+  },
 };
 
 /** 켜진 자리가 하나라도 있는지. 스크립트를 부를지 판단하는 데 쓴다. */

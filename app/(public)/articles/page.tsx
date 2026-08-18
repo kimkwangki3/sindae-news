@@ -1,8 +1,10 @@
+import { Fragment } from "react";
 import { notFound } from "next/navigation";
 import CategoryChips from "@/components/article/CategoryChips";
 import ArticleListItem from "@/components/ArticleListItem";
 import Pager from "@/components/article/Pager";
 import AdSlot from "@/components/AdSlot";
+import NetworkAd from "@/components/NetworkAd";
 import { getArticlesByPage } from "@/lib/mock/articles";
 import { readPageParam } from "@/lib/paging";
 
@@ -38,8 +40,13 @@ export default async function ArticlesPage({ searchParams }: Props) {
       <CategoryChips />
       <div className="px-[18px] pb-6">
         <AdSlot slot="articles-top" />
-        {items.map((a) => (
-          <ArticleListItem key={a.slug} article={a} />
+        {items.map((a, i) => (
+          <Fragment key={a.slug}>
+            <ArticleListItem article={a} />
+            {/* 광고 — 한 쪽 10건의 한가운데. 맨 아래에 두면 페이지를 넘기는
+                사람은 지나치고, 맨 위에 두면 목록보다 광고가 먼저 보인다. */}
+            {i === 4 && <NetworkAd slot="articles-list" />}
+          </Fragment>
         ))}
         {items.length === 0 && (
           <p className="py-10 text-center text-sm text-muted">

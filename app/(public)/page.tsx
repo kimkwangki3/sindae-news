@@ -1,8 +1,10 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import CategoryNav from "@/components/CategoryNav";
 import SiteJsonLd from "@/components/SiteJsonLd";
 import AdSlot from "@/components/AdSlot";
+import NetworkAd from "@/components/NetworkAd";
 import Thumb from "@/components/Thumb";
 import ArticleListItem from "@/components/ArticleListItem";
 import { MEDIA } from "@/lib/media";
@@ -126,8 +128,13 @@ export default async function HomePage() {
             분류별 묶음은 상단 분류 메뉴와 /articles/[분류]에서 볼 수 있다. */}
         <section>
           <SectionTitle title="최신 기사" href="/articles" />
-          {items.slice(0, 5).map((a) => (
-            <ArticleListItem key={a.slug} article={a} />
+          {items.slice(0, 5).map((a, i) => (
+            <Fragment key={a.slug}>
+              <ArticleListItem article={a} />
+              {/* 광고 — 네 번째 기사 뒤. 목록을 훑어내리다 한 번 멈치는 자리다.
+                  바깥 div가 px-[18px]를 지고 있어 카드와 좌우 여백이 같다. */}
+              {i === 3 && <NetworkAd slot="home-list" />}
+            </Fragment>
           ))}
         </section>
 
