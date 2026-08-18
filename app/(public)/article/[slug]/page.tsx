@@ -15,7 +15,7 @@ import NewsArticleJsonLd from "@/components/article/NewsArticleJsonLd";
 import TagChips from "@/components/article/TagChips";
 import ArticlePhoto from "@/components/article/ArticlePhoto";
 import linkify from "@/components/Linkify";
-import PostBody from "@/components/PostBody";
+import PostBody, { midAdAfterParagraph } from "@/components/PostBody";
 import { kstDate } from "@/lib/datetime";
 import { MEDIA } from "@/lib/media";
 import { findStaffByName } from "@/lib/staff";
@@ -86,6 +86,12 @@ export default async function ArticleDetailPage({
 
   // 바이라인이 등록된 필자면 프로필로 연결한다.
   const staff = findStaffByName(article.author);
+
+  // 예전 방식(body_format='text') 기사의 광고 자리. 블록 기사는 PostBody가
+  // 안에서 직접 정하므로 여기서는 셀지 않는다.
+  const midAdAt = article.bodyBlocks
+    ? null
+    : midAdAfterParagraph(article.body.length);
 
   return (
     <article className="px-[18px] pb-10">
@@ -179,11 +185,10 @@ export default async function ArticleDetailPage({
           {article.body.map((p, i) => (
             <Fragment key={i}>
               <p>{linkify(p)}</p>
-              {/* 블록 본문(PostBody)의 규칙과 같게 — 네 문단 뒤, 뒤에 세
-                  문단 이상 남을 때만. */}
-              {i === 3 && article.body.length >= 7 && (
-                <NetworkAd slot="article-mid" />
-              )}
+              {/* 자리를 정하는 규칙은 블록 본문(PostBody)과 같은 함수를
+                  불러 쓴다. 예전에 여기만 기준이 7이고 저쪽은 6이라, 문단
+                  여섯짜리 기사 7건이 조용히 광고를 못 받고 있었다. */}
+              {midAdAt === i + 1 && <NetworkAd slot="article-mid" />}
             </Fragment>
           ))}
         </div>

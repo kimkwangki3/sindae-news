@@ -209,25 +209,51 @@ interface MidAdPlan {
   splitAt: number | null;
 }
 
-/**
- * 본문 중간 광고를 몇 번째 문단 뒤에 넣을지 정한다.
- *
- * 짧은 글에는 넣지 않는다. 뒤에 남는 문단이 몇 개 없으면 '본문 중간'이
- * 아니라 그냥 글 끝이고, 그런 자리의 광고는 본문보다 커 보인다.
- */
-function planMidAd(blocks: Block[], afterParagraph: number): MidAdPlan | null {
-  if (afterParagraph <= 0) return null;
-  // 광고 뒤에 최소한 이만큼은 남아야 한다. 둘이면 대개 500자 안팎이라
-  // '아직 읽을 것이 남은 자리'가 된다. 하나만 남으면 그건 글 끝이다.
-  const MIN_AFTER = 2;
+// 광고를 넣지 않을 만큼 짧은 글의 경계. 문단 둘짜리 글에 300×250을 붙이면
+// 광고가 기사보다 크다.
+const MIN_PARAS = 3;
+// 본문 '중간'이라 부르려면 광고 뒤에 이만큼은 남아야 한다. 넷이면 대개
+// 1,000자 안팎이라 '아직 읽을 것이 남은 자리'가 된다.
+const MIN_AFTER = 4;
 
+/**
+ * 문단 총수만 보고 광고 자리를 정한다. 블록 기사와 예전 text 기사가 같은
+ * 규칙을 쓰도록 판단은 여기 한 곳에만 적는다.
+ *
+ * 반환값은 '몇 번째 문단 뒤'(1부터 셈). null이면 넣지 않는다.
+ *
+ *   문단 8 이상 → 네 번째 문단 뒤 (본문 중간)
+ *   문단 3 ~ 7  → 마지막 문단 뒤 (본문 끝)
+ *   문단 3 미만 → 없음
+ *
+ * 짧은 글의 광고를 끝으로 보내는 이유 — 뒤에 남는 문단이 몇 개 없으면 그건
+ * '중간'이 아니라 그냥 글 끝인데, 어중간하게 끼면 읽던 흐름만 끊는다.
+ * 예전에는 이 경우 광고를 아예 걸렀고, 그래서 발행 기사 33건 중 9건이 광고를
+ * 못 받았다(2026-08-18 실측).
+ */
+export function midAdAfterParagraph(
+  total: number,
+  preferred = 4,
+): number | null {
+  if (preferred <= 0 || total < MIN_PARAS) return null;
+  if (total < preferred + MIN_AFTER) return total;
+  return preferred;
+}
+
+/** 위에서 정한 문단 자리를 블록 배열 위의 위치로 옮긴다. */
+function planMidAd(blocks: Block[], afterParagraph: number): MidAdPlan | null {
   // 문단 수를 먼저 세어 전체 길이를 본다. 사진·그래프는 세지 않는다 —
   // 사진만 여럿인 글이 길어 보이는 착시를 만들지 않기 위해서다.
   const counts = blocks.map((b) =>
     b.type === "text" ? splitParagraphs(b.text).length : 0,
   );
   const total = counts.reduce((a, n) => a + n, 0);
-  if (total < afterParagraph + MIN_AFTER) return null;
+  const at = midAdAfterParagraph(total, afterParagraph);
+  if (at === null) return null;
+
+  // 본문 끝 자리. 마지막 텍스트 블록이 아니라 마지막 블록 뒤에 둔다 —
+  // 글 뒤에 사진이 붙은 기사에서 광고가 사진 앞으로 끼어들지 않게.
+  if (at >= total) return { blockIndex: blocks.length - 1, splitAt: null };
 
   let seen = 0;
   for (let i = 0; i < blocks.length; i++) {
