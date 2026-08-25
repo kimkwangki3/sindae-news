@@ -60,6 +60,10 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
+      // siteName·locale도 이미지와 같은 이유로 여기 다시 적는다. 빠뜨리면
+      // 페이스북 카드에 매체명이 안 붙어 어디 기사인지 알 수 없다.
+      siteName: MEDIA.name,
+      locale: "ko_KR",
       type: "article",
       url: `/article/${a.slug}`,
       images: [image],

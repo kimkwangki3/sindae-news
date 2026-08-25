@@ -26,10 +26,22 @@ export async function generateMetadata({
     title: `${s.title} · 해룡신문`,
     description: s.description ?? desc,
     alternates: { canonical: `/surveys/${s.slug}` },
+    // openGraph를 선언하면 상위(layout)의 것을 통째로 대체한다. 이미지·
+    // siteName·locale을 여기 다시 적지 않으면 설문을 페이스북·카톡에
+    // 공유했을 때 그림도 매체명도 없는 맨 카드가 나간다.
     openGraph: {
       title: s.title,
       description: desc,
+      siteName: "해룡신문",
+      locale: "ko_KR",
       url: `/surveys/${s.slug}`,
+      images: ["/og-image.png"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: s.title,
+      description: desc,
+      images: ["/og-image.png"],
     },
   };
 }
