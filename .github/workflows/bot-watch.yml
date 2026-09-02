@@ -1,0 +1,50 @@
+name: 크롤러 감시
+
+# 두 시간마다 접속 기록을 다시 판정하고, 이름을 숨긴 크롤러가 훑고 갔으면
+# 텔레그램으로 알린다. 이름을 밝히는 봇(구글·네이버 색인)은 알리지 않는다 —
+# 매일 오는 정상적인 것들이라, 그걸로 울리면 곧 알림을 안 보게 된다.
+#
+# 왜 매시간이 아닌가: 크롤러는 대개 새벽에 오고 그때 알림을 봐도 잠들어 있다.
+# 두 시간이면 아침에 확인하기에 충분하고, Actions 실행 시간도 아낀다.
+# 더 촘촘히 보고 싶으면 아래 cron 을 "5 * * * *" 로 바꾸면 매시간이 된다.
+#
+# 감지가 없으면 조용하다. 살아 있는지 확인하려면 Actions 탭에서 수동 실행
+# (workflow_dispatch)하면 없어도 결과를 보낸다.
+on:
+  schedule:
+    - cron: "5 */2 * * *"
+  workflow_dispatch:
+
+# 앞 실행이 늦어져 겹치면 같은 크롤링을 두 번 알릴 수 있다.
+concurrency:
+  group: bot-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node 20에는 전역 WebSocket이 없어 supabase-js가 클라이언트를 만들 때
+      # 죽는다(daily-drafts.yml 과 같은 이유). 22부터 표준으로 들어왔다.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: 의존성 설치
+        working-directory: automation
+        run: npm install --no-audit --no-fund
+
+      - name: 감시 실행
+        working-directory: automation
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SITE_URL: https://www.sdtime.net
+        # 손으로 돌렸을 때는 감지가 없어도 결과를 보낸다 — 점검이 살아 있는지
+        # 확인하려고 누른 것이므로 침묵하면 확인이 안 된다.
+        run: node bot-watch.mjs ${{ github.event_name == 'workflow_dispatch' && '--loud' || '' }}

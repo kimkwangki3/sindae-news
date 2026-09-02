@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AD_SIZE, AD_UNITS, type NetworkAdSlot } from "@/lib/ads-network";
 
@@ -52,10 +52,34 @@ export default function NetworkAd({ slot }: { slot: NetworkAdSlot }) {
   const insRef = useRef<HTMLModElement>(null);
   const pathname = usePathname();
 
+  // 자동화된 브라우저에는 광고를 그리지 않는다.
+  //
+  // 2026-09-02 새벽에 사이트를 훑고 간 크롤러는 자바스크립트를 돌리는
+  // 헤드리스 브라우저였다. 그런 것이 화면을 그리면 광고도 같이 불러온다 —
+  // 아무도 보지 않은 노출이 광고주에게 청구되는 셈이고, 매체 쪽에서는
+  // 무효 트래픽으로 잡힌다.
+  //
+  // navigator.webdriver 는 브라우저가 자동화 도구에 조종당하고 있을 때
+  // 참이 된다. 사람의 브라우저에서는 참이 되지 않으므로 오탐으로 광고를
+  // 잃을 걱정이 없다. 다만 이 값을 일부러 감추는 수집기도 있어서 이걸로
+  // 전부 막히지는 않는다 — 값싸게 걸리는 것만 거르는 그물이다.
+  //
+  // 서버가 그린 HTML은 그대로 두고(사람 쪽 첫 화면 동작을 건드리지 않는다),
+  // 자동화로 판정되면 붙자마자 자리를 걷어낸다. 애드핏 로더는
+  // afterInteractive 라 이보다 늦게 돌기 때문에 대개 그 전에 사라진다.
+  const [automated, setAutomated] = useState(false);
+  useEffect(() => {
+    if (typeof navigator !== "undefined" && navigator.webdriver) {
+      setAutomated(true);
+    }
+  }, []);
+
   useEffect(() => {
     // 꺼진 자리는 그리지도 않으니 셈에 넣지 않는다. 여기서 걸러야 빈 자리가
     // 첫 화면 판정을 대신 써버리는 일이 없다.
     if (!unit.trim()) return;
+    // 자동화 브라우저에는 채워달라는 말도 걸지 않는다.
+    if (automated) return;
 
     if (firstPath === null) firstPath = pathname;
     // 아직 첫 화면이다 — 로더가 훑어 채운다. 우리는 비켜선다.
@@ -66,9 +90,9 @@ export default function NetworkAd({ slot }: { slot: NetworkAdSlot }) {
     if (!el) return;
     // 스크립트가 아직이면 곧 도착해 스스로 훑는다. 그때 채워지므로 그냥 둔다.
     window.adfit?.render?.(el);
-  }, [pathname, unit]);
+  }, [pathname, unit, automated]);
 
-  if (!unit.trim()) return null;
+  if (!unit.trim() || automated) return null;
 
   return (
     <div

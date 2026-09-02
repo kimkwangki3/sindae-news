@@ -85,7 +85,7 @@ export default async function AdminVisitsPage({
     <div className="px-[18px] py-5">
       <PageHead
         title="접속 분석"
-        sub="한국시간 기준 · 방문자는 브라우저(쿠키) 단위로 셉니다"
+        sub="한국시간 기준 · 방문자는 브라우저(쿠키) 단위 · 크롤러는 뺀 수"
         action={
           <Link href="/admin" className="text-xs text-muted">
             ‹ 대시보드
@@ -120,6 +120,15 @@ export default async function AdminVisitsPage({
         </p>
       ) : (
         <div className="flex flex-col gap-3">
+          {/* 뺀 몫을 숨기지 않는다. 어제와 오늘이 크게 다를 때 그것이 사람의
+              변화인지 크롤러가 다녀간 탓인지, 이 줄이 없으면 알 수 없다.
+              판별 방법은 db/bot-detection-migration.sql 에 적어 두었다. */}
+          {a.bots.visitors > 0 && (
+            <p className="rounded-card border border-line bg-white px-3.5 py-2.5 text-[15px] leading-relaxed text-muted">
+              🤖 크롤러 {a.bots.visitors.toLocaleString()}명(
+              {a.bots.views.toLocaleString()}회)은 아래 숫자에서 빼두었습니다.
+            </p>
+          )}
           <div className="flex gap-2">
             <Tile
               label="방문자"

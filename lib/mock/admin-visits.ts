@@ -61,10 +61,19 @@ export interface HourRow {
   visitors: number;
 }
 
+/** 집계에서 빠진 크롤러. 숨기지 않고 얼마나 뺐는지 보여준다. */
+export interface BotSummary {
+  visitors: number;
+  views: number;
+}
+
 /** 집계 함수가 아직 없을 때(마이그레이션 전) 화면이 0으로 착각하지 않게 한다. */
 export interface VisitAnalytics {
   available: boolean;
   summary: VisitSummary;
+  // 위 summary 는 사람만 센 값이다. 뺀 몫을 따로 들고 있어야 "어제 갑자기
+  // 늘었다가 오늘 줄었다"가 무엇 때문인지 화면에서 설명할 수 있다.
+  bots: BotSummary;
   paths: PathRow[];
   sources: SourceRow[];
   articles: ArticleViewRow[];
@@ -78,18 +87,22 @@ export async function getVisitAnalytics(days: number): Promise<VisitAnalytics> {
   const blank: VisitAnalytics = {
     available: false,
     summary: { visitors: 0, views: 0, daysWithTraffic: 0 },
+    bots: { visitors: 0, views: 0 },
     paths: [],
     sources: [],
     articles: [],
     hours: [],
   };
 
-  const [summaryRes, pathRes, srcRes, artRes, hourRes] = await Promise.all([
+  const [summaryRes, pathRes, srcRes, artRes, hourRes, botRes] = await Promise.all([
     supabase.rpc("visit_summary", { p_days: days }),
     supabase.rpc("top_paths", { p_days: days, p_limit: 30 }),
     supabase.rpc("top_referrers", { p_days: days, p_limit: 12 }),
     supabase.rpc("article_view_stats", { p_days: days, p_limit: 50 }),
     supabase.rpc("hourly_visit_stats", { p_days: days }),
+    // 크롤러 판별을 아직 적용하지 않았으면 이 함수가 없다. 그때는 0으로 두고
+    // 나머지 숫자는 그대로 보여준다 — 화면 전체가 막히면 안 된다.
+    supabase.rpc("bot_summary", { p_days: days }),
   ]);
 
   if (summaryRes.error) {
@@ -100,6 +113,11 @@ export async function getVisitAnalytics(days: number): Promise<VisitAnalytics> {
 
   // returns table(...) 은 행 배열로 온다. 요약은 한 줄뿐이다.
   const s = (summaryRes.data as Record<string, unknown>[])?.[0] ?? {};
+  const b = (botRes.data as Record<string, unknown>[])?.[0] ?? {};
+  if (botRes.error) {
+    // eslint-disable-next-line no-console
+    console.error("[admin] bot_summary 실패:", botRes.error.message);
+  }
 
   // 기사 제목은 집계에 없다(id만 온다). 필요한 것만 골라 한 번에 붙인다.
   const artRows = (artRes.data ?? []) as Record<string, unknown>[];
@@ -147,6 +165,7 @@ export async function getVisitAnalytics(days: number): Promise<VisitAnalytics> {
       views: n(s.views),
       daysWithTraffic: n(s.days_with_traffic),
     },
+    bots: { visitors: n(b.visitors), views: n(b.views) },
     paths: pathRows.map((r) => {
       const path = String(r.path ?? "");
       const slug = path.startsWith("/article/") ? path.slice(9) : "";

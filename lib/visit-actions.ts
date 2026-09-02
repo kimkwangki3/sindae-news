@@ -12,8 +12,21 @@ const VISITOR_COOKIE = "hn_vid";
 
 // 검색엔진·모니터링 봇은 "접속한 주민"이 아니다. 걸러내지 않으면
 // 색인이 도는 날 방문자 수가 통째로 부풀어 숫자를 믿을 수 없게 된다.
+//
+// 다만 이 그물은 이름을 정직하게 밝히는 봇만 잡는다. 2026-09-02 새벽에 온
+// 크롤러는 일반 크롬인 척하고 자바스크립트까지 돌려서 여기를 그냥 통과했다
+// (방문자 59명 중 56명). 이름으로 못 잡는 것은 '움직인 모양'으로 잡는다 —
+// db/bot-detection-migration.sql 의 bot_visitors() 가 그 일을 한다.
+//
+// ※ 그쪽의 is_bot_ua() 와 짝이다. 한쪽만 고치면 앱이 안 남긴 것을 DB가
+//   다시 세는 어긋남이 생긴다. 고칠 때는 같이 고칠 것.
 const BOT =
   /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|monitor|pingdom|lighthouse|headless|curl|wget|python-requests|axios|okhttp/i;
+
+// 브라우저가 스스로 밝힌 이름. 길이만 자르고 원문을 그대로 넣는다 —
+// 크롤러를 알아보려면 어떤 문자열이었는지가 그대로 필요하다.
+// 90일 뒤 자동으로 비운다(purge_old_user_agents, 처리방침 §5).
+const UA_MAX = 300;
 
 // 유입 경로는 브라우저가 알려준 값만 쓴다.
 //
@@ -64,6 +77,9 @@ export async function trackVisit(
     ip_hash: getIpHash(),
     session_id: vid,
     referrer: cleanReferrer(referrer),
+    // 이걸 안 남기고 있어서, 새벽에 온 것이 무엇이었는지 되짚을 수가 없었다.
+    // 시간·IP·경로 분포로 우회해서 판단해야 했다(2026-09-02).
+    user_agent: ua.slice(0, UA_MAX),
   });
   if (error) {
     // eslint-disable-next-line no-console
