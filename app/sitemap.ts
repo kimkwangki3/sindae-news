@@ -30,6 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/orgs",
     ...(FEATURES.market ? ["/market"] : []),
     "/board",
+    "/haeryong",
     "/info",
     "/tips",
     ...(FEATURES.recruit ? ["/recruit"] : []),
