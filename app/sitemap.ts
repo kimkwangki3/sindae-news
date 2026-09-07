@@ -12,6 +12,10 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 // DB(쿠키 클라이언트 경유) 조회를 포함하므로 요청 시점 생성.
 export const dynamic = "force-dynamic";
+// force-dynamic은 라우트를 매 요청 실행시킬 뿐, 그 안의 데이터 캐시는 따로 남는다.
+// 이게 빠져 있어 사이트맵이 옛 목록에 머물렀고 새 기사가 색인되지 않았다.
+// rss.xml·news-sitemap.xml과 동일하게 캐시를 끈다.
+export const revalidate = 0;
 
 // 정적 + Supabase 발행 기사 + 목 데이터 경로 사이트맵.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -40,12 +44,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(p.updatedAt),
   }));
 
-  const { data: articleRows } = await createAnonClient()
+  const { data: articleRows, error: articleError } = await createAnonClient()
     .from("articles")
     .select("slug, updated_at")
     .eq("status", "published")
     .order("published_at", { ascending: false })
     .limit(1000);
+  // 조회가 실패해도 200이 나가면 기사 없는 사이트맵이 조용히 배포된다.
+  // eslint-disable-next-line no-console
+  if (articleError) console.error("[sitemap] 기사 조회 실패:", articleError.message);
   const articles = ((articleRows ?? []) as {
     slug: string;
     updated_at: string;
