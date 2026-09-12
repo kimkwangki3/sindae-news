@@ -8,11 +8,13 @@ import { MEDIA } from "@/lib/media";
 export default function ArticleAiNotice({
   aiText,
   aiImage,
+  imageCredit = null,
   sourceName,
   sourceUrl,
 }: {
   aiText: boolean;
   aiImage: boolean;
+  imageCredit?: string | null; // 대표 사진이 남의 저작물일 때
   sourceName: string | null;
   sourceUrl: string | null;
 }) {
@@ -70,6 +72,12 @@ export default function ArticleAiNotice({
         <p>
           ⓒ {MEDIA.name}({MEDIA.regNo}) · 무단전재 및 재배포 금지
         </p>
+        {/* ⓒ 표기가 남의 사진까지 우리 것이라고 말하지 않게 한다 */}
+        {imageCredit && (
+          <p className="mt-1.5">
+            대표 사진은 {MEDIA.name}의 저작물이 아닙니다 · {imageCredit}
+          </p>
+        )}
         <p className="mt-1.5">
           기사에 사실과 다른 내용이 있다면{" "}
           <Link href="/legal/correction" className="underline">

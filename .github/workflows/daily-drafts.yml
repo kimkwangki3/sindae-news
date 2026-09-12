@@ -31,6 +31,11 @@ jobs:
         working-directory: automation
         run: npm install --no-audit --no-fund
 
+      # AI 이미지에 "AI 생성 이미지"를 새길 한글 글꼴. 러너에는 한글 글꼴이
+      # 없어서, 이게 없으면 글자가 네모로 깨진다(image.mjs stampAiLabel).
+      - name: 한글 글꼴 설치
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends fonts-nanum
+
       - name: 초안 생성
         working-directory: automation
         env:
@@ -39,6 +44,10 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # 전국 이슈 대표 이미지(AI 생성). 둘 중 등록된 쪽을 쓴다. 둘 다 없으면
+          # 그림 없이 초안만 가고, 실행 보고에 그 사실이 적힌다.
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           # 순천시청과 일부 언론사는 해외 IP에 응답하지 않는다. 서울 리전에서
           # 도는 우리 사이트의 중계 경로를 거쳐 읽는다.
           RELAY_URL: https://www.sdtime.net/api/relay

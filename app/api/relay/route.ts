@@ -44,11 +44,13 @@ function fail(message: string, status: number): Response {
   });
 }
 
-export async function GET(req: Request): Promise<Response> {
+function authorized(req: Request): boolean {
   const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
-  if (!secret || req.headers.get("x-relay-secret") !== secret) {
-    return fail("권한이 없습니다", 401);
-  }
+  return Boolean(secret) && req.headers.get("x-relay-secret") === secret;
+}
+
+export async function GET(req: Request): Promise<Response> {
+  if (!authorized(req)) return fail("권한이 없습니다", 401);
 
   const target = new URL(req.url).searchParams.get("url");
   if (!target) return fail("url 파라미터가 없습니다", 400);
@@ -83,6 +85,62 @@ export async function GET(req: Request): Promise<Response> {
       status: 200,
       headers: {
         "content-type": "text/plain; charset=utf-8",
+        "cache-control": "no-store",
+      },
+    });
+  } catch (err) {
+    return fail(err instanceof Error ? err.message : "중계 실패", 504);
+  }
+}
+
+// 보도자료 첨부사진 내려받기 — 대표 이미지용(automation/collect.mjs downloadPhoto).
+//
+// 시청 게시판의 첨부는 링크가 아니라 폼 전송(POST)이고, 받는 서버가 따로 있다.
+// 위 GET과 달리 본문을 글자로 바꾸지 않고 바이트 그대로 넘긴다.
+// 열린 프록시가 되지 않도록 대상은 이 주소 하나로 못 박는다.
+const DOWNLOAD_HOST = "eminwon.suncheon.go.kr";
+const DOWNLOAD_PATH = "/emwp/jsp/ofr/FileDownNew.jsp";
+const MAX_DOWNLOAD_BYTES = 10 * 1024 * 1024;
+
+export async function POST(req: Request): Promise<Response> {
+  if (!authorized(req)) return fail("권한이 없습니다", 401);
+
+  let parsed: URL;
+  try {
+    parsed = new URL(new URL(req.url).searchParams.get("url") ?? "");
+  } catch {
+    return fail("url 형식이 올바르지 않습니다", 400);
+  }
+  if (parsed.hostname !== DOWNLOAD_HOST || parsed.pathname !== DOWNLOAD_PATH) {
+    return fail("첨부 내려받기만 중계합니다", 403);
+  }
+  // 게시판 폼은 http로 보내지만 엣지 런타임은 http를 못 쓴다. 같은 서버가
+  // https로도 받는다(확인함).
+  parsed.protocol = "https:";
+
+  const form = await req.text();
+  if (form.length > 4000) return fail("요청이 너무 큽니다", 400);
+
+  try {
+    const res = await fetch(parsed.toString(), {
+      method: "POST",
+      headers: {
+        "user-agent": UA,
+        "content-type": "application/x-www-form-urlencoded",
+        referer: "https://m.suncheon.go.kr/",
+      },
+      body: form,
+      cache: "no-store",
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+    if (!res.ok) return fail(`${parsed.hostname} 응답 ${res.status}`, 502);
+
+    const bytes = await res.arrayBuffer();
+    if (bytes.byteLength > MAX_DOWNLOAD_BYTES) return fail("파일이 너무 큽니다", 502);
+    return new Response(bytes, {
+      status: 200,
+      headers: {
+        "content-type": "application/octet-stream",
         "cache-control": "no-store",
       },
     });

@@ -2,7 +2,8 @@
 //
 // 웹앱은 TypeScript로 빌드되지만 이 스크립트는 GitHub Actions에서 그냥 node로
 // 돈다. 빌드 단계를 두지 않으려고 전송 부분만 여기에 다시 적었다.
-// 버튼의 callback_data 형식(pub:<id> / dis:<id>)은 웹훅과 짝이므로 바꾸면 안 된다.
+// 버튼의 callback_data 형식(pub:<id> / pubn:<id> / dis:<id>)은 웹훅과 짝이므로
+// 바꾸면 안 된다.
 
 const API = "https://api.telegram.org";
 
@@ -48,7 +49,20 @@ const CATEGORY_NAME = {
 };
 
 // 초안 1건 + [발행][보류] 버튼. 성공하면 message_id를 돌려준다.
+//
+// 대표 이미지가 있으면 그림을 먼저 한 장 보내고, 그 아래 초안 메시지에
+// [사진 없이 발행] 버튼을 더한다. 그림과 글을 한 메시지(사진+캡션)로 묶지
+// 않는 이유: 캡션은 1024자까지라 초안 본문이 잘리고, 발행 뒤 메시지를
+// 결과로 바꾸는 흐름(editMessageText)이 사진 메시지에는 통하지 않는다.
 export async function sendDraft(d, index) {
+  if (d.image_url) {
+    await call("sendPhoto", {
+      photo: d.image_url,
+      caption: `🖼 대표 이미지${index ? ` ${index}` : ""}${d.image_credit ? ` · ${esc(d.image_credit)}` : ""}`,
+      parse_mode: "HTML",
+    });
+  }
+
   const lines = [
     `<b>📝 기사 초안${index ? ` ${index}` : ""} · ${esc(CATEGORY_NAME[d.category_slug] ?? d.category_slug)}</b>`,
     "",
@@ -61,22 +75,32 @@ export async function sendDraft(d, index) {
     d.source_name || d.source_url
       ? `출처: ${esc(d.source_name ?? "원문")}${d.source_url ? `\n${esc(d.source_url)}` : ""}`
       : "",
+    d.image_url ? `대표 이미지: 위 그림${d.image_credit ? ` (${esc(d.image_credit)})` : ""}` : "",
     // 오보는 여기서 걸러야 한다. 눈에 띄게 맨 아래에 둔다.
     d.needs_check ? `\n⚠️ <b>확인 필요</b>\n${esc(d.needs_check)}` : "",
   ];
+
+  // pubn = 사진 없이 발행. 그림이 마음에 안 들 때 초안까지 버리지 않게 한다.
+  const keyboard = d.image_url
+    ? [
+        [{ text: "✅ 발행 (그림 포함)", callback_data: `pub:${d.id}` }],
+        [
+          { text: "📝 그림 없이 발행", callback_data: `pubn:${d.id}` },
+          { text: "🗑 보류", callback_data: `dis:${d.id}` },
+        ],
+      ]
+    : [
+        [
+          { text: "✅ 발행", callback_data: `pub:${d.id}` },
+          { text: "🗑 보류", callback_data: `dis:${d.id}` },
+        ],
+      ];
 
   const result = await call("sendMessage", {
     text: lines.filter((l) => l !== "").join("\n"),
     parse_mode: "HTML",
     disable_web_page_preview: true,
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: "✅ 발행", callback_data: `pub:${d.id}` },
-          { text: "🗑 보류", callback_data: `dis:${d.id}` },
-        ],
-      ],
-    },
+    reply_markup: { inline_keyboard: keyboard },
   });
   return result?.message_id ?? null;
 }

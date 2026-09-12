@@ -41,6 +41,7 @@ export interface MockArticle {
   thumbnailUrl: string | null;
   aiText: boolean; // 본문을 AI로 작성·생성했는지
   aiImage: boolean; // 대표 이미지를 AI로 생성했는지
+  imageCredit: string | null; // 대표 사진이 남의 저작물일 때 출처 (예: 사진: 순천시 제공)
   sourceName: string | null; // 출처 기관 (보도자료 재구성 시)
   sourceUrl: string | null; // 원문 링크
   tags: string[]; // #키워드 — 카테고리를 가로지르는 주제 묶음
@@ -250,7 +251,7 @@ export async function getArticleBySlug(
   const { data, error } = await supabase
     .from("articles")
     .select(
-      "id, slug, title, subtitle, body, body_blocks, body_format, thumbnail_url, category_id, view_count, published_at, updated_at, ai_text, ai_image, source_name, source_url, tags, author:profiles!author_id(nickname)",
+      "id, slug, title, subtitle, body, body_blocks, body_format, thumbnail_url, category_id, view_count, published_at, updated_at, ai_text, ai_image, image_credit, source_name, source_url, tags, author:profiles!author_id(nickname)",
     )
     .eq("slug", slug)
     .eq("status", "published")
@@ -276,6 +277,7 @@ export async function getArticleBySlug(
     updated_at: string | null;
     ai_text: boolean | null;
     ai_image: boolean | null;
+    image_credit: string | null;
     source_name: string | null;
     source_url: string | null;
     tags: string[] | null;
@@ -326,6 +328,7 @@ export async function getArticleBySlug(
     thumbnailUrl: a.thumbnail_url,
     aiText: a.ai_text ?? false,
     aiImage: a.ai_image ?? false,
+    imageCredit: a.image_credit,
     sourceName: a.source_name,
     sourceUrl: a.source_url,
     tags: toTags(a.tags),

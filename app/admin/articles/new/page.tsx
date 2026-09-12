@@ -168,6 +168,7 @@ export default async function NewArticlePage({
           defaultImage={editing?.aiImage}
           defaultSourceName={editing?.sourceName}
           defaultSourceUrl={editing?.sourceUrl}
+          defaultImageCredit={editing?.imageCredit}
         />
 
         {/* 발행 / 임시저장 — 같은 폼, status 값만 다름 */}

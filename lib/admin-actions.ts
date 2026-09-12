@@ -104,6 +104,9 @@ export async function saveArticle(formData: FormData): Promise<void> {
     body_blocks: blocks,
     body_format: blocks ? "blocks" : "text",
     thumbnail_url: thumbnailUrl || null,
+    // 대표 사진 출처. 텔레그램 발행분은 '사진: 순천시 제공…'이 미리 채워져
+    // 편집기에 보이고, 사진을 바꾸면 편집자가 함께 고친다.
+    image_credit: String(formData.get("image_credit") ?? "").trim() || null,
     author_id: user.id,
     status,
     ai_text: formData.get("ai_text") === "on",

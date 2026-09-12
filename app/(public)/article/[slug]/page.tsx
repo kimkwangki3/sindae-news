@@ -74,6 +74,38 @@ export async function generateMetadata({
   };
 }
 
+// 사진 출처 + 원문 링크 + (공공누리면) 이용조건 링크.
+// "공공누리 제4유형" 같은 표기에서 유형 번호를 읽어 해당 조건 페이지로 보낸다.
+function ImageCredit({ credit, sourceUrl }: { credit: string; sourceUrl: string | null }) {
+  const kogl = credit.match(/공공누리\s*제\s*([1-4])\s*유형/)?.[1];
+  return (
+    <>
+      {credit}
+      {sourceUrl && (
+        <>
+          {" · "}
+          <a href={sourceUrl} target="_blank" rel="noopener noreferrer nofollow" className="underline">
+            원문
+          </a>
+        </>
+      )}
+      {kogl && (
+        <>
+          {" · "}
+          <a
+            href={`https://www.kogl.or.kr/info/licenseType${kogl}.do`}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            className="underline"
+          >
+            이용조건
+          </a>
+        </>
+      )}
+    </>
+  );
+}
+
 export default async function ArticleDetailPage({
   params,
 }: {
@@ -164,9 +196,16 @@ export default async function ArticleDetailPage({
             alt=""
           />
         )}
-        {article.thumbnailUrl && article.aiImage && (
+        {/* 남의 사진(시청 보도자료 등)은 누구 것인지 바로 아래에 밝힌다 —
+            공공누리 출처표시 조건이자, 하단 ⓒ 표기와 헷갈리지 않게 하려는 것.
+            공공누리는 온라인에서 원 게시물과 이용조건으로 가는 링크를 요구한다. */}
+        {article.thumbnailUrl && (article.aiImage || article.imageCredit) && (
           <figcaption className="mt-1.5 text-[16px] text-muted">
-            이미지: AI 생성 · 실제 현장 사진이 아닙니다
+            {article.aiImage ? (
+              "이미지: AI 생성 · 실제 현장 사진이 아닙니다"
+            ) : (
+              <ImageCredit credit={article.imageCredit ?? ""} sourceUrl={article.sourceUrl} />
+            )}
           </figcaption>
         )}
       </figure>
@@ -204,6 +243,7 @@ export default async function ArticleDetailPage({
       <ArticleAiNotice
         aiText={article.aiText}
         aiImage={article.aiImage}
+        imageCredit={article.thumbnailUrl ? article.imageCredit : null}
         sourceName={article.sourceName}
         sourceUrl={article.sourceUrl}
       />

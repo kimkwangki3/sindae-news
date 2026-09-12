@@ -87,6 +87,13 @@ export default async function HomePage() {
                   alt=""
                 />
               )}
+              {/* 헤드라인은 사진을 가장 크게 쓰는 자리라 여기서도 출처를 밝힌다.
+                  링크 안이라 원문 링크는 기사 상세에 둔다. */}
+              {lead.thumbnailUrl && (lead.aiImage || lead.imageCredit) && (
+                <p className="mt-1.5 text-[14px] text-muted">
+                  {lead.aiImage ? "이미지: AI 생성" : lead.imageCredit}
+                </p>
+              )}
               <h2 className="mt-3.5 text-[28px] font-extrabold leading-snug">
                 {lead.title}
               </h2>

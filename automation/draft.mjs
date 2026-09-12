@@ -9,12 +9,17 @@
 // 어느 칸이든 쓸 자료가 없으면 비워 두고 보고에 적는다. 지어내지 않는다.
 //
 // 자동으로 게재되는 것은 한 건도 없다. 발행인이 [✅ 발행]을 눌러야 기사가 된다.
-// 대표 이미지도 자동 생성하지 않는다 — 초안에 프롬프트만 담고, 발행 후
-// 발행인이 직접 올린다.
+//
+// 대표 이미지는 칸마다 다르다(image.mjs):
+//   시청 — 보도자료 첨부사진 / 전국 — AI 생성("AI 생성 이미지" 표기) /
+//   사건사고 — 붙이지 않는다. 좁은 동네에서는 사고 그림이 '그 집', '그 차'로
+//   읽히고, 남의 보도사진은 출처를 밝혀도 저작권 침해다.
+// 그림은 텔레그램에 초안과 함께 가고, 발행인이 보고 고른다.
 
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { collect } from "./collect.mjs";
+import { aiImage, cityPhoto, hasImageProvider } from "./image.mjs";
 import { collectNews, fetchBody, sameEvent } from "./news.mjs";
 import { sendDraft, sendRunReport } from "./telegram.mjs";
 
@@ -264,9 +269,21 @@ async function recentTitles(days = 21) {
   return (data ?? []).map((r) => r.title);
 }
 
+// 칸별 대표 이미지. 없으면 null — 그림 없이 초안만 간다.
+async function attachImage(slotKey, item, draftId, prompt) {
+  if (slotKey === "city" && item.photos?.length > 0) {
+    return cityPhoto(supabase, draftId, item.photos);
+  }
+  if (slotKey === "tier3" && prompt && hasImageProvider()) {
+    return aiImage(supabase, draftId, prompt);
+  }
+  return null;
+}
+
 async function main() {
   const failures = [];
   const notes = [];
+  let aiKeyMissing = false;
 
   // ── 수집 ───────────────────────────────────────────────
   const city = await collect({ perSource: 10 }).catch((e) => {
@@ -389,9 +406,31 @@ async function main() {
         continue;
       }
 
+      // 대표 이미지. 실패해도 초안은 보낸다 — 그림은 발행 뒤에 붙여도 된다.
+      let image = null;
+      try {
+        image = await attachImage(slot.key, item, data.id, written.image_prompt);
+      } catch (e) {
+        failures.push(`대표 이미지 "${written.title.slice(0, 20)}": ${e.message}`);
+      }
+      if (slot.key === "tier3" && !hasImageProvider()) aiKeyMissing = true;
+      if (image) {
+        const { error: imageError } = await supabase
+          .from("news_drafts")
+          .update({ image_url: image.url, image_credit: image.credit, image_ai: image.ai })
+          .eq("id", data.id);
+        if (imageError) {
+          failures.push(`대표 이미지 저장 "${written.title.slice(0, 20)}": ${imageError.message}`);
+          image = null;
+        }
+      }
+
       made += 1;
       drafted += 1;
-      const messageId = await sendDraft(data, `${drafted}/${total} · ${slot.label}`);
+      const messageId = await sendDraft(
+        { ...data, image_url: image?.url ?? null, image_credit: image?.credit ?? null },
+        `${drafted}/${total} · ${slot.label}`,
+      );
       if (messageId) {
         await supabase.from("news_drafts").update({ tg_message_id: messageId }).eq("id", data.id);
       }
@@ -406,6 +445,13 @@ async function main() {
           : `${slot.label} — 후보 ${pools[slot.key].length}건 모두 기사 가치가 없다고 판단했습니다.`,
       );
     }
+  }
+
+  if (aiKeyMissing) {
+    notes.push(
+      "전국 이슈 대표 이미지 — 이미지 생성 키가 없어 붙이지 못했습니다. " +
+        "GitHub Secrets에 OPENAI_API_KEY 또는 GEMINI_API_KEY를 등록하세요.",
+    );
   }
 
   await sendRunReport({

@@ -54,7 +54,7 @@ export async function POST(req: Request): Promise<Response> {
   const { data: draft } = await supabase
     .from("news_drafts")
     .select(
-      "id, title, subtitle, body, category_slug, source_name, source_url, image_prompt, status, published_slug",
+      "id, title, subtitle, body, category_slug, source_name, source_url, image_prompt, image_url, image_credit, image_ai, status, published_slug",
     )
     .eq("id", draftId)
     .maybeSingle();
@@ -73,6 +73,9 @@ export async function POST(req: Request): Promise<Response> {
     source_name: string | null;
     source_url: string | null;
     image_prompt: string | null;
+    image_url: string | null;
+    image_credit: string | null;
+    image_ai: boolean | null;
     status: string;
     published_slug: string | null;
   };
@@ -86,11 +89,21 @@ export async function POST(req: Request): Promise<Response> {
     return NextResponse.json({ ok: true });
   }
 
+  // 쓰지 않기로 한 초안 그림은 공개 저장소에서 지운다. 남겨 두면 출처 표시
+  // 없는 시청 사진이 우리 주소에 계속 걸려 있게 된다. 실패해도 흐름은 잇는다.
+  const dropDraftImage = async () => {
+    if (!d.image_url) return;
+    await supabase.storage
+      .from("articles")
+      .remove([`drafts/${d.id}.jpg`, `drafts/${d.id}.png`]);
+  };
+
   if (action === "dis") {
     await supabase
       .from("news_drafts")
       .update({ status: "discarded", decided_at: new Date().toISOString() })
       .eq("id", d.id);
+    await dropDraftImage();
     await answerCallback(cq.id, "보류했습니다.");
     if (messageId) {
       await settleDraftMessage(messageId, `<b>🗑 보류</b>\n${d.title}`);
@@ -98,10 +111,12 @@ export async function POST(req: Request): Promise<Response> {
     return NextResponse.json({ ok: true });
   }
 
-  if (action !== "pub") return NextResponse.json({ ok: true });
+  // pub = 초안에 붙은 그림까지, pubn = 그림은 버리고 글만
+  if (action !== "pub" && action !== "pubn") return NextResponse.json({ ok: true });
 
   // --- 발행 ---
   const now = new Date().toISOString();
+  const withImage = action === "pub" && Boolean(d.image_url);
 
   // 슬러그는 날짜+순번이라, 같은 순간에 두 건을 발행하면 번호가 겹칠 수 있다.
   // 겹치면 다시 번호를 받아 한 번 더 시도한다.
@@ -118,9 +133,12 @@ export async function POST(req: Request): Promise<Response> {
       status: "published",
       published_at: now,
       updated_at: now,
-      // 자동 생성 초안이므로 본문은 AI 작성으로 고지한다. 대표 이미지는 수동이라 false.
+      // 자동 생성 초안이므로 본문은 AI 작성으로 고지한다. 대표 이미지는
+      // 초안이 AI로 만든 것일 때만 AI 고지를 켠다 — 시청 사진은 사진 출처를 단다.
       ai_text: true,
-      ai_image: false,
+      thumbnail_url: withImage ? d.image_url : null,
+      ai_image: withImage && Boolean(d.image_ai),
+      image_credit: withImage && !d.image_ai ? d.image_credit : null,
       source_name: d.source_name,
       source_url: d.source_url,
     }));
@@ -138,6 +156,7 @@ export async function POST(req: Request): Promise<Response> {
     .from("news_drafts")
     .update({ status: "published", published_slug: slug, decided_at: now })
     .eq("id", d.id);
+  if (!withImage) await dropDraftImage();
 
   // 관리 행위이므로 감사로그에 남긴다(작성자는 자동화이므로 actor 없음).
   await supabase.from("admin_audit_logs").insert({
@@ -150,8 +169,8 @@ export async function POST(req: Request): Promise<Response> {
 
   revalidatePublic();
 
-  // 게재 직후 필요한 것을 한 화면에 모아 준다. 이미지는 나중에 수정으로 붙이는
-  // 흐름이라, 프롬프트와 수정 링크가 여기 없으면 폰에서 이어가기 어렵다.
+  // 게재 직후 필요한 것을 한 화면에 모아 준다. 그림 없이 나간 기사는 나중에
+  // 수정으로 붙이므로, 프롬프트와 수정 링크가 여기 없으면 폰에서 이어가기 어렵다.
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? "";
   const url = `${site}/article/${slug}`;
   const editUrl = `${site}/admin/articles/new?slug=${encodeURIComponent(slug)}`;
@@ -165,7 +184,14 @@ export async function POST(req: Request): Promise<Response> {
     `<a href="${url}">${MEDIA.name}에서 보기</a>`,
     `<a href="${editUrl}">이미지 추가·수정하기</a>`,
   ];
-  if (d.image_prompt) {
+  if (withImage) {
+    parts.push(
+      "",
+      d.image_ai
+        ? "🖼 대표 이미지 포함 — AI 생성 고지가 자동으로 붙었습니다."
+        : `🖼 대표 이미지 포함 — ${esc(d.image_credit ?? "출처 표기")}`,
+    );
+  } else if (d.image_prompt) {
     parts.push(
       "",
       "🎨 <b>대표 이미지 프롬프트</b>",

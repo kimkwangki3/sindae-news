@@ -9,11 +9,13 @@ export default function ArticleAiFields({
   defaultImage = false,
   defaultSourceName = "",
   defaultSourceUrl = "",
+  defaultImageCredit = "",
 }: {
   defaultText?: boolean;
   defaultImage?: boolean;
   defaultSourceName?: string;
   defaultSourceUrl?: string;
+  defaultImageCredit?: string;
 }) {
   return (
     <div className="flex flex-col gap-4">
@@ -35,6 +37,14 @@ export default function ArticleAiFields({
             type="url"
             defaultValue={defaultSourceUrl}
             placeholder="원문 링크 (https://…)"
+            className={INPUT}
+          />
+          {/* 대표 사진이 남의 저작물이면 사진 바로 아래에 이 문구가 붙는다.
+              직접 찍은 사진·AI 이미지는 비워 둔다. */}
+          <input
+            name="image_credit"
+            defaultValue={defaultImageCredit}
+            placeholder="대표 사진 출처 — 남의 사진일 때만 (예: 사진: 순천시 제공(공공누리 제4유형))"
             className={INPUT}
           />
         </div>

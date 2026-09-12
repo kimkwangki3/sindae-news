@@ -906,6 +906,7 @@ export interface AdminArticleEdit {
   thumbnailUrl: string;
   sourceName: string;
   sourceUrl: string;
+  imageCredit: string;
   aiText: boolean;
   aiImage: boolean;
   tags: string[];
@@ -919,7 +920,7 @@ export async function getArticleForEdit(
   const { data, error } = await supabase
     .from("articles")
     .select(
-      "slug, title, subtitle, category_id, body, body_blocks, body_format, thumbnail_url, source_name, source_url, ai_text, ai_image, tags, status",
+      "slug, title, subtitle, category_id, body, body_blocks, body_format, thumbnail_url, source_name, source_url, image_credit, ai_text, ai_image, tags, status",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -941,6 +942,7 @@ export async function getArticleForEdit(
     thumbnailUrl: (r.thumbnail_url as string) ?? "",
     sourceName: (r.source_name as string) ?? "",
     sourceUrl: (r.source_url as string) ?? "",
+    imageCredit: (r.image_credit as string) ?? "",
     aiText: Boolean(r.ai_text),
     aiImage: Boolean(r.ai_image),
     tags: toTags(r.tags),

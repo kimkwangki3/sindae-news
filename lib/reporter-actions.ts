@@ -80,6 +80,7 @@ export async function saveReporterArticle(
     ai_image: formData.get("ai_image") === "on",
     source_name: String(formData.get("source_name") ?? "").trim() || null,
     source_url: String(formData.get("source_url") ?? "").trim() || null,
+    image_credit: String(formData.get("image_credit") ?? "").trim() || null,
     pledge_ack: pledge,
     pledge_ack_at: pledge ? nowIso : null,
     published_at: status === "published" ? nowIso : null,

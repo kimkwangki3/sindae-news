@@ -4,6 +4,8 @@
 // 브라우저 자동화는 필요 없다 — 더 빠르고 덜 깨진다.
 //
 // 저작권: 공공누리 대상 1차 자료만 본다. 타 언론사 기사는 수집하지 않는다.
+// 두 게시판 모두 공공누리 제4유형(출처표시·비상업·변경금지)이다. 첨부사진을
+// 대표 이미지로 쓸 때는 자르거나 고치지 않고 출처를 밝힌다(image.mjs).
 
 import http from "node:http";
 import https from "node:https";
@@ -49,7 +51,7 @@ function strip(html) {
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
+    .replace(/&#0?39;/g, "'")
     .replace(/[ \t]+/g, " ")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
@@ -154,6 +156,59 @@ function parseDetail(html) {
   return m ? strip(m[1]) : "";
 }
 
+// 첨부사진 목록. 첨부는 링크가 아니라 goDownLoad('원래이름','저장이름','경로')
+// 로 form1을 전송하는 방식이다. 세 값은 암호화돼 있어 그대로 되돌려 보내면 된다.
+// 받는 서버(eminwon)는 게시판과 다른 호스트다.
+const PHOTO_EXT = /\.(jpe?g|png)$/i;
+
+export function parsePhotos(html) {
+  const action = html.match(/<form[^>]+name="form1"[^>]+action="([^"]+)"/i)?.[1];
+  if (!action) return [];
+  const out = [];
+  const seen = new Set();
+  for (const m of html.matchAll(/goDownLoad\('([^']*)','([^']*)','([^']*)'\)[^>]*>([^<]*)/g)) {
+    const name = m[4].trim();
+    if (!PHOTO_EXT.test(name) || seen.has(name)) continue;
+    seen.add(name);
+    out.push({
+      name,
+      action,
+      fields: { user_file_nm: m[1], sys_file_nm: m[2], file_path: m[3] },
+    });
+  }
+  return out;
+}
+
+// 첨부사진 한 장을 바이트로. 해외(GitHub Actions)에서는 중계를 거친다 —
+// 중계는 https로 바꿔 보낸다. 한국에서 직접 돌 때도 https를 쓴다(엣지와 같게).
+export async function downloadPhoto(photo) {
+  const url = photo.action.replace(/^http:/, "https:");
+  const body = new URLSearchParams(photo.fields).toString();
+  const res =
+    RELAY_URL && RELAY_SECRET
+      ? await fetch(`${RELAY_URL}?url=${encodeURIComponent(url)}`, {
+          method: "POST",
+          headers: { "x-relay-secret": RELAY_SECRET, "content-type": "text/plain" },
+          body,
+          signal: AbortSignal.timeout(60000),
+        })
+      : await fetch(url, {
+          method: "POST",
+          headers: {
+            "user-agent": UA,
+            "content-type": "application/x-www-form-urlencoded",
+            referer: `${HOST}/`,
+          },
+          body,
+          signal: AbortSignal.timeout(30000),
+        });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(`사진 ${res.status} ${detail.slice(0, 120)}`);
+  }
+  return Buffer.from(await res.arrayBuffer());
+}
+
 // 지역 관련성 점수. 0이면 우리 지역 기사로 보기 어렵다.
 export function scoreItem(text) {
   let score = 0;
@@ -194,7 +249,8 @@ export async function collect({ perSource = 10 } = {}) {
       for (const it of items) {
         const url = it.url;
         try {
-          const body = parseDetail(await get(url));
+          const html = await get(url);
+          const body = parseDetail(html);
           if (body.length < 100) continue; // 본문이 없으면 기사화 불가
           const { score, scope } = scoreItem(`${it.title} ${body}`);
           if (score === 0) continue;
@@ -203,6 +259,7 @@ export async function collect({ perSource = 10 } = {}) {
             sourceUrl: url,
             title: it.title,
             body: body.slice(0, 4000),
+            photos: parsePhotos(html),
             score,
             scope,
           });
