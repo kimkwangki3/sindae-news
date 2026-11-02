@@ -303,7 +303,7 @@ language sql stable as $$
   from page_views pv
   where pv.created_at >=
     (((now() at time zone 'Asia/Seoul')::date
-      - (greatest(coalesce(p_days, 7), 1) - 1)) at time zone 'Asia/Seoul')
+      - (greatest(coalesce(p_days, 7), 1) - 1))::timestamp at time zone 'Asia/Seoul')
     and not pv.is_bot
   group by 1
   order by 1;
