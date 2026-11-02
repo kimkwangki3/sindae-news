@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Gowun_Batang, Gowun_Dodum } from "next/font/google";
+import { Gowun_Batang, Gowun_Dodum, Noto_Serif_KR } from "next/font/google";
 import Script from "next/script";
 import { ADFIT_SCRIPT, hasNetworkAds } from "@/lib/ads-network";
 import "./globals.css";
@@ -17,6 +17,15 @@ const gowunDodum = Gowun_Dodum({
   subsets: ["latin"],
   variable: "--font-gowun-dodum",
   display: "swap",
+});
+
+// 신문 제목: Noto Serif KR. 파일이 커서 미리 받지 않고 쓰는 글자 조각만 받는다.
+const notoSerif = Noto_Serif_KR({
+  weight: ["700", "900"],
+  subsets: ["latin"],
+  variable: "--font-noto-serif",
+  display: "swap",
+  preload: false,
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -99,7 +108,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className={`${gowunBatang.variable} ${gowunDodum.variable}`}>
+    <html lang="ko" className={`${gowunBatang.variable} ${gowunDodum.variable} ${notoSerif.variable}`}>
       <body>
         {children}
         {/* 애드핏 로더 — 페이지당 한 번. 광고단위를 하나도 켜지 않았으면

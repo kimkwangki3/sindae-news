@@ -45,7 +45,9 @@ const config: Config = {
       },
       fontFamily: {
         // next/font 변수로 주입 (app/layout.tsx)
-        serif: ["var(--font-gowun-batang)", "serif"], // 헤드라인
+        serif: ["var(--font-gowun-batang)", "serif"], // 소제목
+        // 신문 제목용. 고운바탕에는 굵은 자체가 700까지라 큰 제목의 무게가 안 나온다.
+        display: ["var(--font-noto-serif)", "var(--font-gowun-batang)", "serif"],
         sans: ["var(--font-gowun-dodum)", "var(--font-gowun-batang)", "sans-serif"], // 본문
       },
       // 글자가 작다는 피드백 — Tailwind 기본 스케일을 단계별로 약 5px(0.3125rem)씩

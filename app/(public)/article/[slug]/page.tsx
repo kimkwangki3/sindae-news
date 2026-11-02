@@ -23,11 +23,14 @@ import { findStaffByName } from "@/lib/staff";
 import {
   CATEGORY_NAME,
   getArticleBySlug,
+  getArticlesPage,
   getRelated,
 } from "@/lib/mock/articles";
 import { getComments } from "@/lib/mock/comments";
 import { getCurrentUser } from "@/lib/auth";
 import ShareButton from "@/components/ShareButton";
+import SideRail from "@/components/desktop/SideRail";
+import { getMostRead } from "@/lib/frontpage-data";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -114,10 +117,12 @@ export default async function ArticleDetailPage({
   const article = await getArticleBySlug(params.slug);
   if (!article) notFound();
 
-  const [user, comments, related] = await Promise.all([
+  const [user, comments, related, mostRead, latest] = await Promise.all([
     getCurrentUser(),
     getComments(article.slug),
     getRelated(article.slug),
+    getMostRead(),
+    getArticlesPage(null, 0, 6),
   ]);
 
   // 바이라인이 등록된 필자면 프로필로 연결한다.
@@ -130,7 +135,8 @@ export default async function ArticleDetailPage({
     : midAdAfterParagraph(article.body.length);
 
   return (
-    <article className="px-[18px] pb-10">
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-10 lg:px-7 lg:pt-6">
+    <article className="px-[18px] pb-10 md:px-7 lg:px-0">
       <ReadTracker slug={article.slug} />
       <NewsArticleJsonLd
         slug={article.slug}
@@ -148,7 +154,7 @@ export default async function ArticleDetailPage({
         <span className="inline-block rounded-full bg-rose-soft px-2.5 py-1 text-[16px] font-bold text-rose">
           {CATEGORY_NAME[article.category]}
         </span>
-        <h1 className="mt-3 text-[27px] font-extrabold leading-snug">
+        <h1 className="mt-3 font-display text-[27px] font-extrabold leading-snug lg:break-keep lg:text-[38px] lg:font-black lg:leading-[1.28]">
           {article.title}
         </h1>
         {article.subtitle && (
@@ -295,5 +301,10 @@ export default async function ArticleDetailPage({
       )}
       <AdSlot slot="article-bottom" />
     </article>
+    <SideRail
+      mostRead={mostRead}
+      latest={latest.items.filter((a) => a.slug !== article.slug).slice(0, 5)}
+    />
+    </div>
   );
 }

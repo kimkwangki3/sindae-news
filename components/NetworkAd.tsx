@@ -46,7 +46,25 @@ let routeChanged = false;
 // 페이지를 처음 열었을 때의 주소. 첫 화면과 되돌아온 화면을 가른다.
 let firstPath: string | null = null;
 
-export default function NetworkAd({ slot }: { slot: NetworkAdSlot }) {
+// 같은 광고를 휴대폰·PC 자리에 하나씩 둘 때, 화면에 없는 쪽은 걷어낸다.
+// CSS로 숨기기만 하면 애드핏이 보이지 않는 칸까지 채운다. 그러면 아무도 못 본
+// 노출이 잡히고 한 화면에 같은 단위가 둘이 되어 심사 기준에도 어긋난다.
+const VIEWPORT_QUERY = {
+  mobile: "(max-width: 767px)",
+  desktop: "(min-width: 1024px)",
+} as const;
+
+function offScreen(viewport?: keyof typeof VIEWPORT_QUERY): boolean {
+  return Boolean(viewport) && !window.matchMedia(VIEWPORT_QUERY[viewport!]).matches;
+}
+
+export default function NetworkAd({
+  slot,
+  viewport,
+}: {
+  slot: NetworkAdSlot;
+  viewport?: keyof typeof VIEWPORT_QUERY;
+}) {
   const { unit, size } = AD_UNITS[slot];
   const { w, h } = AD_SIZE[size];
   const insRef = useRef<HTMLModElement>(null);
@@ -68,18 +86,20 @@ export default function NetworkAd({ slot }: { slot: NetworkAdSlot }) {
   // 자동화로 판정되면 붙자마자 자리를 걷어낸다. 애드핏 로더는
   // afterInteractive 라 이보다 늦게 돌기 때문에 대개 그 전에 사라진다.
   const [automated, setAutomated] = useState(false);
+  const [removed, setRemoved] = useState(false);
   useEffect(() => {
     if (typeof navigator !== "undefined" && navigator.webdriver) {
       setAutomated(true);
     }
-  }, []);
+    if (offScreen(viewport)) setRemoved(true);
+  }, [viewport]);
 
   useEffect(() => {
     // 꺼진 자리는 그리지도 않으니 셈에 넣지 않는다. 여기서 걸러야 빈 자리가
     // 첫 화면 판정을 대신 써버리는 일이 없다.
     if (!unit.trim()) return;
     // 자동화 브라우저에는 채워달라는 말도 걸지 않는다.
-    if (automated) return;
+    if (automated || removed || offScreen(viewport)) return;
 
     if (firstPath === null) firstPath = pathname;
     // 아직 첫 화면이다 — 로더가 훑어 채운다. 우리는 비켜선다.
@@ -90,9 +110,9 @@ export default function NetworkAd({ slot }: { slot: NetworkAdSlot }) {
     if (!el) return;
     // 스크립트가 아직이면 곧 도착해 스스로 훑는다. 그때 채워지므로 그냥 둔다.
     window.adfit?.render?.(el);
-  }, [pathname, unit, automated]);
+  }, [pathname, unit, automated, removed, viewport]);
 
-  if (!unit.trim() || automated) return null;
+  if (!unit.trim() || automated || removed) return null;
 
   return (
     <div

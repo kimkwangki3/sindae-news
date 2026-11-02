@@ -30,6 +30,7 @@ const GROUPS: Group[] = [
     title: "보도",
     items: [
       { href: "/admin/articles", label: "기사 관리" },
+      { href: "/admin/frontpage", label: "헤드라인 편성" },
       {
         href: "/admin/articles/review",
         label: "기사 승인 큐",

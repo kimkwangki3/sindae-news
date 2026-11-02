@@ -1,20 +1,30 @@
 import { Fragment } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import CategoryNav from "@/components/CategoryNav";
 import SiteJsonLd from "@/components/SiteJsonLd";
 import AdSlot from "@/components/AdSlot";
 import NetworkAd from "@/components/NetworkAd";
-import Thumb from "@/components/Thumb";
-import ArticleListItem from "@/components/ArticleListItem";
+import ArticleListItem, {
+  type ArticleSummary,
+} from "@/components/ArticleListItem";
+import { MostReadList } from "@/components/desktop/SideRail";
+import {
+  CategoryBlocks,
+  LeadStory,
+  LifeTiles,
+  PhotoBand,
+  SubStories,
+  TownBand,
+} from "@/components/home/FrontSections";
 import { MEDIA } from "@/lib/media";
 import { getFeaturedSurvey } from "@/lib/mock/surveys";
 import { remainingLabel } from "@/lib/surveys";
-import {
-  CATEGORY_NAME,
-  getArticlesPage,
-  getLead,
-} from "@/lib/mock/articles";
+import { getArticlesPage } from "@/lib/mock/articles";
+import type { CategorySlug } from "@/lib/mock/articles-meta";
+import { getFrontPage, getMostRead } from "@/lib/frontpage-data";
+import { getInfoPages } from "@/lib/info";
+import { getBoardPosts } from "@/lib/mock/community";
+import { getBusinesses } from "@/lib/mock/district";
 
 // 제목·설명은 루트 레이아웃의 기본값을 그대로 쓴다. 여기서는 정규 주소만 밝힌다.
 export const metadata = { alternates: { canonical: "/" } };
@@ -30,143 +40,147 @@ function SectionTitle({ title, href }: { title: string; href: string }) {
   );
 }
 
-// 홈에 보여줄 최신 기사 수. 헤드라인 1건을 빼야 하므로 하나 더 받아온다.
+// 홈 휴대폰 목록의 기사 수. 톱 기사는 빼고 센다.
 const HOME_LIST = 10;
+const BLOCK_CATEGORIES: CategorySlug[] = ["local", "admin", "life"];
+const BLOCK_SIZE = 4;
 
 export default async function HomePage() {
-  const [lead, latest, survey] = await Promise.all([
-    getLead(),
-    // 분류를 가리지 않고 발행 최신순. 홈은 "지금 무슨 일이 있었나"를 보는
-    // 자리라 분류별로 나눠 놓으면 정작 방금 올라온 기사가 아래로 밀린다.
-    getArticlesPage(null, 0, HOME_LIST + 1),
-    getFeaturedSurvey(),
-  ]);
+  const [front, survey, mostRead, infoPages, posts, businesses, ...categories] =
+    await Promise.all([
+      getFrontPage(),
+      getFeaturedSurvey(),
+      getMostRead(),
+      getInfoPages(),
+      getBoardPosts("all"),
+      getBusinesses("all"),
+      ...BLOCK_CATEGORIES.map((c) => getArticlesPage(c, 0, BLOCK_SIZE + 4)),
+    ]);
 
-  // 헤드라인으로 크게 띄운 기사가 바로 아래 목록에 또 나오면 같은 기사를
-  // 두 번 읽게 된다.
-  const items = latest.items
-    .filter((a) => a.slug !== lead?.slug)
-    .slice(0, HOME_LIST);
+  const { lead, leadTitle, subs, rest } = front;
+  const items: ArticleSummary[] = [...subs, ...rest].slice(0, HOME_LIST);
+
+  // 톱·서브에 나온 기사는 아래 묶음에서 뺀다. 묶음의 첫 기사는 사진을 크게
+  // 쓰므로, 사진 띠는 그 기사들을 피해 같은 사진이 두 번 나오지 않게 한다.
+  const onTop = new Set([lead?.slug, ...subs.map((a) => a.slug)]);
+  const blocks = BLOCK_CATEGORIES.map((slug, i) => ({
+    slug,
+    items: categories[i].items
+      .filter((a) => !onTop.has(a.slug))
+      .slice(0, BLOCK_SIZE),
+  }));
+  const blockLeads = new Set(blocks.map((b) => b.items[0]?.slug));
+  const photos = rest
+    // '사진'이라는 제목 아래 AI 그림을 놓으면 현장 사진으로 읽힌다.
+    .filter((a) => a.thumbnailUrl && !a.aiImage && !blockLeads.has(a.slug))
+    .slice(0, 4);
 
   return (
     <>
       {/* 검색 결과에 'sdtime.net' 대신 '해룡신문'이 뜨게 하는 구조화 데이터.
           구글은 홈페이지에서만 사이트 이름을 읽는다. */}
       <SiteJsonLd />
+      {/* 화면의 제호는 그림과 링크라 문서 제목이 따로 필요하다. */}
+      <h1 className="sr-only">{MEDIA.name} — 순천시 해룡면 지역 인터넷신문</h1>
       <CategoryNav />
 
-      <div className="px-[18px] pb-6">
-        {/* 오늘의 헤드라인 */}
-        {lead && (
-          <section className="pt-[18px]">
-            <span className="inline-block rounded-full bg-rose-soft px-2.5 py-1 text-[16px] font-bold tracking-wide text-rose">
-              오늘의 헤드라인
-            </span>
-            <Link href={`/article/${lead.slug}`} className="mt-3.5 block">
-              {/* 헤드라인 사진은 자르지 않는다 — 안내 포스터처럼 글자가 들어간
-                  이미지를 200px 상자에 맞춰 잘라내면 정작 읽어야 할 날짜·장소가
-                  사라진다. 기사 상세와 같은 기준이다.
-                  화면 맨 위라 미리 받아야 첫 화면이 늦지 않는다(priority).
-                  width/height는 자리를 미리 잡기 위한 값이고, 로드된 뒤에는
-                  h-auto가 실제 비율을 따라가므로 어떤 비율이든 잘리지 않는다. */}
-              {lead.thumbnailUrl ? (
-                <Image
-                  src={lead.thumbnailUrl}
-                  alt={lead.title}
-                  width={1448}
-                  height={1086}
-                  sizes="(max-width: 768px) 100vw, 720px"
-                  priority
-                  className="h-auto w-full rounded-card"
-                />
-              ) : (
-                <Thumb
-                  src={null}
-                  className="h-[200px] w-full"
-                  rounded="rounded-card"
-                  alt=""
-                />
-              )}
-              {/* 헤드라인은 사진을 가장 크게 쓰는 자리라 여기서도 출처를 밝힌다.
-                  링크 안이라 원문 링크는 기사 상세에 둔다. */}
-              {lead.thumbnailUrl && (lead.aiImage || lead.imageCredit) && (
-                <p className="mt-1.5 text-[14px] text-muted">
-                  {lead.aiImage ? "이미지: AI 생성" : lead.imageCredit}
-                </p>
-              )}
-              <h2 className="mt-3.5 text-[28px] font-extrabold leading-snug">
-                {lead.title}
-              </h2>
-              <p className="mt-2 text-xs text-muted">
-                {CATEGORY_NAME[lead.category]} · {lead.publishedAt} ·{" "}
-                {lead.author}
-              </p>
-            </Link>
-          </section>
-        )}
+      <div className="px-[18px] pb-6 md:px-7 md:pt-6">
+        {/* 태블릿 2단, PC 3단. 휴대폰은 위에서 아래로 쌓인다. */}
+        <div className="md:grid md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:gap-6 lg:grid-cols-[minmax(0,1.75fr)_minmax(0,1fr)_288px]">
+          {lead && (
+            <LeadStory lead={lead} title={leadTitle ?? lead.title} />
+          )}
+          <SubStories items={subs} />
+          <aside className="hidden min-w-0 flex-col gap-5 border-l border-line pl-6 lg:flex">
+            <MostReadList items={mostRead} />
+            <NetworkAd slot="home-list" viewport="desktop" />
+            <AdSlot slot="home-top" placeholder />
+          </aside>
+        </div>
 
-        {/* 진행 중인 주민 의견 조사. 헤드라인 바로 아래에 둔다 — 마감이 있는
-            일이라 아래로 내리면 끝난 뒤에 보게 된다. 없으면 자리도 없다. */}
-        {survey && (
-          <Link
-            href={`/surveys/${survey.slug}`}
-            className="mt-5 flex flex-col gap-1.5 rounded-card border border-rose bg-rose-soft p-4"
-          >
-            <span className="flex items-center gap-1.5 text-[16px] font-bold text-rose-deep">
-              📊 주민 의견 조사
-              {remainingLabel(survey.endsAt) && (
-                <span className="font-normal text-muted">
-                  · {remainingLabel(survey.endsAt)}
-                </span>
-              )}
-            </span>
-            <span className="text-[21px] font-bold leading-snug">
-              {survey.title}
-            </span>
-            <span className="text-[17px] text-muted">
-              참여 {survey.totalVotes.toLocaleString()}명 · 눌러서 참여하기
-            </span>
-          </Link>
-        )}
-
-        <AdSlot slot="home-top" placeholder />
-
-        {/* 최신 기사 — 분류를 나누지 않고 올라온 순서대로.
-            분류별 묶음은 상단 분류 메뉴와 /articles/[분류]에서 볼 수 있다. */}
-        <section>
-          <SectionTitle title="최신 기사" href="/articles" />
-          {items.slice(0, 5).map((a, i) => (
-            <Fragment key={a.slug}>
-              <ArticleListItem article={a} />
-              {/* 광고 — 네 번째 기사 뒤. 목록을 훑어내리다 한 번 멈치는 자리다.
-                  바깥 div가 px-[18px]를 지고 있어 카드와 좌우 여백이 같다. */}
-              {i === 3 && <NetworkAd slot="home-list" />}
-            </Fragment>
-          ))}
-        </section>
-
-        <AdSlot slot="home-mid" />
-
-        <section>
-          {items.slice(5).map((a) => (
-            <ArticleListItem key={a.slug} article={a} />
-          ))}
-          {items.length >= HOME_LIST && (
+        {/* 휴대폰 지면 — 기존 구성 그대로 */}
+        <div className="md:hidden">
+          {/* 진행 중인 주민 의견 조사. 헤드라인 바로 아래에 둔다 — 마감이 있는
+              일이라 아래로 내리면 끝난 뒤에 보게 된다. 없으면 자리도 없다. */}
+          {survey && (
             <Link
-              href="/articles"
-              className="mt-2 flex min-h-[48px] items-center justify-center rounded-card border border-line bg-white text-sm font-bold text-rose-deep"
+              href={`/surveys/${survey.slug}`}
+              className="mt-5 flex flex-col gap-1.5 rounded-card border border-rose bg-rose-soft p-4"
             >
-              기사 더 보기 ›
+              <span className="flex items-center gap-1.5 text-[16px] font-bold text-rose-deep">
+                📊 주민 의견 조사
+                {remainingLabel(survey.endsAt) && (
+                  <span className="font-normal text-muted">
+                    · {remainingLabel(survey.endsAt)}
+                  </span>
+                )}
+              </span>
+              <span className="text-[21px] font-bold leading-snug">
+                {survey.title}
+              </span>
+              <span className="text-[17px] text-muted">
+                참여 {survey.totalVotes.toLocaleString()}명 · 눌러서 참여하기
+              </span>
             </Link>
           )}
-        </section>
 
-        <AdSlot slot="home-bottom" />
+          <AdSlot slot="home-top" placeholder />
 
-        {/* 신문법 제21조 단서 — 청소년보호 정책·책임자는 첫 화면에 노출해야 한다 */}
+          {/* 최신 기사 — 분류를 나누지 않고 올라온 순서대로.
+              분류별 묶음은 상단 분류 메뉴와 /articles/[분류]에서 볼 수 있다. */}
+          <section>
+            <SectionTitle title="최신 기사" href="/articles" />
+            {items.slice(0, 5).map((a, i) => (
+              <Fragment key={a.slug}>
+                <ArticleListItem article={a} />
+                {/* 광고 — 네 번째 기사 뒤. 목록을 훑어내리다 한 번 멈치는 자리다.
+                    바깥 div가 px-[18px]를 지고 있어 카드와 좌우 여백이 같다. */}
+                {i === 3 && <NetworkAd slot="home-list" viewport="mobile" />}
+              </Fragment>
+            ))}
+          </section>
+
+          <AdSlot slot="home-mid" />
+
+          <section>
+            {items.slice(5).map((a) => (
+              <ArticleListItem key={a.slug} article={a} />
+            ))}
+            {items.length >= HOME_LIST && (
+              <Link
+                href="/articles"
+                className="mt-2 flex min-h-[48px] items-center justify-center rounded-card border border-line bg-white text-sm font-bold text-rose-deep"
+              >
+                기사 더 보기 ›
+              </Link>
+            )}
+          </section>
+
+          <AdSlot slot="home-bottom" />
+        </div>
+
+        {/* PC·태블릿 지면 */}
+        <div className="hidden md:block">
+          {/* PC는 곁단이 맡고, 곁단이 없는 태블릿만 여기에 둔다. */}
+          <div className="lg:hidden">
+            <AdSlot slot="home-top" placeholder />
+          </div>
+          <PhotoBand items={photos} />
+          <CategoryBlocks blocks={blocks} />
+          <AdSlot slot="home-mid" />
+          <LifeTiles pages={infoPages} />
+          <TownBand
+            survey={survey}
+            posts={posts.slice(0, 3)}
+            businesses={businesses.slice(0, 3)}
+          />
+          <AdSlot slot="home-bottom" />
+        </div>
+
+        {/* 신문법 제9조의2 — 청소년보호 정책·책임자는 첫 화면에 노출해야 한다 */}
         <Link
           href="/legal/youth"
-          className="flex min-h-[44px] items-center justify-between rounded-card border border-line bg-ivory-2 px-4 py-3 text-[17px] text-muted"
+          className="mt-6 flex min-h-[44px] items-center justify-between rounded-card border border-line bg-ivory-2 px-4 py-3 text-[17px] text-muted md:rounded-none"
         >
           <span>청소년보호정책 · 청소년보호책임자 {MEDIA.youthOfficer}</span>
           <span aria-hidden>›</span>

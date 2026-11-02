@@ -7,6 +7,8 @@ export interface ArticleSummary {
   title: string;
   meta: string; // "지역소식 · 2026.06.25"
   thumbnailUrl?: string | null;
+  aiImage?: boolean; // 사진을 크게 쓰는 자리에서 출처를 밝힐 때 쓴다
+  imageCredit?: string | null;
 }
 
 // 기사 목록 한 줄: 썸네일 + 카테고리/제목/메타.

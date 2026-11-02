@@ -58,7 +58,7 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="sticky bottom-0 z-10 flex items-stretch border-t border-line bg-white pb-[max(env(safe-area-inset-bottom),0px)] shadow-[0_-8px_30px_-18px_rgba(60,50,35,0.25)]">
+    <nav className="sticky bottom-0 z-10 flex items-stretch border-t lg:hidden border-line bg-white pb-[max(env(safe-area-inset-bottom),0px)] shadow-[0_-8px_30px_-18px_rgba(60,50,35,0.25)]">
       {BOTTOM_TABS.map((tab) => {
         const active =
           tab.href === "/"

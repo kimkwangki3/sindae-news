@@ -17,7 +17,7 @@ export default async function TopBar() {
   const isStaff = user?.role === "admin" || user?.role === "superadmin";
 
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-ivory/90 px-[18px] py-3.5 backdrop-blur">
+    <header className="sticky top-0 z-20 flex items-center justify-between border-b lg:hidden border-line bg-ivory/90 px-[18px] py-3.5 backdrop-blur">
       {/* 로고를 키운 뒤로 360px에서 뱃지 두 개까지 한 줄에 안 들어간다.
           로고는 절대 줄이지 않고, 뱃지 줄만 가로 스크롤시켜 헤더 높이를 고정한다. */}
       <div className="flex min-w-0 flex-1 items-center gap-2">

@@ -38,4 +38,15 @@ export const CATEGORY_LINKS: CategoryLink[] = [
   { href: "/articles/people", label: "해룡인물" },
   { href: "/articles/admin", label: "행정" },
   { href: "/articles/life", label: "생활" },
+  { href: "/info", label: "생활정보" },
+];
+
+// PC판 메뉴의 둘째 묶음. 휴대폰에서 하단 탭이 맡는 자리들이다.
+export const DESKTOP_LINKS: CategoryLink[] = [
+  { href: "/info", label: "생활정보" },
+  { href: "/haeryong", label: "동네 안내" },
+  { href: "/district", label: "상권" },
+  { href: "/orgs", label: "단체" },
+  { href: "/board", label: "게시판" },
+  { href: "/surveys", label: "주민 의견" },
 ];

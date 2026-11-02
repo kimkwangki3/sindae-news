@@ -83,7 +83,10 @@ export async function sendDraft(d, index) {
   // pubn = 사진 없이 발행. 그림이 마음에 안 들 때 초안까지 버리지 않게 한다.
   const keyboard = d.image_url
     ? [
-        [{ text: "✅ 발행 (그림 포함)", callback_data: `pub:${d.id}` }],
+        [
+          { text: "✅ 발행 (그림 포함)", callback_data: `pub:${d.id}` },
+          { text: "⭐ 톱으로 발행", callback_data: `pubt:${d.id}` },
+        ],
         [
           { text: "📝 그림 없이 발행", callback_data: `pubn:${d.id}` },
           { text: "🗑 보류", callback_data: `dis:${d.id}` },
@@ -92,8 +95,9 @@ export async function sendDraft(d, index) {
     : [
         [
           { text: "✅ 발행", callback_data: `pub:${d.id}` },
-          { text: "🗑 보류", callback_data: `dis:${d.id}` },
+          { text: "⭐ 톱으로 발행", callback_data: `pubt:${d.id}` },
         ],
+        [{ text: "🗑 보류", callback_data: `dis:${d.id}` }],
       ];
 
   const result = await call("sendMessage", {

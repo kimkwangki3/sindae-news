@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import CategoryChips from "@/components/article/CategoryChips";
 import ArticleListItem from "@/components/ArticleListItem";
 import Pager from "@/components/article/Pager";
+import SideRail from "@/components/desktop/SideRail";
+import { getMostRead } from "@/lib/frontpage-data";
 import {
   CATEGORY_NAME,
   getArticlesByPage,
@@ -39,11 +41,15 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   if (!VALID.includes(category)) notFound();
 
   const page = readPageParam(searchParams);
-  const { items, totalPages } = await getArticlesByPage(category, page, PER_PAGE);
+  const [{ items, totalPages }, mostRead] = await Promise.all([
+    getArticlesByPage(category, page, PER_PAGE),
+    getMostRead(),
+  ]);
   if (page > 1 && items.length === 0) notFound();
 
   return (
-    <>
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-10 lg:px-7 lg:pt-3">
+      <div className="min-w-0 md:px-7 lg:px-0">
       <CategoryChips />
       <div className="px-[18px] pb-6">
         <h1 className="py-2 text-[22px] text-rose-deep">
@@ -63,6 +69,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           basePath={`/articles/${category}`}
         />
       </div>
-    </>
+      </div>
+      <SideRail mostRead={mostRead} latest={[]} />
+    </div>
   );
 }

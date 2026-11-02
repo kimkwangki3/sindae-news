@@ -9,6 +9,13 @@
     --bottom-nav-h: 70px;
   }
 
+  /* PC판에는 하단 탭바가 없다. */
+  @media (min-width: 1024px) {
+    :root {
+      --bottom-nav-h: 0px;
+    }
+  }
+
   html {
     /* iOS 탭 하이라이트 제거, 모바일 우선 */
     -webkit-tap-highlight-color: transparent;

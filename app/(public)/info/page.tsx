@@ -16,7 +16,7 @@ export default async function InfoPage() {
   const pages = await getInfoPages();
 
   return (
-    <div className="px-[18px] py-6">
+    <div className="px-[18px] py-6 md:px-7">
       <h1 className="text-xl text-rose-deep">생활정보</h1>
       <p className="mt-2 text-sm leading-relaxed text-muted">
         해룡면에 사는 데 필요한 것들을 모아 두고 계속 갱신합니다.
@@ -29,7 +29,7 @@ export default async function InfoPage() {
           버스 시간표·야간 약국·재활용 배출 요일부터 차례로 올립니다.
         </p>
       ) : (
-        <ul className="mt-6 flex flex-col gap-2.5">
+        <ul className="mt-6 flex flex-col gap-2.5 md:grid md:grid-cols-2 lg:grid-cols-3">
           {pages.map((p) => (
             <li key={p.slug}>
               <Link

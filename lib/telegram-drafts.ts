@@ -97,8 +97,9 @@ export async function sendDraft(
       inline_keyboard: [
         [
           { text: "✅ 발행", callback_data: `pub:${d.id}` },
-          { text: "🗑 보류", callback_data: `dis:${d.id}` },
+          { text: "⭐ 톱으로 발행", callback_data: `pubt:${d.id}` },
         ],
+        [{ text: "🗑 보류", callback_data: `dis:${d.id}` }],
       ],
     },
   });

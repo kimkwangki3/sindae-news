@@ -5,7 +5,9 @@ import ArticleListItem from "@/components/ArticleListItem";
 import Pager from "@/components/article/Pager";
 import AdSlot from "@/components/AdSlot";
 import NetworkAd from "@/components/NetworkAd";
+import SideRail from "@/components/desktop/SideRail";
 import { getArticlesByPage } from "@/lib/mock/articles";
+import { getMostRead } from "@/lib/frontpage-data";
 import { readPageParam } from "@/lib/paging";
 
 // 발행 즉시 목록에 반영되도록 동적 렌더.
@@ -30,13 +32,17 @@ export function generateMetadata({ searchParams }: Props) {
 
 export default async function ArticlesPage({ searchParams }: Props) {
   const page = readPageParam(searchParams);
-  const { items, totalPages } = await getArticlesByPage(null, page, PER_PAGE);
+  const [{ items, totalPages }, mostRead] = await Promise.all([
+    getArticlesByPage(null, page, PER_PAGE),
+    getMostRead(),
+  ]);
 
   // 없는 쪽을 빈 화면으로 내주면 검색엔진이 빈 쪽을 끝없이 긁는다.
   if (page > 1 && items.length === 0) notFound();
 
   return (
-    <>
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-10 lg:px-7 lg:pt-3">
+      <div className="min-w-0 md:px-7 lg:px-0">
       <CategoryChips />
       <div className="px-[18px] pb-6">
         <AdSlot slot="articles-top" />
@@ -55,6 +61,8 @@ export default async function ArticlesPage({ searchParams }: Props) {
         )}
         <Pager page={page} totalPages={totalPages} basePath="/articles" />
       </div>
-    </>
+      </div>
+      <SideRail mostRead={mostRead} latest={[]} />
+    </div>
   );
 }

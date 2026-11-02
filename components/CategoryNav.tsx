@@ -13,7 +13,7 @@ export default function CategoryNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="no-scrollbar flex gap-5 overflow-x-auto border-b border-line px-[18px] py-3 text-[17px] font-medium">
+    <nav className="no-scrollbar flex gap-5 overflow-x-auto border-b border-line px-[18px] py-3 text-[17px] font-medium lg:hidden">
       {CATEGORY_LINKS.map((link) => {
         const active =
           link.href === "/" ? pathname === "/" : pathname === link.href;

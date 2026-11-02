@@ -5,6 +5,7 @@ import { nextArticleSlug } from "@/lib/slug";
 import { answerCallback, settleDraftMessage } from "@/lib/telegram-drafts";
 import { revalidatePublic } from "@/lib/revalidate";
 import { MEDIA } from "@/lib/media";
+import { planSlotRows } from "@/lib/frontpage";
 
 // 텔레그램 초안 승인 버튼 수신 엔드포인트.
 //
@@ -111,12 +112,15 @@ export async function POST(req: Request): Promise<Response> {
     return NextResponse.json({ ok: true });
   }
 
-  // pub = 초안에 붙은 그림까지, pubn = 그림은 버리고 글만
-  if (action !== "pub" && action !== "pubn") return NextResponse.json({ ok: true });
+  // pub = 초안에 붙은 그림까지, pubn = 그림은 버리고 글만,
+  // pubt = pub과 같고 첫 화면 톱으로도 올린다
+  if (action !== "pub" && action !== "pubn" && action !== "pubt") {
+    return NextResponse.json({ ok: true });
+  }
 
   // --- 발행 ---
   const now = new Date().toISOString();
-  const withImage = action === "pub" && Boolean(d.image_url);
+  const withImage = action !== "pubn" && Boolean(d.image_url);
 
   // 슬러그는 날짜+순번이라, 같은 순간에 두 건을 발행하면 번호가 겹칠 수 있다.
   // 겹치면 다시 번호를 받아 한 번 더 시도한다.
@@ -167,6 +171,36 @@ export async function POST(req: Request): Promise<Response> {
     memo: "telegram",
   });
 
+  // 톱 지정이 실패해도 기사는 이미 나갔다. 사유를 메시지에 남기고 흐름은 잇는다.
+  let topNote = "";
+  if (action === "pubt") {
+    const { data: created } = await supabase
+      .from("articles")
+      .select("id")
+      .eq("slug", slug)
+      .maybeSingle();
+    const [row] = planSlotRows(
+      {
+        top: (created as { id: string } | null)?.id ?? null,
+        subs: [],
+        shortTitle: "",
+        pinned: false,
+      },
+      [],
+      Date.now(),
+    );
+    const { error: slotError } = row
+      ? await supabase.from("front_page_slots").upsert(row, { onConflict: "slot" })
+      : { error: { message: "새 기사를 찾지 못했습니다" } };
+    if (slotError) {
+      // eslint-disable-next-line no-console
+      console.warn("[draft] 톱 지정 실패:", slotError.message);
+      topNote = "⚠️ 기사는 게재했지만 톱 지정에 실패했습니다. 관리자 편성판에서 지정해 주세요.";
+    } else {
+      topNote = "⭐ 첫 화면 톱으로 올렸습니다. 3일 뒤 자동으로 내려갑니다.";
+    }
+  }
+
   revalidatePublic();
 
   // 게재 직후 필요한 것을 한 화면에 모아 준다. 그림 없이 나간 기사는 나중에
@@ -184,6 +218,7 @@ export async function POST(req: Request): Promise<Response> {
     `<a href="${url}">${MEDIA.name}에서 보기</a>`,
     `<a href="${editUrl}">이미지 추가·수정하기</a>`,
   ];
+  if (topNote) parts.push("", topNote);
   if (withImage) {
     parts.push(
       "",

@@ -100,6 +100,8 @@ type ListRow = {
   thumbnail_url: string | null;
   category_id: number | null;
   published_at: string | null;
+  ai_image?: boolean | null;
+  image_credit?: string | null;
 };
 
 function rowToSummary(r: ListRow): ArticleSummary {
@@ -111,10 +113,13 @@ function rowToSummary(r: ListRow): ArticleSummary {
     title: r.title,
     meta: `${name} · ${fmtDate(r.published_at)}`,
     thumbnailUrl: r.thumbnail_url,
+    aiImage: r.ai_image ?? false,
+    imageCredit: r.image_credit ?? null,
   };
 }
 
-const LIST_COLS = "slug, title, thumbnail_url, category_id, published_at";
+const LIST_COLS =
+  "slug, title, thumbnail_url, category_id, published_at, ai_image, image_credit";
 
 // 무한스크롤용 페이지네이션. cursor = 시작 인덱스(.range). category 없으면 전체.
 export async function getArticlesPage(
@@ -459,19 +464,4 @@ export async function getRelated(
   }
 
   return picked.slice(0, limit).map(rowToSummary);
-}
-
-// 홈 헤드라인(가장 최신 1건). 기사 없으면 null.
-export async function getLead(): Promise<MockArticle | null> {
-  const supabase = createClient();
-  const { data } = await supabase
-    .from("articles")
-    .select("slug")
-    .eq("status", "published")
-    .not("published_at", "is", null)
-    .order("published_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (!data) return null;
-  return getArticleBySlug((data as { slug: string }).slug);
 }
