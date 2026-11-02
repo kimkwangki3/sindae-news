@@ -40,7 +40,9 @@ const UA_MAX = 300;
 // 그대로 어딘가에 흘리지는 않는다.
 function cleanReferrer(raw: string | undefined): string | null {
   const s = (raw ?? "").trim();
-  if (!s || !/^https?:\/\//i.test(s)) return null;
+  // android-app:// 은 안드로이드 앱이 크롬으로 넘겨줄 때 오는 값이다
+  // (예: com.nhn.android.search). 버리면 네이버 앱 유입이 직접 방문이 된다.
+  if (!s || !/^(https?|android-app):\/\//i.test(s)) return null;
   return s.slice(0, 300);
 }
 

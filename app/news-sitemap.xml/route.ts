@@ -10,6 +10,7 @@ export const revalidate = 0;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const WINDOW_HOURS = 48;
+const FALLBACK_ARTICLES = 5;
 
 function esc(s: string): string {
   return s
@@ -25,15 +26,27 @@ export async function GET(): Promise<Response> {
     Date.now() - WINDOW_HOURS * 60 * 60 * 1000,
   ).toISOString();
 
-  const { data } = await createAnonClient()
-    .from("articles")
-    .select("slug, title, published_at")
-    .eq("status", "published")
-    .gte("published_at", since)
-    .order("published_at", { ascending: false })
-    .limit(1000);
+  const latest = () =>
+    createAnonClient()
+      .from("articles")
+      .select("slug, title, published_at")
+      .eq("status", "published")
+      .order("published_at", { ascending: false });
 
-  const items = (data ?? []) as {
+  const recent = await latest().gte("published_at", since).limit(1000);
+  // 이틀 넘게 발행이 없으면 빈 사이트맵이 되고 서치콘솔이 오류로 잡는다
+  // (2026-08-10, 11-02 실제 발생). 그럴 때만 최근 기사로 채운다. 48시간이
+  // 지난 기사는 구글이 뉴스 후보에서 무시할 뿐 오류로 보지는 않는다.
+  const res =
+    !recent.error && (recent.data ?? []).length === 0
+      ? await latest().limit(FALLBACK_ARTICLES)
+      : recent;
+  if (res.error) {
+    // eslint-disable-next-line no-console
+    console.warn("[news-sitemap] 기사 조회 실패:", res.error.message);
+  }
+
+  const items = (res.data ?? []) as {
     slug: string;
     title: string;
     published_at: string;

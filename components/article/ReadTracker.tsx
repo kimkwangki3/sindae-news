@@ -27,11 +27,17 @@ export default function ReadTracker({ slug }: { slug: string }) {
     function flush() {
       if (sent.current) return;
       sent.current = true;
-      void trackArticleView({
+      const event = {
         slug,
         scrollPct: Math.min(100, maxScrollPct.current),
         dwellMs: Math.round(performance.now() - enteredAt.current),
-      });
+      };
+      // 페이지가 닫혀도 끝까지 가는 쪽을 먼저 쓴다(app/api/read/route.ts).
+      const queued = navigator.sendBeacon?.(
+        "/api/read",
+        new Blob([JSON.stringify(event)], { type: "application/json" }),
+      );
+      if (!queued) void trackArticleView(event);
     }
 
     function onVisibility() {

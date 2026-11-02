@@ -6,8 +6,10 @@ import {
   getBoardStatsList,
   getVisitStats,
 } from "@/lib/mock/admin";
+import { getVisitAnalytics, sourceBrief } from "@/lib/mock/admin-visits";
 import { kstTime } from "@/lib/datetime";
 import { PageHead } from "@/components/admin/ui";
+import RankBars from "@/components/admin/RankBars";
 import VisitCard from "@/components/admin/VisitCard";
 import AutoRefresh from "@/components/admin/AutoRefresh";
 
@@ -27,14 +29,22 @@ const QUEUE: { key: keyof Awaited<ReturnType<typeof getAdminQueueCounts>>; label
 ];
 
 export default async function AdminDashboard() {
-  const [stats, counts, articles, boards, visits] = await Promise.all([
+  const [stats, counts, articles, boards, visits, today] = await Promise.all([
     getAdminStats(),
     getAdminQueueCounts(),
     getArticleStatsList(5),
     getBoardStatsList(5),
     getVisitStats(7),
+    getVisitAnalytics(1),
   ]);
   const todo = QUEUE.filter((q) => counts[q.key] > 0);
+
+  // 아래 '인기 기사'는 창간 이래 누적이다. 오늘 무엇이 읽혔는지는 방문 기록으로
+  // 따로 센다(article_views 는 화면을 떠날 때 남아 휴대폰에서 일부 빠진다).
+  const todayArticles = today.paths
+    .filter((p) => p.path.startsWith("/article/") && p.title)
+    .slice(0, 5);
+  const todaySources = today.sources.filter((s) => !s.isInternal);
   const todoTotal = QUEUE.reduce((s, q) => s + counts[q.key], 0);
 
   // 이 화면을 언제 그렸는지. AutoRefresh가 "지금 보고 있는 게 옛 화면인가"를
@@ -49,6 +59,32 @@ export default async function AdminDashboard() {
 
       {/* 오늘 접속 */}
       <VisitCard stats={visits} updatedAt={updatedAt} />
+
+      {/* 오늘 무엇이 읽혔고 어디서 왔나 */}
+      <div className="mb-6 grid gap-3 lg:grid-cols-2">
+        <RankBars
+          title="오늘 많이 본 기사"
+          unit="회"
+          items={todayArticles.map((p) => ({
+            key: p.path,
+            label: p.title,
+            value: p.views,
+            sub: sourceBrief(p.sources) || undefined,
+          }))}
+          empty="오늘 읽힌 기사가 아직 없습니다"
+        />
+        <RankBars
+          title="오늘 어디서 들어왔나"
+          unit="회"
+          items={todaySources.map((s) => ({
+            key: s.source,
+            label: s.source,
+            value: s.views,
+            sub: `방문자 ${s.visitors.toLocaleString()}명`,
+          }))}
+          empty="오늘 들어온 기록이 아직 없습니다"
+        />
+      </div>
 
       {/* 처리할 일 */}
       <section className="mb-6 rounded-card border border-line bg-white p-4">

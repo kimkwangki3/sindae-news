@@ -290,6 +290,8 @@ comment on function bot_summary(int) is
 -- 아래 정의는 db/page-views-migration.sql · db/visit-analytics-migration.sql
 -- 의 것과 같고, where 절에 `not is_bot` 한 줄씩만 더했다. 저 두 파일을
 -- 다시 실행하면 이 조건이 사라지므로, 그때는 이 파일도 다시 실행할 것.
+-- 이 파일을 다시 실행하면 top_referrers 가 옛 분류로 돌아가므로, 그 뒤에
+-- db/visit-source-migration.sql 도 다시 실행할 것.
 
 create or replace function daily_visit_stats(p_days int default 7)
 returns table (day date, visitors bigint, views bigint)

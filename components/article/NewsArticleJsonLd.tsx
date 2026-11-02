@@ -58,7 +58,13 @@ export default function NewsArticleJsonLd({
       "@type": "NewsMediaOrganization",
       name: MEDIA.name,
       url: siteUrl,
-      logo: { "@type": "ImageObject", url: `${siteUrl}/logo.svg` },
+      // 구글은 크기를 읽을 수 있는 래스터 로고를 요구한다(SiteJsonLd 와 같은 파일).
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteUrl}/icon-512.png`,
+        width: 512,
+        height: 512,
+      },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     articleSection: section,

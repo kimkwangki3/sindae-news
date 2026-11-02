@@ -8,10 +8,11 @@
 import { createServiceClient } from "@/lib/supabase/server";
 
 /** 화면이 고를 수 있는 기간. 여기 없는 값은 받지 않는다. */
-export const PERIODS = [7, 30, 90, 180] as const;
+export const PERIODS = [1, 7, 30, 90, 180] as const;
 export type Period = (typeof PERIODS)[number];
 
 export const PERIOD_LABEL: Record<Period, string> = {
+  1: "오늘",
   7: "최근 7일",
   30: "최근 30일",
   90: "최근 90일",
@@ -35,6 +36,16 @@ export interface PathRow {
   visitors: number;
   // 기사 경로면 제목을 붙여 준다. 슬러그만 늘어놓으면 어느 기사인지 모른다.
   title?: string;
+  // 이 쪽으로 사람을 데려온 곳. 많은 순.
+  sources: { source: string; views: number }[];
+}
+
+/** "네이버 3 · 직접 방문 2" — 화면 한 줄에 들어가게 위 3곳만. */
+export function sourceBrief(sources: PathRow["sources"]): string {
+  return sources
+    .slice(0, 3)
+    .map((s) => `${s.source} ${s.views.toLocaleString()}`)
+    .join(" · ");
 }
 
 export interface SourceRow {
@@ -75,6 +86,9 @@ export interface VisitAnalytics {
   // 늘었다가 오늘 줄었다"가 무엇 때문인지 화면에서 설명할 수 있다.
   bots: BotSummary;
   paths: PathRow[];
+  // false 면 쪽별 유입을 못 가져온 것이다. 빈 칸을 '유입 없음'으로 읽지 않게
+  // 화면에서 사유를 밝힌다(db/visit-source-migration.sql 미적용일 때).
+  pathSourcesReady: boolean;
   sources: SourceRow[];
   articles: ArticleViewRow[];
   hours: HourRow[];
@@ -89,12 +103,13 @@ export async function getVisitAnalytics(days: number): Promise<VisitAnalytics> {
     summary: { visitors: 0, views: 0, daysWithTraffic: 0 },
     bots: { visitors: 0, views: 0 },
     paths: [],
+    pathSourcesReady: false,
     sources: [],
     articles: [],
     hours: [],
   };
 
-  const [summaryRes, pathRes, srcRes, artRes, hourRes, botRes] = await Promise.all([
+  const [summaryRes, pathRes, srcRes, artRes, hourRes, botRes, pathSrcRes] = await Promise.all([
     supabase.rpc("visit_summary", { p_days: days }),
     supabase.rpc("top_paths", { p_days: days, p_limit: 30 }),
     supabase.rpc("top_referrers", { p_days: days, p_limit: 12 }),
@@ -103,6 +118,7 @@ export async function getVisitAnalytics(days: number): Promise<VisitAnalytics> {
     // 크롤러 판별을 아직 적용하지 않았으면 이 함수가 없다. 그때는 0으로 두고
     // 나머지 숫자는 그대로 보여준다 — 화면 전체가 막히면 안 된다.
     supabase.rpc("bot_summary", { p_days: days }),
+    supabase.rpc("path_sources", { p_days: days, p_limit: 500 }),
   ]);
 
   if (summaryRes.error) {
@@ -117,6 +133,19 @@ export async function getVisitAnalytics(days: number): Promise<VisitAnalytics> {
   if (botRes.error) {
     // eslint-disable-next-line no-console
     console.error("[admin] bot_summary 실패:", botRes.error.message);
+  }
+
+  if (pathSrcRes.error) {
+    // eslint-disable-next-line no-console
+    console.warn("[admin] path_sources 실패:", pathSrcRes.error.message);
+  }
+  // 집계가 많은 순으로 오므로 쪽별로 나누기만 하면 순서가 유지된다.
+  const pathSources = new Map<string, PathRow["sources"]>();
+  for (const r of (pathSrcRes.data ?? []) as Record<string, unknown>[]) {
+    const path = String(r.path ?? "");
+    const list = pathSources.get(path) ?? [];
+    list.push({ source: String(r.source ?? "기타"), views: n(r.views) });
+    pathSources.set(path, list);
   }
 
   // 기사 제목은 집계에 없다(id만 온다). 필요한 것만 골라 한 번에 붙인다.
@@ -174,8 +203,10 @@ export async function getVisitAnalytics(days: number): Promise<VisitAnalytics> {
         views: n(r.views),
         visitors: n(r.visitors),
         title: slug ? pathTitles.get(slug) : undefined,
+        sources: pathSources.get(path) ?? [],
       };
     }),
+    pathSourcesReady: !pathSrcRes.error,
     sources: ((srcRes.data ?? []) as Record<string, unknown>[]).map((r) => ({
       source: String(r.source ?? "기타"),
       views: n(r.views),

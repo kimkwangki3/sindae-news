@@ -7,6 +7,7 @@ import {
   getVisitAnalytics,
   PERIODS,
   PERIOD_LABEL,
+  sourceBrief,
   toPeriod,
 } from "@/lib/mock/admin-visits";
 
@@ -80,6 +81,15 @@ export default async function AdminVisitsPage({
     a.summary.daysWithTraffic > 0
       ? Math.round(a.summary.views / a.summary.daysWithTraffic)
       : 0;
+  const isToday = days === 1;
+
+  // 사람은 새벽 0~5시에 낮만큼 읽지 않는다. 이 비중이 높으면 크롤러 판별을
+  // 빠져나간 기계가 섞여 있다는 신호다(2026-11-02 30일치 20%).
+  const hourTotal = a.hours.reduce((sum, h) => sum + h.views, 0);
+  const nightViews = a.hours
+    .filter((h) => h.hour < 6)
+    .reduce((sum, h) => sum + h.views, 0);
+  const nightPct = hourTotal > 0 ? Math.round((nightViews / hourTotal) * 100) : 0;
 
   return (
     <div className="px-[18px] py-5">
@@ -140,34 +150,44 @@ export default async function AdminVisitsPage({
               label="페이지뷰"
               value={a.summary.views.toLocaleString()}
               unit="회"
-              sub={`하루 평균 ${dailyAvg.toLocaleString()}회`}
-            />
-          </div>
-          <div className="flex gap-2">
-            <Tile
-              label="1인당 페이지뷰"
-              value={perVisitor.toFixed(1)}
-              unit="쪽"
-              sub="한 사람이 본 쪽 수"
-            />
-            <Tile
-              label="접속이 있던 날"
-              value={a.summary.daysWithTraffic.toLocaleString()}
-              unit="일"
-              sub={`${days}일 중`}
+              sub={
+                isToday
+                  ? `1인당 ${perVisitor.toFixed(1)}쪽`
+                  : `하루 평균 ${dailyAvg.toLocaleString()}회`
+              }
             />
           </div>
 
-          {/* 기간 합계 방문자는 일별 방문자를 더한 값이 아니다. 사흘 연속
-              들른 한 사람은 여기서 1명, 일별 그래프에서는 3번 세어진다.
-              둘 다 맞는 숫자인데 뜻이 달라, 그 차이를 적어 둔다. */}
-          <p className="text-[15px] leading-relaxed text-muted">
-            ※ 위 방문자 수는 기간 전체에서 <b>겹치지 않게</b> 센 값입니다. 아래
-            일별 그래프의 방문자를 모두 더한 값보다 작은 것이 정상입니다 —
-            며칠에 걸쳐 다시 온 분을 한 번만 세기 때문입니다.
-          </p>
+          {/* 하루만 볼 때는 '접속이 있던 날'과 일별 추세가 뜻이 없다. */}
+          {!isToday && (
+            <>
+              <div className="flex gap-2">
+                <Tile
+                  label="1인당 페이지뷰"
+                  value={perVisitor.toFixed(1)}
+                  unit="쪽"
+                  sub="한 사람이 본 쪽 수"
+                />
+                <Tile
+                  label="접속이 있던 날"
+                  value={a.summary.daysWithTraffic.toLocaleString()}
+                  unit="일"
+                  sub={`${days}일 중`}
+                />
+              </div>
 
-          <TrendChart days={trend.days} />
+              {/* 기간 합계 방문자는 일별 방문자를 더한 값이 아니다. 사흘 연속
+                  들른 한 사람은 여기서 1명, 일별 그래프에서는 3번 세어진다.
+                  둘 다 맞는 숫자인데 뜻이 달라, 그 차이를 적어 둔다. */}
+              <p className="text-[15px] leading-relaxed text-muted">
+                ※ 위 방문자 수는 기간 전체에서 <b>겹치지 않게</b> 센 값입니다.
+                아래 일별 그래프의 방문자를 모두 더한 값보다 작은 것이
+                정상입니다 — 며칠에 걸쳐 다시 온 분을 한 번만 세기 때문입니다.
+              </p>
+
+              <TrendChart days={trend.days} />
+            </>
+          )}
 
           <RankBars
             title="많이 본 쪽"
@@ -187,9 +207,20 @@ export default async function AdminVisitsPage({
                 </>
               ),
               value: p.views,
-              sub: `방문자 ${p.visitors.toLocaleString()}명`,
+              sub: [
+                `방문자 ${p.visitors.toLocaleString()}명`,
+                sourceBrief(p.sources),
+              ]
+                .filter(Boolean)
+                .join(" · "),
             }))}
           />
+          {!a.pathSourcesReady && (
+            <p className="-mt-1 text-[15px] leading-relaxed text-muted">
+              ※ 쪽별 유입처는 <code>db/visit-source-migration.sql</code> 을
+              실행하면 함께 나옵니다.
+            </p>
+          )}
 
           {/* 유입에서 '사이트 안에서 이동'은 빼고 센다. 우리 사이트 안에서
               링크를 타고 넘어가도 referrer 에는 우리 주소가 남는데, 그것까지
@@ -206,6 +237,11 @@ export default async function AdminVisitsPage({
             }))}
             empty="바깥에서 들어온 기록이 아직 없습니다"
           />
+          <p className="-mt-1 text-[15px] leading-relaxed text-muted">
+            ※ 직접 방문에는 주소 입력·즐겨찾기 말고도 출처를 알려 주지 않는 앱과
+            판별을 빠져나간 크롤러가 섞여 있습니다. 카카오톡·네이버 앱은 앱
+            이름으로 따로 가려 세되, 최근 90일 기록까지만 가능합니다.
+          </p>
           {internal.length > 0 && (
             <p className="-mt-1 text-[15px] leading-relaxed text-muted">
               ※ 사이트 안에서 링크를 타고 넘어간{" "}
@@ -226,6 +262,12 @@ export default async function AdminVisitsPage({
               value: h.views,
             }))}
           />
+          {!isToday && (
+            <p className="-mt-1 text-[15px] leading-relaxed text-muted">
+              ※ 새벽 0~5시 비중 {nightPct}%. 이 값이 높을수록 사람이 아닌 접속이
+              섞여 있을 가능성이 큽니다.
+            </p>
+          )}
 
           {/* 기사별 — 이 화면의 알맹이. 조회수만 보면 제목만 보고 닫은 기사와
               끝까지 읽힌 기사가 같아 보인다. 지역 신문에는 그 차이가 더 중요해서
@@ -300,7 +342,8 @@ export default async function AdminVisitsPage({
             <p className="mt-2 text-[15px] leading-relaxed text-muted">
               체류는 기사 화면에 머문 평균 시간, 읽음률은 본문을 어디까지
               내렸는지의 평균입니다. 조회는 많은데 읽음률이 낮으면 제목이 끌고
-              본문이 놓친 기사입니다.
+              본문이 놓친 기사입니다. 이 표는 화면을 떠날 때 기록되어 휴대폰에서
+              일부 빠지므로 위 많이 본 쪽보다 적게 나옵니다.
             </p>
           </section>
         </div>

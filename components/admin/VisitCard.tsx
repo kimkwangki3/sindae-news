@@ -55,7 +55,7 @@ export default function VisitCard({
           {/* 이 카드는 오늘과 최근 7일만 보여준다. 기간을 넓혀 보거나 어느
               기사가 읽혔는지 보려면 분석 화면으로 간다. */}
           <Link
-            href="/admin/visits"
+            href="/admin/visits?d=1"
             className="ml-2 text-xs font-normal text-muted underline"
           >
             자세히 보기 ›
