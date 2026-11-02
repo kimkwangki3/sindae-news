@@ -7,7 +7,7 @@ import {
   SourceNote,
 } from "@/components/info/LiveParts";
 import { getEmergencyRooms } from "@/lib/localinfo-data";
-import { shortAddr } from "@/lib/localinfo";
+import { bedLabel, shortAddr } from "@/lib/localinfo";
 
 export const metadata = {
   title: "순천 응급실 — 위치·전화번호·병상 현황 · 해룡신문",
@@ -20,6 +20,7 @@ export const dynamic = "force-dynamic";
 
 export default async function EmergencyPage() {
   const { data, fail } = await getEmergencyRooms();
+  const now = Date.now();
 
   const faq = [
     {
@@ -28,7 +29,7 @@ export default async function EmergencyPage() {
     },
     {
       q: "응급실에 바로 가도 되나요?",
-      a: "위급하면 119에 전화하세요. 병상 표시는 수시로 바뀌므로 직접 가는 경우에도 먼저 전화로 확인하는 편이 안전합니다.",
+      a: "위급하면 바로 119에 전화하세요. 직접 이동할 수 있는 상태라면 응급실에 전화해 진료 가능 여부를 확인할 수 있습니다.",
     },
   ];
 
@@ -60,8 +61,9 @@ export default async function EmergencyPage() {
         <>
           <h2 className={INFO_H2}>응급의료기관 ({data.length}곳)</h2>
           <p className="mt-1 text-[16px] text-muted">
-            이름순입니다. 병상 수는 수시로 바뀌고, 병상이 있어도 진료가 어려울 수
-            있습니다.
+            이름순입니다. 병상 수는 병원이 입력한 참고 정보로 수시로 바뀝니다. 수용이나
+            진료 가능 여부를 보장하지 않으며, 의료 판단을 대신하지 않습니다. 병상이
+            있어도 전문의 부재 등으로 진료가 어려울 수 있습니다.
           </p>
           <ul className="mt-2">
             {data.map((er) => (
@@ -75,7 +77,7 @@ export default async function EmergencyPage() {
                     {er.grade} · {shortAddr(er.addr)}
                   </p>
                   <p className="text-[17px] leading-snug text-ink">
-                    {er.beds}
+                    {bedLabel(er.hvec, er.stamp, now)}
                     {er.updated && (
                       <span className="text-muted"> · {er.updated} 기준</span>
                     )}
@@ -91,8 +93,8 @@ export default async function EmergencyPage() {
 
       <SourceNote>
         <p>
-          자료: 국립중앙의료원 전국 응급의료기관 정보(공공데이터포털). 약 5분마다
-          새로 받습니다.
+          자료: 국립중앙의료원 전국 응급의료기관 정보(공공데이터포털). 병상 수는 각
+          병원이 입력한 값이며, 표시된 시각 이후 달라졌을 수 있습니다.
         </p>
       </SourceNote>
     </div>

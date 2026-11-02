@@ -6,7 +6,6 @@
 
 import { unstable_cache } from "next/cache";
 import {
-  bedLabel,
   dayForecasts,
   dayRangeBase,
   explainFailure,
@@ -112,7 +111,8 @@ export interface EmergencyRoom {
   grade: string;
   addr: string;
   tel: string;
-  beds: string;
+  hvec?: string;
+  stamp?: string;
   updated: string;
 }
 
@@ -156,7 +156,8 @@ const cachedEmergency = unstable_cache(
           grade: e.dutyEmclsName ?? "",
           addr: e.dutyAddr ?? "",
           tel: e.dutyTel3 || e.dutyTel1 || "",
-          beds: bedLabel(b?.hvec),
+          hvec: b?.hvec,
+          stamp: b?.hvidate,
           updated: stampLabel(b?.hvidate),
         };
       })
@@ -247,9 +248,10 @@ export const getWeather = () => {
 export interface AirNow {
   station: string;
   pm10: string;
-  pm10Grade: string | null;
+  pm10Grade: string | null; // 1시간 등급. 함께 보여주는 농도와 기준을 맞춘다
   pm25: string;
   pm25Grade: string | null;
+  checking: boolean; // 측정기 점검·자료 이상
   dataTime: string;
 }
 
@@ -263,7 +265,7 @@ const cachedAir = unstable_cache(
         returnType: "json",
         numOfRows: "1",
         pageNo: "1",
-        ver: "1.0",
+        ver: "1.3",
       },
     );
     const row = JSON.parse(text).response?.body?.items?.[0];
@@ -271,9 +273,10 @@ const cachedAir = unstable_cache(
     return {
       station: AIR_STATION,
       pm10: row.pm10Value ?? "-",
-      pm10Grade: row.pm10Grade ?? null,
+      pm10Grade: row.pm10Grade1h ?? null,
       pm25: row.pm25Value ?? "-",
-      pm25Grade: row.pm25Grade ?? null,
+      pm25Grade: row.pm25Grade1h ?? null,
+      checking: Boolean(row.pm10Flag || row.pm25Flag),
       dataTime: row.dataTime ?? "",
     };
   },

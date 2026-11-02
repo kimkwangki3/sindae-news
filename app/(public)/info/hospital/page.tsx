@@ -53,9 +53,9 @@ export default async function HospitalPage() {
         해룡면 병원·의원 진료시간
       </h1>
       <p className="mt-2 text-[18px] leading-relaxed text-muted">
-        {DAY_LABEL[day]}요일 {clock(hhmm)} 기준 진료시간 안에 있는 곳은{" "}
-        {openCount}곳입니다. 점심시간과 임시 휴진은 반영되지 않으니 가기 전에
-        전화로 확인해 주세요.
+        {fail
+          ? "지금은 진료시간 자료를 받지 못했습니다. 의료기관에 전화로 확인해 주세요."
+          : `${DAY_LABEL[day]}요일 ${clock(hhmm)} 기준, 등록된 진료시간 안에 있는 곳은 ${openCount}곳입니다. 공휴일, 점심시간, 임시 휴진은 반영되지 않으니 가기 전에 전화로 확인해 주세요.`}
       </p>
       <Link
         href="/info/emergency"
@@ -82,6 +82,7 @@ export default async function HospitalPage() {
                       place={p}
                       day={day}
                       open={isOpenAt(p, now)}
+                      openLabel="등록 진료시간 안"
                     />
                   ))}
                 </ul>

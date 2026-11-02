@@ -162,11 +162,36 @@ export function hoursLabel(p: Pick<Place, "hours">, day: number): string {
 }
 
 // ── 응급실 ────────────────────────────────────────────────────────
-// hvec 는 응급실 가용 병상 수이고, 0 이하이면 자리가 없다는 뜻이다(음수는 초과 수용).
-export function bedLabel(hvec: string | undefined): string {
+// 병원이 입력한 값보다 이만큼 오래되면 숫자를 내리지 않는다. 방문이 적어 캐시가
+// 늦게 갱신될 수 있고, 응급 화면의 낡은 숫자는 없는 것보다 위험하다.
+const BED_STALE_MS = 30 * 60 * 1000;
+
+// "20261102144832"(한국시각) → 시각값
+export function stampMs(stamp: string): number {
+  return (
+    Date.UTC(
+      Number(stamp.slice(0, 4)),
+      Number(stamp.slice(4, 6)) - 1,
+      Number(stamp.slice(6, 8)),
+      Number(stamp.slice(8, 10)),
+      Number(stamp.slice(10, 12)),
+    ) - KST_MS
+  );
+}
+
+// hvec 는 병원이 입력한 응급실 가용 병상 값이다. 0 이하를 '자리 없음'으로 단정하면
+// 위급한 사람이 아예 가지 않는 쪽으로 읽힐 수 있어 전화 확인을 함께 적는다.
+export function bedLabel(
+  hvec: string | undefined,
+  stamp: string | undefined,
+  nowMs: number,
+): string {
   const n = Number(hvec);
   if (hvec === undefined || hvec === "" || Number.isNaN(n)) return "병상 정보 없음";
-  return n > 0 ? `일반 병상 ${n}석` : "일반 병상 여유 없음";
+  if (!stamp || nowMs - stampMs(stamp) > BED_STALE_MS) return "병상 정보 확인 필요 — 전화 확인";
+  return n > 0
+    ? `병원 입력 가용 병상 ${n}`
+    : "입력된 가용 병상 없음(0 이하) — 전화 확인";
 }
 
 // "20261102144832" → "11월 2일 14:48"

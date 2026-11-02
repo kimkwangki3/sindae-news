@@ -163,11 +163,15 @@ async function main() {
     assert.deepEqual(info.mergePlaces([[a, b], [a]]).map((p) => p.name), ["가", "나"]);
   });
 
-  test("응급실 병상 표시 — 음수는 여유 없음", () => {
-    assert.equal(info.bedLabel("-7"), "일반 병상 여유 없음");
-    assert.equal(info.bedLabel("0"), "일반 병상 여유 없음");
-    assert.equal(info.bedLabel("3"), "일반 병상 3석");
-    assert.equal(info.bedLabel(undefined), "병상 정보 없음");
+  test("응급실 병상 표시 — 단정하지 않고 낡은 값은 내린다", () => {
+    const stamp = "20261102144832"; // 2026-11-02 14:48 KST
+    const at = Date.parse("2026-11-02T06:00:00Z"); // 15:00 KST
+    const later = Date.parse("2026-11-02T07:00:00Z"); // 16:00 KST
+    assert.equal(info.bedLabel("-7", stamp, at), "입력된 가용 병상 없음(0 이하) — 전화 확인");
+    assert.equal(info.bedLabel("0", stamp, at), "입력된 가용 병상 없음(0 이하) — 전화 확인");
+    assert.equal(info.bedLabel("3", stamp, at), "병원 입력 가용 병상 3");
+    assert.equal(info.bedLabel("3", stamp, later), "병상 정보 확인 필요 — 전화 확인");
+    assert.equal(info.bedLabel(undefined, stamp, at), "병상 정보 없음");
     assert.equal(info.stampLabel("20261102144832"), "11월 2일 14:48");
   });
 

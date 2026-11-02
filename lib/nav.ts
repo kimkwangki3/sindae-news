@@ -43,7 +43,7 @@ export const CATEGORY_LINKS: CategoryLink[] = [
 
 // 실시간 공공데이터로 만드는 생활정보. 고정 안내(info_pages)보다 앞에 둔다.
 export const LIVE_INFO_PAGES = [
-  { slug: "pharmacy", icon: "💊", title: "지금 문 연 약국", summary: "해룡면 약국 영업시간과 전화번호" },
+  { slug: "pharmacy", icon: "💊", title: "해룡면 약국 영업시간", summary: "지금 영업시간 안인 곳과 전화번호" },
   { slug: "hospital", icon: "🏥", title: "병원·의원 진료시간", summary: "의원·치과·한의원 종별 안내" },
   { slug: "emergency", icon: "🚑", title: "순천 응급실", summary: "위치·전화번호·병상 현황" },
   { slug: "weather", icon: "🌤️", title: "해룡면 날씨", summary: "시간별 예보와 신대 미세먼지" },

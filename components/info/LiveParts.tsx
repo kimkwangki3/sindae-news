@@ -33,10 +33,12 @@ export function PlaceRow({
   place,
   day,
   open,
+  openLabel = "등록 영업시간 안",
 }: {
   place: Place;
   day: number;
   open: boolean;
+  openLabel?: string;
 }) {
   return (
     <li className="flex items-center gap-3 border-t border-line py-3 first:border-t-0">
@@ -45,7 +47,7 @@ export function PlaceRow({
           {place.name}
           {open && (
             <span className="ml-2 text-[15px] font-normal text-body-green">
-              영업시간 안
+              {openLabel}
             </span>
           )}
         </p>
@@ -56,7 +58,9 @@ export function PlaceRow({
           {DAY_LABEL[day]}요일 {hoursLabel(place, day)}
         </p>
         {place.note && (
-          <p className="text-[15px] leading-snug text-muted">{place.note}</p>
+          <p className="text-[15px] leading-snug text-muted">
+            기관 입력 비고: {place.note}
+          </p>
         )}
       </div>
       <CallButton tel={place.tel} />
@@ -105,7 +109,11 @@ export function SourceNote({ children }: { children: React.ReactNode }) {
         <Link href="/tips" className="underline">
           제보
         </Link>
-        로 알려 주세요.
+        로 알려 주세요. 기사 정정은{" "}
+        <Link href="/legal/correction" className="underline">
+          정정 안내
+        </Link>
+        를 봐 주세요.
       </p>
     </div>
   );

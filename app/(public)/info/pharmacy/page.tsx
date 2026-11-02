@@ -10,7 +10,7 @@ import { getPharmacies } from "@/lib/localinfo-data";
 import { clock, isHaeryong, isOpenAt, kstNow, DAY_LABEL } from "@/lib/localinfo";
 
 export const metadata = {
-  title: "해룡면 약국 — 지금 문 연 약국 · 해룡신문",
+  title: "해룡면 약국 영업시간 — 지금 영업시간 안인 곳 · 해룡신문",
   description:
     "순천시 해룡면 약국의 요일별 영업시간과 지금 영업시간 안에 있는 약국을 한곳에서 확인합니다. 신대·복성·선월지구 약국 전화번호 포함.",
   alternates: { canonical: "/info/pharmacy" },
@@ -53,11 +53,12 @@ export default async function PharmacyPage() {
         ‹ 생활정보
       </Link>
       <h1 className="mt-2 text-2xl leading-snug text-rose-deep">
-        해룡면 지금 문 연 약국
+        해룡면 약국 — 지금 영업시간 안인 곳
       </h1>
       <p className="mt-2 text-[18px] leading-relaxed text-muted">
-        {DAY_LABEL[day]}요일 {clock(hhmm)} 기준입니다. 등록된 영업시간으로 찾은
-        결과이며 실제와 다를 수 있으니, 가기 전에 전화로 확인해 주세요.
+        {DAY_LABEL[day]}요일 {clock(hhmm)} 기준으로 등록된 영업시간에서 찾은
+        결과입니다. 공휴일·임시 휴무는 반영되지 않으니 가기 전에 전화로 확인해
+        주세요.
       </p>
 
       {fail ? (

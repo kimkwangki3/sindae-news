@@ -35,6 +35,7 @@ export default function TodayBand({ today }: { today: TodaySummary }) {
   const w = today.weather.data;
   const a = today.air.data;
   return (
+    <>
     <section
       aria-label="오늘의 해룡"
       className="no-scrollbar flex overflow-x-auto border-b border-ink px-[18px] md:mx-7 md:grid md:grid-cols-5 md:overflow-visible md:px-0"
@@ -43,19 +44,19 @@ export default function TodayBand({ today }: { today: TodaySummary }) {
         href="/info/weather"
         label="해룡면 날씨"
         value={w ? `${w.sky} ${w.temp}°` : WAIT}
-        sub={w?.today ? `최저 ${w.today.min}° 최고 ${w.today.max}°` : "기상청"}
+        sub={w?.today ? `최저 ${w.today.min}° 최고 ${w.today.max}°` : "기상청 예보"}
       />
       <Cell
         href="/info/weather"
         label="미세먼지"
-        value={a ? (AIR_GRADE[a.pm10Grade ?? ""] ?? "측정 없음") : WAIT}
-        sub={a ? `초미세 ${AIR_GRADE[a.pm25Grade ?? ""] ?? "측정 없음"} · 신대` : "에어코리아"}
+        value={a ? (a.checking ? "장비 점검 중" : (AIR_GRADE[a.pm10Grade ?? ""] ?? "측정 없음")) : WAIT}
+        sub={a ? `초미세 ${AIR_GRADE[a.pm25Grade ?? ""] ?? "측정 없음"} · 신대 1시간` : "에어코리아"}
       />
       <Cell
         href="/info/pharmacy"
-        label="지금 문 연 약국"
+        label="영업시간 안 약국"
         value={today.openPharmacies === null ? WAIT : `해룡면 ${today.openPharmacies}곳`}
-        sub="등록된 영업시간 기준"
+        sub="공휴일 미반영·전화 확인"
       />
       <Cell
         href="/info/emergency"
@@ -70,5 +71,10 @@ export default function TodayBand({ today }: { today: TodaySummary }) {
         sub="음식물·종량제 안내"
       />
     </section>
+    {/* 공공누리 출처표시 조건. 값이 나가는 화면마다 밝힌다. */}
+    <p className="px-[18px] pt-1 text-[14px] text-muted md:px-7 md:text-right">
+      자료: 기상청 · 한국환경공단 에어코리아(실시간, 확정 전 수치) · 국립중앙의료원
+    </p>
+    </>
   );
 }

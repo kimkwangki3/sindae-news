@@ -29,12 +29,12 @@ export default async function WeatherPage() {
     {
       q: "오늘 해룡면 날씨는 어떤가요?",
       a: w
-        ? `${w.baseLabel} 기준 기온은 ${w.temp}도이고, 하늘은 ${w.sky}입니다.`
+        ? `${w.baseLabel} 기온은 ${w.temp}도입니다. 하늘 상태는 예보 기준 ${w.sky}입니다.`
         : "지금은 자료를 받지 못했습니다. 잠시 뒤 다시 확인해 주세요.",
     },
     {
       q: "해룡면 미세먼지는 어디 측정값인가요?",
-      a: "에어코리아 신대 측정소 값입니다. 실시간 자료라 나중에 확정값과 달라질 수 있습니다.",
+      a: "에어코리아 신대 측정소의 실시간 값입니다. 해룡면 전체를 대표하는 값은 아니며, 확정값과 달라질 수 있습니다.",
     },
   ];
 
@@ -55,7 +55,7 @@ export default async function WeatherPage() {
               {w?.temp}°
             </p>
             <p className="mt-2 text-[19px]">
-              {w?.sky}
+              예보 {w?.sky}
               {w?.today && ` · 최저 ${w.today.min}° 최고 ${w.today.max}°`}
             </p>
             <p className="mt-1 text-[17px] text-muted">
@@ -102,18 +102,20 @@ export default async function WeatherPage() {
           <div className="rounded-card border border-line bg-white p-4">
             <p className="text-[16px] text-muted">미세먼지</p>
             <p className="text-[22px] font-bold">
-              {AIR_GRADE[a?.pm10Grade ?? ""] ?? "측정 없음"}
+              {a?.checking ? "장비 점검 중" : (AIR_GRADE[a?.pm10Grade ?? ""] ?? "측정 없음")}
             </p>
             <p className="text-[16px] text-muted">{a?.pm10} ㎍/㎥</p>
           </div>
           <div className="rounded-card border border-line bg-white p-4">
             <p className="text-[16px] text-muted">초미세먼지</p>
             <p className="text-[22px] font-bold">
-              {AIR_GRADE[a?.pm25Grade ?? ""] ?? "측정 없음"}
+              {a?.checking ? "장비 점검 중" : (AIR_GRADE[a?.pm25Grade ?? ""] ?? "측정 없음")}
             </p>
             <p className="text-[16px] text-muted">{a?.pm25} ㎍/㎥</p>
           </div>
-          <p className="col-span-2 text-[16px] text-muted">{a?.dataTime} 기준</p>
+          <p className="col-span-2 text-[16px] text-muted">
+            {a?.dataTime} 기준 · 1시간 등급
+          </p>
         </div>
       )}
 
@@ -121,8 +123,18 @@ export default async function WeatherPage() {
 
       <SourceNote>
         <p>
-          자료: 기상청 단기예보, 한국환경공단 에어코리아. 에어코리아 값은 실시간
-          측정 자료로 확정 전 수치입니다.
+          자료: 기상청 단기예보 조회서비스(공공누리 제1유형), 한국환경공단
+          에어코리아 대기오염정보(공공누리 제3유형,{" "}
+          <a
+            href="https://www.airkorea.or.kr"
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            className="underline"
+          >
+            airkorea.or.kr
+          </a>
+          ). 에어코리아 값은 실시간 측정 자료로 확정 전 수치이며, 측정기 상태에 따라
+          달라질 수 있습니다.
         </p>
       </SourceNote>
     </div>
