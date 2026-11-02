@@ -1,5 +1,6 @@
 import { createAnonClient } from "@/lib/supabase/server";
 import { getInfoPages } from "@/lib/info";
+import { LIVE_INFO_PAGES } from "@/lib/nav";
 import { MEDIA } from "@/lib/media";
 
 // llms.txt — AI 검색이 이 매체가 무엇인지, 어디를 읽으면 되는지 한 번에 알게 하는
@@ -28,7 +29,7 @@ export async function GET(): Promise<Response> {
   const articles = ((data ?? []) as { slug: string; title: string }[]).map(
     (a) => `- [${a.title}](${u(`/article/${a.slug}`)})`,
   );
-  const info = (await getInfoPages()).map(
+  const info = [...LIVE_INFO_PAGES, ...(await getInfoPages())].map(
     (p) =>
       `- [${p.title}](${u(`/info/${p.slug}`)})${p.summary ? `: ${p.summary}` : ""}`,
   );

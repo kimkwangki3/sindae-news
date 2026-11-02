@@ -16,7 +16,10 @@ import {
   SubStories,
   TownBand,
 } from "@/components/home/FrontSections";
+import TodayBand from "@/components/home/TodayBand";
 import { MEDIA } from "@/lib/media";
+import { LIVE_INFO_PAGES } from "@/lib/nav";
+import { getTodaySummary } from "@/lib/localinfo-data";
 import { getFeaturedSurvey } from "@/lib/mock/surveys";
 import { remainingLabel } from "@/lib/surveys";
 import { getArticlesPage } from "@/lib/mock/articles";
@@ -46,9 +49,18 @@ const BLOCK_CATEGORIES: CategorySlug[] = ["local", "admin", "life"];
 const BLOCK_SIZE = 4;
 
 export default async function HomePage() {
-  const [front, survey, mostRead, infoPages, posts, businesses, ...categories] =
-    await Promise.all([
+  const [
+    front,
+    today,
+    survey,
+    mostRead,
+    infoPages,
+    posts,
+    businesses,
+    ...categories
+  ] = await Promise.all([
       getFrontPage(),
+      getTodaySummary(),
       getFeaturedSurvey(),
       getMostRead(),
       getInfoPages(),
@@ -83,6 +95,9 @@ export default async function HomePage() {
       {/* 화면의 제호는 그림과 링크라 문서 제목이 따로 필요하다. */}
       <h1 className="sr-only">{MEDIA.name} — 순천시 해룡면 지역 인터넷신문</h1>
       <CategoryNav />
+      <div className="mx-auto max-w-[1240px]">
+        <TodayBand today={today} />
+      </div>
 
       <div className="px-[18px] pb-6 md:px-7 md:pt-6">
         {/* 태블릿 2단, PC 3단. 휴대폰은 위에서 아래로 쌓인다. */}
@@ -168,7 +183,7 @@ export default async function HomePage() {
           <PhotoBand items={photos} />
           <CategoryBlocks blocks={blocks} />
           <AdSlot slot="home-mid" />
-          <LifeTiles pages={infoPages} />
+          <LifeTiles pages={[...LIVE_INFO_PAGES, ...infoPages]} />
           <TownBand
             survey={survey}
             posts={posts.slice(0, 3)}

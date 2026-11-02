@@ -28,6 +28,23 @@ async function main() {
     "lib/frontpage.ts",
   );
   const { isWidePath } = await load("lib/layout-paths.ts");
+  const info = await load("lib/localinfo.ts");
+  const MON_13 = Date.parse("2026-11-02T04:00:00Z"); // 월요일 13:00 KST
+  const MON_20 = Date.parse("2026-11-02T11:00:00Z"); // 월요일 20:00 KST
+  const SUN_13 = Date.parse("2026-11-08T04:00:00Z"); // 일요일 13:00 KST
+  // 2026-11-02 실제 응답의 가까운평화약국
+  const fields = {
+    hpid: "C2601161",
+    dutyName: "가까운평화약국",
+    dutyAddr: "전라남도 순천시 해룡면 순광로 234-9, 가동 1층 101호",
+    dutyEtc: "일요일 2,4주 휴무&#xD;\n",
+    dutyTime1s: "0930",
+    dutyTime1c: "1900",
+    dutyTime7s: "0930",
+    dutyTime7c: "1400",
+  };
+  const xml = `<item>${Object.entries(fields).map(([k, v]) => `<${k}>${v}</${k}>`).join("")}</item>`;
+  const place = info.toPlace(info.parseXmlItems(xml)[0]);
   const slugs = (list) => list.map((a) => a.slug);
 
   test("편성이 없으면 최신순으로 채운다", () => {
@@ -117,6 +134,58 @@ async function main() {
     assert.equal(shortTitleAfterTopChange("a", "b", "앞 기사 제목"), "");
     assert.equal(shortTitleAfterTopChange("a", null, "앞 기사 제목"), "");
     assert.equal(shortTitleAfterTopChange("a", "a", "그대로"), "그대로");
+  });
+
+  test("Encoding 키와 Decoding 키를 모두 받는다", () => {
+    assert.equal(info.normalizeKey(" a%2Bb%3D%3D "), "a+b==");
+    assert.equal(info.normalizeKey("a+b=="), "a+b==");
+  });
+
+  test("약국 응답을 읽고 영업 여부를 판정한다", () => {
+    assert.equal(place.note, "일요일 2,4주 휴무");
+    assert.equal(info.isHaeryong(place), true);
+    assert.equal(info.isOpenAt(place, MON_13), true);
+    assert.equal(info.isOpenAt(place, MON_20), false);
+    assert.equal(info.isOpenAt(place, SUN_13), true);
+    assert.equal(info.hoursLabel(place, 2), "등록된 시간 없음");
+  });
+
+  test("자정을 넘겨 여는 곳", () => {
+    const late = { hours: [null, null, null, null, null, null, null, { open: 1800, close: 2600 }, null] };
+    assert.equal(info.isOpenAt(late, Date.parse("2026-11-08T16:00:00Z")), true); // 월 01:00
+    assert.equal(info.isOpenAt(late, Date.parse("2026-11-08T18:00:00Z")), false); // 월 03:00
+    assert.equal(info.clock(2600), "다음날 02:00");
+  });
+
+  test("두 시도명에 나뉜 자료를 합친다", () => {
+    const a = { id: "1", name: "나" };
+    const b = { id: "2", name: "가" };
+    assert.deepEqual(info.mergePlaces([[a, b], [a]]).map((p) => p.name), ["가", "나"]);
+  });
+
+  test("응급실 병상 표시 — 음수는 여유 없음", () => {
+    assert.equal(info.bedLabel("-7"), "일반 병상 여유 없음");
+    assert.equal(info.bedLabel("0"), "일반 병상 여유 없음");
+    assert.equal(info.bedLabel("3"), "일반 병상 3석");
+    assert.equal(info.bedLabel(undefined), "병상 정보 없음");
+    assert.equal(info.stampLabel("20261102144832"), "11월 2일 14:48");
+  });
+
+  test("날씨 해석과 발표 시각", () => {
+    assert.equal(info.skyLabel("1", "0"), "맑음");
+    assert.equal(info.skyLabel("4", "1"), "비");
+    assert.deepEqual(info.ncstBase(Date.parse("2026-11-02T05:10:00Z")), { date: "20261102", time: "1300" });
+    assert.deepEqual(info.fcstBase(Date.parse("2026-11-02T05:30:00Z")), { date: "20261102", time: "1400" });
+    assert.deepEqual(info.fcstBase(Date.parse("2026-11-01T16:30:00Z")), { date: "20261101", time: "2300" });
+    assert.deepEqual(info.fcstBase(Date.parse("2026-11-01T17:30:00Z")), { date: "20261102", time: "0200" });
+    assert.deepEqual(info.dayRangeBase(Date.parse("2026-11-02T05:30:00Z")), { date: "20261102", time: "0200" });
+  });
+
+  test("실패 사유는 조치 필요와 기다림을 가른다", () => {
+    assert.equal(info.explainFailure({ missingKey: true }).needsAction, true);
+    assert.equal(info.explainFailure({ status: 403 }).needsAction, true);
+    assert.equal(info.explainFailure({ code: "22" }).needsAction, false);
+    assert.equal(info.explainFailure({ timedOut: true }).needsAction, false);
   });
 
   test("넓은 지면을 쓰는 주소", () => {

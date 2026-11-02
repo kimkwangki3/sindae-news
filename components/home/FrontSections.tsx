@@ -3,7 +3,6 @@ import Image from "next/image";
 import Thumb from "@/components/Thumb";
 import type { ArticleSummary } from "@/components/ArticleListItem";
 import type { FrontArticle } from "@/lib/frontpage-data";
-import type { InfoPage } from "@/lib/info";
 import type { BoardPost } from "@/lib/mock/community";
 import type { Business } from "@/lib/mock/district";
 import { CATEGORY_NAME, type CategorySlug } from "@/lib/mock/articles-meta";
@@ -206,7 +205,11 @@ export function CategoryBlocks({
   );
 }
 
-export function LifeTiles({ pages }: { pages: InfoPage[] }) {
+export function LifeTiles({
+  pages,
+}: {
+  pages: { slug: string; title: string; summary: string | null }[];
+}) {
   if (pages.length === 0) return null;
   return (
     <section className={BAND}>
@@ -216,7 +219,7 @@ export function LifeTiles({ pages }: { pages: InfoPage[] }) {
           전체 보기
         </Link>
       </h2>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         {pages.map((p) => (
           <Link
             key={p.slug}

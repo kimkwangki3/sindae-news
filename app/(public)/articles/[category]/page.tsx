@@ -51,7 +51,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-10 lg:px-7 lg:pt-3">
       <div className="min-w-0 md:px-7 lg:px-0">
       <CategoryChips />
-      <div className="px-[18px] pb-6">
+      <div className="px-[18px] pb-6 md:px-0">
         <h1 className="py-2 text-[22px] text-rose-deep">
           {CATEGORY_NAME[category]}
         </h1>

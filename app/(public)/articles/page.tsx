@@ -44,7 +44,7 @@ export default async function ArticlesPage({ searchParams }: Props) {
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-10 lg:px-7 lg:pt-3">
       <div className="min-w-0 md:px-7 lg:px-0">
       <CategoryChips />
-      <div className="px-[18px] pb-6">
+      <div className="px-[18px] pb-6 md:px-0">
         <AdSlot slot="articles-top" />
         {items.map((a, i) => (
           <Fragment key={a.slug}>

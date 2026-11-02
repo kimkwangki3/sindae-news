@@ -29,6 +29,11 @@
 
   body {
     @apply bg-ivory text-ink font-sans antialiased;
+
+    /* 한글이 단어 중간에서 끊기지 않게 한다('안내'가 '안/내'로 갈리던 것).
+       칸보다 긴 주소 같은 덩어리는 넘치지 않고 그때만 끊긴다. */
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
 
   h1,
@@ -36,6 +41,8 @@
   h3,
   h4 {
     @apply font-serif;
+    /* 마지막 줄에 한 단어만 남는 일을 줄인다. */
+    text-wrap: pretty;
   }
 }
 

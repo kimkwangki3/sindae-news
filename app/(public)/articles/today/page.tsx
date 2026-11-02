@@ -16,9 +16,9 @@ export default async function TodayPage() {
   const { items, date, isToday } = await getTodayArticles();
 
   return (
-    <>
+    <div className="md:px-7">
       <CategoryChips />
-      <div className="px-[18px] pb-6">
+      <div className="px-[18px] pb-6 md:px-0">
         <div className="py-2">
           <h1 className="text-[22px] text-rose-deep">금일 뉴스</h1>
           <p className="mt-1 text-xs text-muted">
@@ -44,6 +44,6 @@ export default async function TodayPage() {
           </Link>
         </div>
       </div>
-    </>
+    </div>
   );
 }

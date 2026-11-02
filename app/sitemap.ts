@@ -7,6 +7,7 @@ import { LEGAL_LINKS } from "@/lib/legal";
 import { FEATURES } from "@/lib/features";
 import { STAFF } from "@/lib/staff";
 import { getInfoPages } from "@/lib/info";
+import { LIVE_INFO_PAGES } from "@/lib/nav";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -32,6 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/board",
     "/haeryong",
     "/info",
+    ...LIVE_INFO_PAGES.map((p) => `/info/${p.slug}`),
     "/tips",
     ...(FEATURES.recruit ? ["/recruit"] : []),
     "/reporters",

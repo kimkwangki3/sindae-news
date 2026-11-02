@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { getInfoPages, fmtUpdated } from "@/lib/info";
+import { LIVE_INFO_PAGES } from "@/lib/nav";
 
 export const metadata = {
   title: "생활정보 · 해룡신문",
   description:
-    "해룡면 신대·복성·선월지구 생활정보 — 버스 시간표, 야간·휴일 병원과 약국, 재활용 배출 요일, 어린이집·학원, 민원 안내.",
+    "해룡면 신대·복성·선월지구 생활정보 — 지금 문 연 약국, 병원 진료시간, 응급실, 날씨와 미세먼지, 쓰레기 배출 요일, 민원 안내.",
   alternates: { canonical: "/info" },
 };
 
@@ -22,6 +23,27 @@ export default async function InfoPage() {
         해룡면에 사는 데 필요한 것들을 모아 두고 계속 갱신합니다.
       </p>
 
+      <ul className="mt-6 flex flex-col gap-2.5 md:grid md:grid-cols-2 lg:grid-cols-4">
+        {LIVE_INFO_PAGES.map((p) => (
+          <li key={p.slug}>
+            <Link
+              href={`/info/${p.slug}`}
+              className="flex h-full min-h-[72px] items-center gap-3.5 rounded-card border border-rose bg-rose-soft px-4 py-3"
+            >
+              <span className="text-2xl" aria-hidden>
+                {p.icon}
+              </span>
+              <span className="flex flex-col gap-0.5">
+                <span className="text-[20px] font-bold text-ink">{p.title}</span>
+                <span className="text-[17px] leading-relaxed text-muted">
+                  {p.summary}
+                </span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+
       {pages.length === 0 ? (
         <p className="mt-8 rounded-card border border-line bg-ivory-2 p-5 text-center text-[18px] leading-relaxed text-muted">
           준비 중입니다.
@@ -29,12 +51,12 @@ export default async function InfoPage() {
           버스 시간표·야간 약국·재활용 배출 요일부터 차례로 올립니다.
         </p>
       ) : (
-        <ul className="mt-6 flex flex-col gap-2.5 md:grid md:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-2.5 flex flex-col gap-2.5 md:grid md:grid-cols-2 lg:grid-cols-4">
           {pages.map((p) => (
             <li key={p.slug}>
               <Link
                 href={`/info/${p.slug}`}
-                className="flex min-h-[72px] items-center gap-3.5 rounded-card border border-line bg-white px-4 py-3"
+                className="flex h-full min-h-[72px] items-center gap-3.5 rounded-card border border-line bg-white px-4 py-3"
               >
                 <span className="text-2xl" aria-hidden>
                   {p.icon ?? "📄"}
